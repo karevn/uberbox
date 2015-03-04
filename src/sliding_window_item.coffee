@@ -16,13 +16,7 @@ class Uberbox.SlidingWindowItem extends Marionette.ItemView
 		setTimeout((=>@remove()), 600)
 	fadeIn: ->
 		@$el.addClass('uberbox-visible')
-		setTimeout((=> @$el.addClass('uberbox-enable-transition')), 300)
-	flyOutPrev: ->
-		@$el.addClass('uberbox-fled-prev').removeClass('uberbox-visible')
-		setTimeout((=>@remove()), 600)
-	flyOutNext: ->
-		@$el.addClass('uberbox-fled-next').removeClass('uberbox-visible')
-		setTimeout((=>@remove()), 600)
+
 
 	layoutAsCurrent: ->
 		if @getOrientation() == 'vertical'
@@ -36,8 +30,19 @@ class Uberbox.SlidingWindowItem extends Marionette.ItemView
 			@top = @padding
 			@width = @getCurrentHorizontalWidth()
 			@height = @$el.parent().height() - @padding * 2
-		@applyRect()
-	applyRect: -> @$el.css(left: @left, top: @top, width: @width, height: @height)
+		unless @$el.hasClass('uberbox-visible')
+			@applyLayout()
+			@fadeIn()
+			_.defer =>
+
+				_.defer =>
+					@$el.addClass('uberbox-enable-transition')
+
+		else
+			@applyLayout()
+
+	applyLayout: ->
+		_.defer => @$el.css(left: @left, top: @top, width: @width, height: @height)
 	layoutAsNext: ->
 		prev = @getOption('prev')
 		if @getOrientation() == 'vertical'
@@ -45,12 +50,34 @@ class Uberbox.SlidingWindowItem extends Marionette.ItemView
 			@top =  @padding + prev.top  + prev.height
 			@height = @getVerticalHeight(prev)
 			@width = @$el.parent().width() - @padding * 2
+			unless @$el.hasClass('uberbox-visible')
+				@applyLayout()
+				if @belongs()
+					@fadeIn()
+				else
+					@$el.css('top', @top + @height)
+					_.defer =>
+						@$el.addClass('uberbox-enable-transition')
+						@fadeIn()
+			else
+				@applyLayout()
 		else
 			@left = prev.left + prev.width + @padding
 			@top = @padding
 			@width = @getHorizontalWidth(prev)
 			@height = @$el.parent().height() - @padding * 2
-		@applyRect()
+			unless @$el.hasClass('uberbox-visible')
+				@applyLayout()
+				if @belongs()
+					@fadeIn()
+				else
+					@$el.css('left', @left + @width)
+					_.defer =>
+						@$el.addClass('uberbox-enable-transition')
+						@fadeIn()
+			else
+				@applyLayout()
+
 	layoutAsPrev: ->
 		next = @getOption('next')
 		if @getOrientation() == 'vertical'
@@ -58,12 +85,33 @@ class Uberbox.SlidingWindowItem extends Marionette.ItemView
 			@top = next.top - @padding - @getVerticalHeight(next)
 			@height = @getVerticalHeight(next)
 			@width = @$el.parent().width() - @padding * 2
+			unless @$el.hasClass('uberbox-visible')
+				@applyLayout()
+				if @belongs()
+					@fadeIn()
+				else
+					@$el.css('top', @top - @height)
+					_.defer =>
+						@$el.addClass('uberbox-enable-transition')
+						@fadeIn()
+			else
+				@applyLayout()
 		else
 			@left = next.left - @getHorizontalWidth(next) - @padding
 			@top = @padding
 			@width = @getHorizontalWidth(next)
 			@height = @$el.parent().height() - @padding * 2
-		@applyRect()
+			unless @$el.hasClass('uberbox-visible')
+				@applyLayout()
+				if @belongs()
+					@fadeIn()
+				else
+					@$el.css('left', @left - @width)
+					_.defer =>
+						@$el.addClass('uberbox-enable-transition')
+						@fadeIn()
+			else
+				@applyLayout()
 
 
 

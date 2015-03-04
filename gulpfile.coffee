@@ -10,6 +10,7 @@ uglify = require('gulp-uglify')
 watch  = require('gulp-watch')
 wrap   = require('gulp-wrap')
 sourcemaps = require('gulp-sourcemaps')
+beautify = require('gulp-jsbeautifier')
 
 fs = require('fs')
 
@@ -32,10 +33,11 @@ sources = [
 
 gulp.task 'build', ->
 	uberbox = gulp.src(sources)
-	.pipe(concat('uberbox.js'))
 	.pipe(coffee(bare: true).on('error', util.log))
-	.pipe(wrap({ src: 'exports.js'}))
+	.pipe(concat('uberbox.js'))
+	.pipe(wrap({ src: 'exports.js.template'}))
 	.pipe(header(banner()))
+	.pipe(beautify())
 	.pipe(gulp.dest('dist'))
 
 	uberboxMin = uberbox.pipe(concat('uberbox.min.js'))

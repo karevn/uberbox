@@ -35,8 +35,7 @@ class Uberbox.SlidingWindow extends Marionette.View
 
 	buildFromScratch: (item)->
 		@currentItemView = @createChildView(item)
-		@currentItemView.layoutAsCurrent()
-		@currentItemView.fadeIn()
+		@currentItemView.layoutAsCurrent(true)
 		@layoutNextItems(@currentItemView)
 		@layoutPrevItems(@currentItemView)
 	slideNext: ->
@@ -60,9 +59,7 @@ class Uberbox.SlidingWindow extends Marionette.View
 			view = @createChildView(prev.model.next(), prev: prev)
 			prev.options.next = view
 			view.options.prev = prev
-			view.fadeIn()
-			view.layoutAsNext()
-
+			view.layoutAsNext(true)
 			return @layoutNextItems(view)
 		else
 			if prev.getOption('next')
@@ -78,8 +75,7 @@ class Uberbox.SlidingWindow extends Marionette.View
 			view = @createChildView(next.model.prev(), next: next)
 			next.options.prev = view
 			view.options.next = next
-			view.layoutAsPrev()
-			view.fadeIn()
+			view.layoutAsPrev(true)
 			return @layoutPrevItems(view)
 		else
 			if next.getOption('prev')

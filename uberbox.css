@@ -40,15 +40,11 @@
     opacity: 0;
     position: absolute;
     background: #ccc;
-    left: 10%;
-    right: 10%;
-    top: 10%;
-    bottom: 10%;
     transition: opacity 0.3s; }
     .uberbox .uberbox-lightbox-item.uberbox-visible {
       opacity: 1; }
     .uberbox .uberbox-lightbox-item.uberbox-enable-transition {
-      transition: left 0.3s, top 0.3s, width 0.3s, height 0.3s; }
+      transition: opacity 0.3s, left 0.3s, top 0.3s, width 0.3s, height 0.3s; }
     .uberbox .uberbox-lightbox-item img {
       display: block;
       height: 100%; }
@@ -67,8 +63,7 @@
       opacity: 0;
       position: absolute;
       transition: opacity 0.3s;
-      transition: left 0.3s, top 0.3s, width 0.3s, height 0.3s;
-        transition-transition: left 0.3s, top 0.3s, width 0.3s, height 0.3s; }
+      transition: opacity 0.3s, left 0.3s, top 0.3s, width 0.3s, height 0.3s; }
       .uberbox .uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-visible {
         opacity: 1; }
     .uberbox .uberbox-carousel-wrapper img {
