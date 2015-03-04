@@ -12,6 +12,12 @@
 		opacity: 1
 
 .uberbox
+	position: fixed
+	left: 0
+	top: 0
+	width: 100%
+	height: 100%
+	z-index: 100001
 	.uberbox-lightbox-wrapper
 		position: fixed
 		z-index: 100001
@@ -32,16 +38,19 @@
 		bottom: 150px
 	.uberbox-lightbox-item
 		opacity: 0
-
 		position: absolute
-
 		background: #ccc
 		left: 10%
 		right: 10%
 		top: 10%
 		bottom: 10%
+		transition: opacity 0.3s
 		&.uberbox-visible
 			opacity: 1
+
+		&.uberbox-enable-transition
+			transition: left 0.3s, top 0.3s, width 0.3s, height 0.3s
+
 		img
 			display: block
 			height: 100%
@@ -50,6 +59,26 @@
 		background: #red
 		position: fixed
 		z-index: 100001
+		.uberbox-carousel-content
+			width: 100%
+			height: 100%
+			position: absolute
+			left: 0
+			top: 0
+			background: red
+		.uberbox-carousel-item
+			opacity: 0
+			position: absolute
+			transition: opacity 0.3s
+			&.uberbox-visible
+				opacity: 1
+			&.uberbox-enable-transition
+			transition: left 0.3s, top 0.3s, width 0.3s, height 0.3s
+				transition: left 0.3s, top 0.3s, width 0.3s, height 0.3s
+		img
+			display: block
+			height: 100%
+			width: 100%
 	&.uberbox-vertical
 		.uberbox-carousel-wrapper
 			right: 30px
