@@ -11,7 +11,12 @@ class Uberbox extends Marionette.LayoutView
 		Uberbox
 
 	@show: (items, options = {})->
-		options = _.extend({current: 0, orientation: 'vertical', collection: new Uberbox.ItemCollection(items)}, options)
+		options = _.extend({
+			current: 0
+			orientation: 'vertical'
+			collection: new Uberbox.ItemCollection(items)
+			carousel: false
+		}, options)
 		return unless items and items.length > 0
 		@instances.push uberbox = new Uberbox(options)
 		uberbox
@@ -30,7 +35,9 @@ class Uberbox extends Marionette.LayoutView
 		lightboxOptions = _.clone(@options)
 		delete lightboxOptions.el
 		@lightbox.show(new Uberbox.Lightbox(lightboxOptions))
-		@carousel.show(new Uberbox.Carousel(lightboxOptions))
+		if @getOption('carousel')
+			@$el.addClass('uberbox-has-carousel')
+			@carousel.show(new Uberbox.Carousel(lightboxOptions))
 		jQuery('body').on 'keydown.uberbox', @onKeyDown
 	remove: ->
 		super
