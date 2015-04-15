@@ -1,5 +1,4 @@
 (function(root, factory) {
-
 	// Start with AMD.
 	if (typeof define === 'function' && define.amd) {
 		define(['underscore', 'jquery', 'backbone', 'backbone.marionette'], function(_, $, backbone, marionette) {
@@ -23,5 +22,8 @@
 
 }(this, function(root, _, jQuery, Backbone, Marionette) {
 	<%= contents %>
+	if (root.Uberbox){
+		Uberbox.Templates = root.Uberbox.Templates;
+	}
 	return Uberbox;
 }));

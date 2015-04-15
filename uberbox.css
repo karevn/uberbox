@@ -1,88 +1,41 @@
-.uberbox-overlay {
-  background: rgba(0, 0, 0, 0.7);
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: all 0.6s;
-  z-index: 100000; }
-  .uberbox-overlay.visible {
-    opacity: 1; }
+/*
+Error: The line was indented 2 levels deeper than the previous line.
+        on line 139 of uberbox.sass
 
-.uberbox {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100001; }
-  .uberbox .uberbox-lightbox-wrapper {
-    position: fixed;
-    z-index: 100001;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
-    top: 0px;
-    overflow: hidden; }
-    .uberbox .uberbox-lightbox-wrapper .uberbox-lightbox-content {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      left: 0;
-      top: 0; }
-  .uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-lightbox-wrapper {
-    right: 180px; }
-  .uberbox.uberbox-horizontal.uberbox-has-carousel .uberbox-lightbox-wrapper {
-    bottom: 150px; }
-  .uberbox .uberbox-lightbox-item {
-    opacity: 0;
-    position: absolute;
-    background: #ccc;
-    transition: opacity 0.3s; }
-    .uberbox .uberbox-lightbox-item.uberbox-visible {
-      opacity: 1; }
-    .uberbox .uberbox-lightbox-item.uberbox-enable-transition {
-      transition: opacity 0.3s, left 0.3s, top 0.3s, width 0.3s, height 0.3s; }
-    .uberbox .uberbox-lightbox-item img {
-      display: block;
-      height: 100%; }
-  .uberbox .uberbox-carousel-wrapper {
-    background: #red;
-    position: fixed;
-    z-index: 100001; }
-    .uberbox .uberbox-carousel-wrapper .uberbox-carousel-content {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      left: 0;
-      top: 0;
-      background: red; }
-    .uberbox .uberbox-carousel-wrapper .uberbox-carousel-item {
-      opacity: 0;
-      position: absolute;
-      transition: opacity 0.3s;
-      transition: opacity 0.3s, left 0.3s, top 0.3s, width 0.3s, height 0.3s; }
-      .uberbox .uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-visible {
-        opacity: 1; }
-    .uberbox .uberbox-carousel-wrapper img {
-      display: block;
-      height: 100%;
-      width: 100%; }
-  .uberbox.uberbox-vertical .uberbox-carousel-wrapper {
-    right: 30px;
-    bottom: 50px;
-    top: 50px;
-    width: 150px; }
-  .uberbox.uberbox-vertical .uberbox-lightbox-item.uberbox-fled-prev {
-    top: -100%; }
-  .uberbox.uberbox-vertical .uberbox-lightbox-item.uberbox-fled-next {
-    top: 100%; }
-  .uberbox.uberbox-horizontal .uberbox-carousel-wrapper {
-    left: 0px;
-    bottom: 30px;
-    height: 100px;
-    right: 0px; }
+134: 				img
+135: 					opacity: 1
+136: 	
+137: 	&.uberbox-vertical
+138: 		&.uberbox-has-carousel .uberbox-lightbox-wrapper
+139: 				right: 150px
+140: 		.uberbox-lightbox-item
+141: 			left: 30px
+142: 			right: 30px
+143: 			top: 90px
+144: 			bottom: 90px
 
-/*# sourceMappingURL=uberbox.css.map */
+Backtrace:
+uberbox.sass:139
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/engine.rb:509:in `tree'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/engine.rb:513:in `tree'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/engine.rb:513:in `tree'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/engine.rb:396:in `_to_tree'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/engine.rb:368:in `_render_with_sourcemap'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/engine.rb:285:in `render_with_sourcemap'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:490:in `update_stylesheet'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:209:in `each'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/plugin.rb:82:in `update_stylesheets'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/exec/sass_scss.rb:361:in `watch_or_update'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/exec/sass_scss.rb:51:in `process_result'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/exec/base.rb:52:in `parse'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/lib/sass/exec/base.rb:19:in `parse!'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.4.13/bin/sass:13:in `<top (required)>'
+/usr/bin/sass:23:in `load'
+/usr/bin/sass:23:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Error: The line was indented 2 levels deeper than the previous line.\A         on line 139 of uberbox.sass\A \A 134: 				img\A 135: 					opacity: 1\A 136: 	\A 137: 	&.uberbox-vertical\A 138: 		&.uberbox-has-carousel .uberbox-lightbox-wrapper\A 139: 				right: 150px\A 140: 		.uberbox-lightbox-item\A 141: 			left: 30px\A 142: 			right: 30px\A 143: 			top: 90px\A 144: 			bottom: 90px"; }

@@ -1,0 +1,42 @@
+<div class="uberbox-lightbox-actions">
+	<button data-action="close"><i class="uberbox-icon-close"></i></button>
+	<% if (Uberbox.Utils.supportsFullScreen()) { %>
+		<button data-action="fullscreen">
+			<i class="uberbox-icon-fullscreen"></i>
+			<span class="uberbox-tooltip"><%= obj.model.get('fullscreen_tooltip' )%></span>
+		</button>
+		<button data-action="exit-fullscreen" disabled="disabled">
+			<i class="uberbox-icon-exit-fullscreen"></i>
+			<span class="uberbox-tooltip"><%= obj.model.get('exit_fullscreen_tooltip' )%></span>
+		</button>
+	<% } %>
+	
+	<% if (obj.model.get('download_url')) { %>
+		<a data-action="download" href="<%= obj.model.get('download_url') %>" target="_blank">
+			<i class="uberbox-icon-download"></i>
+			<span class="uberbox-tooltip"><%= obj.model.get('download_tooltip') %></span>
+		</a>
+	<% } %>
+	<% if (services = obj.model.get('share')) { %>
+		<button data-action="share">
+			<i class="uberbox-icon-share"></i>
+			<span class="uberbox-tooltip"><%= obj.model.get('share_tooltip') %></span>
+			<div class="uberbox-share-menu">
+				<% for (service in services) { %>
+					<% service = services[service] %>
+					<a target="_blank" class="uberbox-share-link" href="<%= service.getShareLinkUrl() %>" > 
+							<% if (service.get('image')) { %>
+								<img src="<%= service.get('image') %>" alt="">
+							<% } else { %>
+								<i class="uberbox-icon-<%= service.get('slug') %>"></i>
+							<% } %>
+							
+							<% if (service.get('name')) { %>
+								<%= service.get('name') %>
+							<% } %>
+					</a>
+				<% } %>
+			</div>
+		</button>
+	<% } %>
+</div>
