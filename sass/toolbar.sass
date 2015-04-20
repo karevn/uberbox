@@ -1,0 +1,116 @@
+.uberbox-toolbar-wrapper
+	position: fixed
+	left: 0
+	top: 0
+	z-index: 100005
+.uberbox-toolbar
+	position: fixed
+	padding: 0
+	z-index: 100005
+	height: 42px
+	margin-top: -42px
+	opacity: 0
+	transition: opacity 0.3s
+	&.uberbox-visible
+		opacity: 1
+	a[data-action], button[data-action]
+		position: relative
+		float: right
+		font-size: 15px
+		border: none
+		line-height: 1
+		padding: 0
+		margin: 0 0 0 18px
+		background: transparent
+		color: white
+		text-decoration: none
+		color: #aaa
+		line-height: 40px
+		transition: color 0.3s
+		&:disabled
+			display: none
+		&:active
+			box-shadow: none
+			outline: none
+		&[data-action="close"]
+			opacity: 1
+			color: white
+		&:hover 
+			color: white
+			.uberbox-tooltip
+				opacity: 1
+.uberbox-share-menu
+	position: absolute
+	top: 100%
+	right: -40px
+	background: white
+	z-index: 6
+	width: 200px
+	text-align: left
+	border-radius: 3px
+	transition: opacity 0.3s
+	&:after
+		position: absolute
+		top: -6px
+		right: 43px
+		display: block
+		content: ''
+		border-left: 6px solid transparent
+		border-right: 6px solid transparent
+		border-bottom: 6px solid white
+	a
+		display: block
+		line-height: 24px
+		font-size: 13px
+		padding: 3px 18px 3px 9px
+		text-decoration: none
+		color: #444
+		transition: background-color 0.3s
+		i
+			font-size: 16px
+			margin-right: 0.75em
+		&:hover
+			background: #eee
+.uberbox-toolbar button[data-action=share] 
+	.uberbox-share-menu
+		display: none
+		opacity: 0
+	&.uberbox-active 
+		.uberbox-share-overlay
+			position: fixed
+			left: 0
+			right: 0
+			top: 0
+			bottom: 0
+			background: black
+			opacity: 0.3
+			cursor: default
+			z-index: 5
+		.uberbox-share-menu
+			display: block
+			&.uberbox-active
+				opacity: 1
+.uberbox-tooltip
+	position: absolute
+	left: 50%
+	bottom: 4px
+	font-size: 12px
+	color: white
+	line-height: 18px
+	transform: translate(-50%, 100%)
+	opacity: 0
+	background: #333
+	border-radius: 2px
+	padding: 3px 9px
+	transition: opacity 0.3s
+	white-space: nowrap
+	&:after
+		display: block
+		content: ''
+		border-left: 3px solid transparent
+		border-right: 3px solid transparent
+		border-bottom: 3px solid #333
+		position: absolute
+		left: 50%
+		margin-left: -3px
+		top: -3px

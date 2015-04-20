@@ -81,7 +81,7 @@ gulp.task 'css', ->
 gulp.task 'build', ['js', 'css']
 gulp.task 'watch', -> 
 	gulp.watch(['src/*.coffee', 'templates/*.html', 'exports.js.template'], ['js'])
-	gulp.watch(['*.sass'], ['css'])
+	gulp.watch(['*.sass', 'sass/*.sass'], ['css'])
 gulp.task 'default', ['build', 'watch']
 
 

@@ -7,7 +7,6 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 	regions:
 		object: '.uberbox-item-object'
 		description: '.uberbox-item-description'
-		toolbar: '.uberbox-toolbar-wrapper'
 	ui:
 		content: '> .uberbox-lightbox-item-content'
 		description: '.uberbox-item-description'
@@ -33,7 +32,16 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			@layoutWithMiniDescription()
 		else if @model.get('description_style') == 'bottom'
 			@layoutWithDescriptionAtBottom()
-		
+	getOffset: ->
+		offset = jQuery(@$el).offset()
+		if @model.get('description_style') == 'bottom' || @model.get('description_style') == 'mini'
+			left = @object.currentView.$el.offset().left
+			return left: left, top: @object.currentView.$el.offset().top
+		@object.currentView.$el.offset()
+	getWidth: ->
+		if @model.get('description_style') == 'bottom' || @model.get('description_style') == 'mini'
+			return @object.currentView.$el.width()
+		@object.currentView.$el.width() + @ui.description.outerWidth()
 	layoutWithDescriptionAtBottom: ->
 		unless @object.currentView.supportsOversizing
 			@$el.addClass('uberbox-fit-height')
@@ -102,8 +110,6 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		else
 			@trigger 'load'
 			@showContent()
-		@toolbar.show new Uberbox.ToolbarView(model: @model)
-		@listenTo @toolbar.currentView, 'close', => @remove()
 	layoutAsCurrent: ->
 		@$el.css(transform: '')
 		@layout()
@@ -139,8 +145,6 @@ class Uberbox.HorizontalLightboxItem extends Uberbox.LightboxItem
 		@layout()
 	
 class Uberbox.Lightbox extends Uberbox.SlidingWindow
-	defaults: -> _.extend super, 
-		toolbar: true
 	className: 'uberbox-lightbox-content'
 	template: -> Uberbox.Templates['lightbox-content']
 	ui:

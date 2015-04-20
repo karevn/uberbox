@@ -649,17 +649,29 @@
     overflow: hidden;
 }
 
-.uberbox .uberbox-toolbar-wrapper {
-    position: absolute;
-    top: -42px;
-    right: 0;
+.uberbox-toolbar-wrapper {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100005;
+}
+
+.uberbox-toolbar {
+    position: fixed;
     padding: 0;
     z-index: 100005;
     height: 42px;
-    width: 100%;
+    margin-top: -42px;
+    opacity: 0;
+    -webkit-transition: opacity 0.3s;
+    transition: opacity 0.3s;
 }
 
-.uberbox .uberbox-toolbar-wrapper a[data-action], .uberbox .uberbox-toolbar-wrapper button[data-action] {
+.uberbox-toolbar.uberbox-visible {
+    opacity: 1;
+}
+
+.uberbox-toolbar a[data-action], .uberbox-toolbar button[data-action] {
     position: relative;
     float: right;
     font-size: 15px;
@@ -676,29 +688,29 @@
     transition: color 0.3s;
 }
 
-.uberbox .uberbox-toolbar-wrapper a[data-action]:disabled, .uberbox .uberbox-toolbar-wrapper button[data-action]:disabled {
+.uberbox-toolbar a[data-action]:disabled, .uberbox-toolbar button[data-action]:disabled {
     display: none;
 }
 
-.uberbox .uberbox-toolbar-wrapper a[data-action]:active, .uberbox .uberbox-toolbar-wrapper button[data-action]:active {
+.uberbox-toolbar a[data-action]:active, .uberbox-toolbar button[data-action]:active {
     box-shadow: none;
     outline: none;
 }
 
-.uberbox .uberbox-toolbar-wrapper a[data-action][data-action="close"], .uberbox .uberbox-toolbar-wrapper button[data-action][data-action="close"] {
+.uberbox-toolbar a[data-action][data-action="close"], .uberbox-toolbar button[data-action][data-action="close"] {
     opacity: 1;
     color: white;
 }
 
-.uberbox .uberbox-toolbar-wrapper a[data-action]:hover, .uberbox .uberbox-toolbar-wrapper button[data-action]:hover {
+.uberbox-toolbar a[data-action]:hover, .uberbox-toolbar button[data-action]:hover {
     color: white;
 }
 
-.uberbox .uberbox-toolbar-wrapper a[data-action]:hover .uberbox-tooltip, .uberbox .uberbox-toolbar-wrapper button[data-action]:hover .uberbox-tooltip {
+.uberbox-toolbar a[data-action]:hover .uberbox-tooltip, .uberbox-toolbar button[data-action]:hover .uberbox-tooltip {
     opacity: 1;
 }
 
-.uberbox .uberbox-share-menu {
+.uberbox-share-menu {
     position: absolute;
     top: 100%;
     right: -40px;
@@ -711,7 +723,7 @@
     transition: opacity 0.3s;
 }
 
-.uberbox .uberbox-share-menu:after {
+.uberbox-share-menu:after {
     position: absolute;
     top: -6px;
     right: 43px;
@@ -722,7 +734,7 @@
     border-bottom: 6px solid white;
 }
 
-.uberbox .uberbox-share-menu a {
+.uberbox-share-menu a {
     display: block;
     line-height: 24px;
     font-size: 13px;
@@ -733,21 +745,21 @@
     transition: background-color 0.3s;
 }
 
-.uberbox .uberbox-share-menu a i {
+.uberbox-share-menu a i {
     font-size: 16px;
     margin-right: 0.75em;
 }
 
-.uberbox .uberbox-share-menu a:hover {
+.uberbox-share-menu a:hover {
     background: #eee;
 }
 
-.uberbox *[data-action=share] .uberbox-share-menu {
+.uberbox-toolbar button[data-action=share] .uberbox-share-menu {
     display: none;
     opacity: 0;
 }
 
-.uberbox *[data-action=share].uberbox-active .uberbox-share-overlay {
+.uberbox-toolbar button[data-action=share].uberbox-active .uberbox-share-overlay {
     position: fixed;
     left: 0;
     right: 0;
@@ -759,18 +771,18 @@
     z-index: 5;
 }
 
-.uberbox *[data-action=share].uberbox-active .uberbox-share-menu {
+.uberbox-toolbar button[data-action=share].uberbox-active .uberbox-share-menu {
     display: block;
 }
 
-.uberbox *[data-action=share].uberbox-active .uberbox-share-menu.uberbox-active {
+.uberbox-toolbar button[data-action=share].uberbox-active .uberbox-share-menu.uberbox-active {
     opacity: 1;
 }
 
-.uberbox .uberbox-tooltip {
+.uberbox-tooltip {
     position: absolute;
     left: 50%;
-    bottom: 0;
+    bottom: 4px;
     font-size: 12px;
     color: white;
     line-height: 18px;
@@ -778,7 +790,7 @@
     -ms-transform: translate(-50%, 100%);
     transform: translate(-50%, 100%);
     opacity: 0;
-    background: #444;
+    background: #333;
     border-radius: 2px;
     padding: 3px 9px;
     -webkit-transition: opacity 0.3s;
@@ -786,19 +798,19 @@
     white-space: nowrap;
 }
 
-.uberbox .uberbox-tooltip:after {
+.uberbox-tooltip:after {
     display: block;
     content: '';
     border-left: 3px solid transparent;
     border-right: 3px solid transparent;
-    border-bottom: 3px solid #444;
+    border-bottom: 3px solid #333;
     position: absolute;
     left: 50%;
     margin-left: -3px;
     top: -3px;
 }
 
-.uberbox .uberbox-lightbox-wrapper {
+.uberbox-lightbox-wrapper {
     position: absolute;
     z-index: 100002;
     left: 0px;
@@ -807,7 +819,7 @@
     top: 0px;
 }
 
-.uberbox .uberbox-lightbox-wrapper .uberbox-lightbox-content {
+.uberbox-lightbox-wrapper .uberbox-lightbox-content {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -815,174 +827,57 @@
     top: 0;
 }
 
-.uberbox .uberbox-lightbox-wrapper .uberbox-next, .uberbox .uberbox-lightbox-wrapper .uberbox-prev {
+.uberbox-next, .uberbox-prev {
     position: fixed;
     color: white;
     font-size: 54px;
     cursor: pointer;
     z-index: 5;
     color: white;
-    opacity: 0.7;
+    opacity: 0.6;
     -webkit-transition: opacity 0.3s;
     transition: opacity 0.3s;
 }
 
-.uberbox .uberbox-lightbox-wrapper .uberbox-next:hover, .uberbox .uberbox-lightbox-wrapper .uberbox-prev:hover {
+.uberbox-next:hover, .uberbox-prev:hover {
     opacity: 1;
 }
 
-.uberbox .uberbox-lightbox-wrapper .uberbox-next.uberbox-disabled, .uberbox .uberbox-lightbox-wrapper .uberbox-prev.uberbox-disabled {
-    opacity: 0.2;
+.uberbox-next.uberbox-disabled, .uberbox-prev.uberbox-disabled {
+    opacity: 0.15;
     cursor: default;
 }
 
-.uberbox .uberbox-lightbox-wrapper .uberbox-next.uberbox-disabled:hover, .uberbox .uberbox-lightbox-wrapper .uberbox-prev.uberbox-disabled:hover {
-    opacity: 0.2;
+.uberbox-next.uberbox-disabled:hover, .uberbox-prev.uberbox-disabled:hover {
+    opacity: 0.15;
 }
 
-.uberbox .uberbox-lightbox-wrapper .uberbox-next i, .uberbox .uberbox-lightbox-wrapper .uberbox-prev i {
+.uberbox-next i, .uberbox-prev i {
     position: absolute;
     display: block;
 }
 
-.uberbox .uberbox-lightbox-item {
-    position: fixed;
-    -webkit-transition: opacity 0.3s, left 0.3s, top 0.3s, -webkit-transform 0.3s;
-    transition: opacity 0.3s, left 0.3s, top 0.3s, transform 0.3s;
-    opacity: 0;
-    z-index: 1;
-    border-radius: 3px;
-}
-
-.uberbox .uberbox-lightbox-item.uberbox-visible {
-    opacity: 1;
-}
-
-.uberbox .uberbox-lightbox-item.uberbox-enable-transition {
-    -webkit-transition: opacity 0.3s, left 0.3s, top 0.3s;
-    transition: opacity 0.3s, left 0.3s, top 0.3s;
-}
-
-.uberbox .uberbox-lightbox-item.uberbox-current {
-    z-index: 2;
-}
-
-.uberbox .uberbox-carousel-wrapper {
-    position: fixed;
-    z-index: 100003;
-    display: none;
-}
-
-@media only screen and (min-width: 1024px) {
-    .uberbox .uberbox-carousel-wrapper {
-        display: block;
-    }
-}
-
-.uberbox .uberbox-carousel-wrapper .uberbox-carousel-content {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-}
-
-.uberbox .uberbox-carousel-wrapper .uberbox-carousel-item {
-    opacity: 0;
-    position: absolute;
-    -webkit-transition: opacity 0.3s;
-    transition: opacity 0.3s;
-    cursor: pointer;
-    background: black;
-}
-
-.uberbox .uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-loaded {
-    opacity: 1;
-    -webkit-transition: opacity 0.3s ease-in-out, left 0.3s ease-in-out, top 0.3s ease-in-out;
-    transition: opacity 0.3s ease-in-out, left 0.3s ease-in-out, top 0.3s ease-in-out;
-}
-
-.uberbox .uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-faded {
-    opacity: 0;
-}
-
-.uberbox .uberbox-carousel-wrapper .uberbox-carousel-item img {
-    display: block;
-    height: 100%;
-    width: 100%;
-    opacity: 0.5;
-    -webkit-transition: opacity 0.3s;
-    transition: opacity 0.3s;
-    border-radius: 2px;
-}
-
-.uberbox .uberbox-carousel-wrapper .uberbox-carousel-item:hover img {
-    opacity: 1;
-}
-
-.uberbox .uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-current {
-    cursor: default;
-}
-
-.uberbox .uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-current img {
-    opacity: 1;
-}
-
-.uberbox.uberbox-vertical .uberbox-lightbox-item {
-    left: 30px;
-    right: 30px;
-    top: 90px;
-    bottom: 90px;
-}
-
-.uberbox.uberbox-vertical .uberbox-lightbox-item.uberbox-flyout-next {
-    -webkit-transform: translate(0, 200%);
-    -ms-transform: translate(0, 200%);
-    transform: translate(0, 200%);
-}
-
-.uberbox.uberbox-vertical .uberbox-lightbox-item.uberbox-flyout-prev {
-    -webkit-transform: translate(0, -200%);
-    -ms-transform: translate(0, -200%);
-    transform: translate(0, -200%);
-}
-
-.uberbox.uberbox-vertical .uberbox-next, .uberbox.uberbox-vertical .uberbox-prev {
+.uberbox-vertical .uberbox-next, .uberbox-vertical .uberbox-prev {
     left: 50%;
 }
 
-.uberbox.uberbox-vertical .uberbox-carousel-wrapper {
-    right: 15px;
-    bottom: 0;
-    top: 0px;
-    width: 150px;
-}
-
-.uberbox.uberbox-vertical .uberbox-lightbox-item.uberbox-fled-prev {
-    top: -100%;
-}
-
-.uberbox.uberbox-vertical .uberbox-lightbox-item.uberbox-fled-next {
-    top: 100%;
-}
-
-.uberbox.uberbox-vertical .uberbox-next, .uberbox.uberbox-vertical .uberbox-prev {
+.uberbox-vertical .uberbox-next, .uberbox-vertical .uberbox-prev {
     left: 20%;
     right: 20%;
     height: 90px;
 }
 
-.uberbox.uberbox-vertical .uberbox-prev {
+.uberbox-vertical .uberbox-prev {
     top: 0;
 }
 
-.uberbox.uberbox-vertical .uberbox-prev i {
-    top: 15px;
+.uberbox-vertical .uberbox-prev i {
+    top: 9px;
     margin-left: -26px;
     left: 50%;
 }
 
-.uberbox.uberbox-vertical .uberbox-prev i:before {
+.uberbox-vertical .uberbox-prev i:before {
     font-family: "uberbox";
     font-style: normal;
     font-weight: normal;
@@ -992,22 +887,22 @@
     width: 1em;
     margin-right: .2em;
     text-align: center;
-        /* opacity: .8; */
-        /* For safety - reset parent styles, that can break glyph codes */
+      /* opacity: .8; */
+      /* For safety - reset parent styles, that can break glyph codes */
     font-variant: normal;
     text-transform: none;
-        /* fix buttons height, for twitter bootstrap */
+      /* fix buttons height, for twitter bootstrap */
     line-height: 1em;
-        /* Animation center compensation - margins should be symmetric */
-        /* remove if not needed */
+      /* Animation center compensation - margins should be symmetric */
+      /* remove if not needed */
     margin-left: .2em;
-        /* you can be more comfortable with increased icons size */
-        /* font-size: 120%; */
-        /* Uncomment for 3D effect */
-        /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+      /* you can be more comfortable with increased icons size */
+      /* font-size: 120%; */
+      /* Uncomment for 3D effect */
+      /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
-.uberbox.uberbox-vertical .uberbox-prev i:before {
+.uberbox-vertical .uberbox-prev i:before {
     content: '\e800';
     -webkit-transform: rotate(-90deg);
     -ms-transform: rotate(-90deg);
@@ -1017,31 +912,17 @@
     transform-origin: center;
 }
 
-.uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-lightbox-item {
-    right: 30px;
-}
-
-@media only screen and (min-width: 1024px) {
-    .uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-lightbox-item {
-        right: 180px;
-    }
-}
-
-.uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-next, .uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-prev {
-    margin-left: -180px;
-}
-
-.uberbox.uberbox-vertical .uberbox-next {
+.uberbox-vertical .uberbox-next {
     bottom: 0;
 }
 
-.uberbox.uberbox-vertical .uberbox-next i {
-    bottom: 15px;
+.uberbox-vertical .uberbox-next i {
+    bottom: 9px;
     left: 50%;
     margin-left: -26px;
 }
 
-.uberbox.uberbox-vertical .uberbox-next i:before {
+.uberbox-vertical .uberbox-next i:before {
     font-family: "uberbox";
     font-style: normal;
     font-weight: normal;
@@ -1051,22 +932,22 @@
     width: 1em;
     margin-right: .2em;
     text-align: center;
-        /* opacity: .8; */
-        /* For safety - reset parent styles, that can break glyph codes */
+      /* opacity: .8; */
+      /* For safety - reset parent styles, that can break glyph codes */
     font-variant: normal;
     text-transform: none;
-        /* fix buttons height, for twitter bootstrap */
+      /* fix buttons height, for twitter bootstrap */
     line-height: 1em;
-        /* Animation center compensation - margins should be symmetric */
-        /* remove if not needed */
+      /* Animation center compensation - margins should be symmetric */
+      /* remove if not needed */
     margin-left: .2em;
-        /* you can be more comfortable with increased icons size */
-        /* font-size: 120%; */
-        /* Uncomment for 3D effect */
-        /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+      /* you can be more comfortable with increased icons size */
+      /* font-size: 120%; */
+      /* Uncomment for 3D effect */
+      /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
-.uberbox.uberbox-vertical .uberbox-next i:before {
+.uberbox-vertical .uberbox-next i:before {
     content: '\e800';
     -webkit-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
@@ -1076,20 +957,17 @@
     transform-origin: center;
 }
 
-.uberbox.uberbox-horizontal .uberbox-lightbox-item {
-    left: 0;
-    right: 0;
-    bottom: 45px;
-    top: 45px;
+.uberbox-vertical.uberbox-has-carousel .uberbox-next, .uberbox-vertical.uberbox-has-carousel .uberbox-prev {
+    margin-left: -180px;
 }
 
-.uberbox.uberbox-horizontal .uberbox-next, .uberbox.uberbox-horizontal .uberbox-prev {
+.uberbox-horizontal .uberbox-next, .uberbox-horizontal .uberbox-prev {
     top: 45px;
     bottom: 0px;
     width: 60px;
 }
 
-.uberbox.uberbox-horizontal .uberbox-next i, .uberbox.uberbox-horizontal .uberbox-prev i {
+.uberbox-horizontal .uberbox-next i, .uberbox-horizontal .uberbox-prev i {
     text-align: center;
     display: inline-block;
     width: 100%;
@@ -1097,7 +975,7 @@
     top: 50%;
 }
 
-.uberbox.uberbox-horizontal .uberbox-next i:before, .uberbox.uberbox-horizontal .uberbox-prev i:before {
+.uberbox-horizontal .uberbox-next i:before, .uberbox-horizontal .uberbox-prev i:before {
     font-family: "uberbox";
     font-style: normal;
     font-weight: normal;
@@ -1107,31 +985,31 @@
     width: 1em;
     margin-right: .2em;
     text-align: center;
-        /* opacity: .8; */
-        /* For safety - reset parent styles, that can break glyph codes */
+      /* opacity: .8; */
+      /* For safety - reset parent styles, that can break glyph codes */
     font-variant: normal;
     text-transform: none;
-        /* fix buttons height, for twitter bootstrap */
+      /* fix buttons height, for twitter bootstrap */
     line-height: 1em;
-        /* Animation center compensation - margins should be symmetric */
-        /* remove if not needed */
+      /* Animation center compensation - margins should be symmetric */
+      /* remove if not needed */
     margin-left: .2em;
-        /* you can be more comfortable with increased icons size */
-        /* font-size: 120%; */
-        /* Uncomment for 3D effect */
-        /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+      /* you can be more comfortable with increased icons size */
+      /* font-size: 120%; */
+      /* Uncomment for 3D effect */
+      /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
-.uberbox.uberbox-horizontal .uberbox-next i:before, .uberbox.uberbox-horizontal .uberbox-prev i:before {
+.uberbox-horizontal .uberbox-next i:before, .uberbox-horizontal .uberbox-prev i:before {
     margin: 0;
 }
 
-.uberbox.uberbox-horizontal .uberbox-prev {
+.uberbox-horizontal .uberbox-prev {
     left: 0;
     width: 54px;
 }
 
-.uberbox.uberbox-horizontal .uberbox-prev i:before {
+.uberbox-horizontal .uberbox-prev i:before {
     content: '\e800';
     -webkit-transform: rotate(180deg);
     -ms-transform: rotate(180deg);
@@ -1141,32 +1019,81 @@
     transform-origin: 50% 50%;
 }
 
-.uberbox.uberbox-horizontal .uberbox-next {
+.uberbox-horizontal .uberbox-next {
     right: 0;
 }
 
-.uberbox.uberbox-horizontal .uberbox-next i:before {
+.uberbox-horizontal .uberbox-next i:before {
     content: '\e800';
     -webkit-transform-origin: 50% 50%;
     -ms-transform-origin: 50% 50%;
     transform-origin: 50% 50%;
 }
 
-.uberbox.uberbox-horizontal .uberbox-carousel-wrapper {
-    left: 0px;
-    bottom: 0px;
-    height: 130px;
-    right: 0px;
-    background: rgba(0, 0, 0, 0.8);
+.uberbox-lightbox-item {
+    position: fixed;
+    -webkit-transition: opacity 0.3s, left 0.3s, top 0.3s, -webkit-transform 0.3s;
+    transition: opacity 0.3s, left 0.3s, top 0.3s, transform 0.3s;
+    opacity: 0;
+    z-index: 1;
+}
+
+.uberbox-lightbox-item.uberbox-visible {
+    opacity: 1;
+}
+
+.uberbox-lightbox-item.uberbox-enable-transition {
+    -webkit-transition: opacity 0.3s, left 0.3s, top 0.3s;
+    transition: opacity 0.3s, left 0.3s, top 0.3s;
+}
+
+.uberbox-lightbox-item.uberbox-current {
+    z-index: 2;
+}
+
+.uberbox-vertical .uberbox-lightbox-item {
+    left: 30px;
+    right: 30px;
+    top: 90px;
+    bottom: 90px;
+}
+
+.uberbox-vertical .uberbox-lightbox-item.uberbox-flyout-next {
+    -webkit-transform: translate(0, 200%);
+    -ms-transform: translate(0, 200%);
+    transform: translate(0, 200%);
+}
+
+.uberbox-vertical .uberbox-lightbox-item.uberbox-flyout-prev {
+    -webkit-transform: translate(0, -200%);
+    -ms-transform: translate(0, -200%);
+    transform: translate(0, -200%);
+}
+
+.uberbox-vertical.uberbox-has-carousel .uberbox-lightbox-item {
+    right: 30px;
 }
 
 @media only screen and (min-width: 1024px) {
-    .uberbox.uberbox-horizontal.uberbox-has-carousel .uberbox-lightbox-item {
+    .uberbox-vertical.uberbox-has-carousel .uberbox-lightbox-item {
+        right: 180px;
+    }
+}
+
+.uberbox-horizontal .uberbox-lightbox-item {
+    left: 0;
+    right: 0;
+    bottom: 45px;
+    top: 45px;
+}
+
+@media only screen and (min-width: 1024px) {
+    .uberbox-horizontal.uberbox-has-carousel .uberbox-lightbox-item {
         bottom: 130px;
     }
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-lightbox-item-content-wrapper {
+.uberbox-lightbox-item.uberbox-description-mini .uberbox-lightbox-item-content-wrapper {
     position: absolute;
     left: 0;
     right: 0;
@@ -1177,7 +1104,7 @@
     transform: none;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-item-object {
+.uberbox-lightbox-item.uberbox-description-mini .uberbox-item-object {
     position: absolute;
     left: 60px;
     right: 60px;
@@ -1185,7 +1112,7 @@
     top: 0;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-item-description {
+.uberbox-lightbox-item.uberbox-description-mini .uberbox-item-description {
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -1209,7 +1136,7 @@
     text-align: center;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-item-description h2 {
+.uberbox-lightbox-item.uberbox-description-mini .uberbox-item-description h2 {
     font-size: 13px;
     font-weight: normal;
     line-height: 20px;
@@ -1219,17 +1146,17 @@
     color: #ccc;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-iframe-content {
+.uberbox-lightbox-item.uberbox-description-mini .uberbox-iframe-content {
     width: 100%;
     height: 100%;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-iframe-content iframe {
+.uberbox-lightbox-item.uberbox-description-mini .uberbox-iframe-content iframe {
     width: 100%;
     height: 100%;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-item-object {
+.uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-item-object {
     position: absolute;
     left: 60px;
     right: 60px;
@@ -1237,7 +1164,7 @@
     top: 0;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-image-content {
+.uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-image-content {
     position: absolute;
     top: 0;
     left: 0;
@@ -1245,7 +1172,7 @@
     bottom: 0;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-image-content img {
+.uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-image-content img {
     display: block;
     position: absolute;
     top: 50%;
@@ -1257,7 +1184,7 @@
     max-width: 100%;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-fit-width .uberbox-image-content {
+.uberbox-lightbox-item.uberbox-description-mini.uberbox-fit-width .uberbox-image-content {
     position: absolute;
     top: 50%;
     -webkit-transform: translate(0, -50%);
@@ -1265,12 +1192,12 @@
     transform: translate(0, -50%);
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-fit-width .uberbox-image-content img {
+.uberbox-lightbox-item.uberbox-description-mini.uberbox-fit-width .uberbox-image-content img {
     width: 100%;
     margin: 0 auto;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-fit-height .uberbox-image-content {
+.uberbox-lightbox-item.uberbox-description-mini.uberbox-fit-height .uberbox-image-content {
     position: absolute;
     left: 0;
     right: 0;
@@ -1278,66 +1205,66 @@
     bottom: 0;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-fit-height .uberbox-image-content img {
+.uberbox-lightbox-item.uberbox-description-mini.uberbox-fit-height .uberbox-image-content img {
     height: 100%;
     display: block;
     margin: 0 auto;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right, .uberbox .uberbox-lightbox-item.uberbox-description-bottom {
+.uberbox-lightbox-item.uberbox-description-right, .uberbox-lightbox-item.uberbox-description-bottom {
     font-weight: 200;
     color: #444;
     line-height: 20px;
     font-size: 13px;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right:after, .uberbox .uberbox-lightbox-item.uberbox-description-bottom:after {
+.uberbox-lightbox-item.uberbox-description-right:after, .uberbox-lightbox-item.uberbox-description-bottom:after {
     display: none;
     clear: both;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right h2, .uberbox .uberbox-lightbox-item.uberbox-description-bottom h2 {
+.uberbox-lightbox-item.uberbox-description-right h2, .uberbox-lightbox-item.uberbox-description-bottom h2 {
     color: #000;
     font-weight: 200;
     font-size: 24px;
     padding-bottom: 12px;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right h3, .uberbox .uberbox-lightbox-item.uberbox-description-bottom h3 {
+.uberbox-lightbox-item.uberbox-description-right h3, .uberbox-lightbox-item.uberbox-description-bottom h3 {
     color: #888;
     font-weight: 200;
     text-transform: uppercase;
     font-size: 13px;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right p, .uberbox .uberbox-lightbox-item.uberbox-description-bottom p {
+.uberbox-lightbox-item.uberbox-description-right p, .uberbox-lightbox-item.uberbox-description-bottom p {
     margin-bottom: 18px;
 }
 
 @media only screen and (min-width: 1024px) {
-    .uberbox .uberbox-lightbox-item.uberbox-description-right, .uberbox .uberbox-lightbox-item.uberbox-description-bottom {
+    .uberbox-lightbox-item.uberbox-description-right, .uberbox-lightbox-item.uberbox-description-bottom {
         font-size: 16px;
         line-height: 28px;
     }
 
-    .uberbox .uberbox-lightbox-item.uberbox-description-right h2, .uberbox .uberbox-lightbox-item.uberbox-description-bottom h2 {
+    .uberbox-lightbox-item.uberbox-description-right h2, .uberbox-lightbox-item.uberbox-description-bottom h2 {
         font-size: 32px;
         line-height: 40px;
         padding-bottom: 8px;
     }
 
-    .uberbox .uberbox-lightbox-item.uberbox-description-right h3, .uberbox .uberbox-lightbox-item.uberbox-description-bottom h3 {
+    .uberbox-lightbox-item.uberbox-description-right h3, .uberbox-lightbox-item.uberbox-description-bottom h3 {
         font-size: 15px;
         line-height: 20px;
         margin-bottom: 12px;
     }
 
-    .uberbox .uberbox-lightbox-item.uberbox-description-right p, .uberbox .uberbox-lightbox-item.uberbox-description-bottom p {
+    .uberbox-lightbox-item.uberbox-description-right p, .uberbox-lightbox-item.uberbox-description-bottom p {
         margin-bottom: 24px;
     }
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-lightbox-item-content-wrapper {
+.uberbox-lightbox-item.uberbox-description-right .uberbox-lightbox-item-content-wrapper {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1349,26 +1276,25 @@
     max-width: 1200px;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-object {
+.uberbox-lightbox-item.uberbox-description-right .uberbox-item-object {
     position: relative;
     margin-right: 329.5px;
     height: 100%;
     overflow: hidden;
-    border-radius: 3px 0 0 3px;
 }
 
 @media only screen and (min-width: 1024px) {
-    .uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-object {
-        margin-right: 567.5px !important;
+    .uberbox-lightbox-item.uberbox-description-right .uberbox-item-object {
+        margin-right: 55%;
     }
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-object .uberbox-image-content {
+.uberbox-lightbox-item.uberbox-description-right .uberbox-item-object .uberbox-image-content {
     height: 100%;
     overflow: hidden;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-object .uberbox-image-content img {
+.uberbox-lightbox-item.uberbox-description-right .uberbox-item-object .uberbox-image-content img {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1379,7 +1305,7 @@
     max-height: 100%;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-fit-oversized .uberbox-image-content {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-fit-oversized .uberbox-image-content {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -1389,17 +1315,17 @@
     height: auto;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-fit-width-oversized .uberbox-image-content img {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-fit-width-oversized .uberbox-image-content img {
     width: 100%;
     max-height: none;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-fit-height-oversized .uberbox-image-content img {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-fit-height-oversized .uberbox-image-content img {
     height: 100%;
     max-width: none;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-fit-height .uberbox-image-content img {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-fit-height .uberbox-image-content img {
     -webkit-transform: none;
     -ms-transform: none;
     transform: none;
@@ -1409,7 +1335,7 @@
     height: 100%;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-description {
+.uberbox-lightbox-item.uberbox-description-right .uberbox-item-description {
     position: absolute;
     top: 0;
     right: 0;
@@ -1418,23 +1344,22 @@
     background: #fff;
     box-sizing: border-box;
     overflow: hidden;
-    border-radius: 0 3px 3px 0;
     padding: 24px 18px 24px 24px;
 }
 
 @media only screen and (min-width: 1024px) {
-    .uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-description {
-        width: 568px;
+    .uberbox-lightbox-item.uberbox-description-right .uberbox-item-description {
+        width: 55%;
     }
 }
 
 @media only screen and (min-width: 1024px) {
-    .uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-description {
+    .uberbox-lightbox-item.uberbox-description-right .uberbox-item-description {
         padding: 30px 36px 20px 42px;
     }
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-lightbox-item-content-wrapper {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-lightbox-item-content-wrapper {
     top: 0;
     bottom: 0;
     left: 30px;
@@ -1445,73 +1370,66 @@
     width: auto;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description {
     color: white;
     background: transparent;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description h1, .uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description h2, .uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description h3 {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description h1, .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description h2, .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description h3 {
     color: white;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-object {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-object {
     width: 50%;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-object iframe {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-object iframe {
     width: 100%;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description {
+.uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description {
     width: 50%;
     padding-top: 0;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-lightbox-item-content {
+.uberbox-lightbox-item.uberbox-description-bottom {
     overflow: scroll;
-    height: 100%;
-    position: relative;
-    width: 100%;
+}
+
+.uberbox-lightbox-item.uberbox-description-bottom .uberbox-lightbox-item-content-wrapper {
     max-height: 100%;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-lightbox-item-content-wrapper {
-    border-radius: 3px;
-    max-height: 100%;
-}
-
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-description, .uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object {
+.uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-description, .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object {
     width: 650px;
     margin: 0 auto;
     max-width: 100%;
 }
 
 @media only screen and (max-width: 440px) {
-    .uberbox .uberbox-lightbox-item.uberbox-description-bottom {
+    .uberbox-lightbox-item.uberbox-description-bottom {
         width: 100%;
         bottom: 0;
     }
 
-    .uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-description, .uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object {
+    .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-description, .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object {
         width: 100%;
     }
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object {
+.uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object {
     overflow: hidden;
     margin: 0 auto;
-    border-radius: 3px 3px 0 0;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object .uberbox-image-content {
+.uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object .uberbox-image-content {
     overflow: hidden;
     width: 100%;
     position: relative;
     height: 300px;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object .uberbox-image-content img {
-    border-radius: 3px 3px 0 0;
+.uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object .uberbox-image-content img {
     display: block;
     position: absolute;
     top: 50%;
@@ -1522,17 +1440,17 @@
     width: 100.1%;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object .uberbox-iframe-content iframe {
+.uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object .uberbox-iframe-content iframe {
     width: 100%;
     height: 365px;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom.uberbox-fit-height-oversized .uberbox-image-content img {
+.uberbox-lightbox-item.uberbox-description-bottom.uberbox-fit-height-oversized .uberbox-image-content img {
     height: 100.1%;
     width: auto;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom.uberbox-center-vertically .uberbox-lightbox-item-content-wrapper {
+.uberbox-lightbox-item.uberbox-description-bottom.uberbox-center-vertically .uberbox-lightbox-item-content-wrapper {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1541,22 +1459,19 @@
     transform: translate(-50%, -50%);
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-description {
+.uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-description {
     box-sizing: border-box;
     background: white;
     padding: 24px 36px 20px 36px;
-    border-radius: 0 0 3px 3px;
 }
 
 @media only screen and (max-width: 440px) {
-    .uberbox .uberbox-lightbox-item {
+    .uberbox-lightbox-item {
         left: 0;
         right: 0;
-        border-radius: 0;
     }
 
-    .uberbox .uberbox-lightbox-item > .uberbox-lightbox-item-content-wrapper {
-        border-radius: 0 !important;
+    .uberbox-lightbox-item > .uberbox-lightbox-item-content-wrapper {
         width: 100%;
         bottom: 0;
         left: 0;
@@ -1569,11 +1484,11 @@
 }
 
 @media only screen and (max-width: 440px) {
-    .uberbox .uberbox-prev, .uberbox .uberbox-next {
+    .uberbox-prev, .uberbox-next {
         font-size: 36px !important;
     }
 
-    .uberbox .uberbox-lightbox-item {
+    .uberbox-lightbox-item {
         left: 6px !important;
         right: 6px !important;
         top: 45px !important;
@@ -1581,20 +1496,16 @@
         width: auto !important;
     }
 
-    .uberbox .uberbox-lightbox-item .uberbox-image-content img, .uberbox .uberbox-lightbox-item .uberbox-image-content iframe, .uberbox .uberbox-lightbox-item .uberbox-iframe-content img, .uberbox .uberbox-lightbox-item .uberbox-iframe-content iframe {
-        border-radius: 0 !important;
-    }
-
-    .uberbox.uberbox-vertical .uberbox-prev, .uberbox.uberbox-vertical .uberbox-next {
+    .uberbox-vertical .uberbox-prev, .uberbox-vertical .uberbox-next {
         display: none !important;
     }
 
-    .uberbox .uberbox-description-bottom .uberbox-item-description, .uberbox .uberbox-description-right .uberbox-item-description {
+    .uberbox-description-bottom .uberbox-item-description, .uberbox-description-right .uberbox-item-description {
         padding: 24px !important;
     }
 }
 
-.uberbox .uberbox-description-mini .uberbox-bandcamp-content iframe {
+.uberbox-description-mini .uberbox-bandcamp-content iframe {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -1603,8 +1514,83 @@
     transform: translate(-50%, -50%);
 }
 
-.uberbox .uberbox-bandcamp-content iframe {
+.uberbox-bandcamp-content iframe {
     max-width: 700px;
+}
+
+.uberbox-carousel-wrapper {
+    position: fixed;
+    z-index: 100003;
+    display: none;
+}
+
+@media only screen and (min-width: 1024px) {
+    .uberbox-carousel-wrapper {
+        display: block;
+    }
+}
+
+.uberbox-carousel-wrapper .uberbox-carousel-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.uberbox-carousel-wrapper .uberbox-carousel-item {
+    opacity: 0;
+    position: absolute;
+    -webkit-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+    cursor: pointer;
+    background: black;
+}
+
+.uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-loaded {
+    opacity: 1;
+    -webkit-transition: opacity 0.3s ease-in-out, left 0.3s ease-in-out, top 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out, left 0.3s ease-in-out, top 0.3s ease-in-out;
+}
+
+.uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-faded {
+    opacity: 0;
+}
+
+.uberbox-carousel-wrapper .uberbox-carousel-item img {
+    display: block;
+    height: 100%;
+    width: 100%;
+    opacity: 0.5;
+    -webkit-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+    border-radius: 2px;
+}
+
+.uberbox-carousel-wrapper .uberbox-carousel-item:hover img {
+    opacity: 1;
+}
+
+.uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-current {
+    cursor: default;
+}
+
+.uberbox-carousel-wrapper .uberbox-carousel-item.uberbox-current img {
+    opacity: 1;
+}
+
+.uberbox-vertical .uberbox-carousel-wrapper {
+    right: 15px;
+    bottom: 0;
+    top: 0px;
+    width: 150px;
+}
+
+.uberbox-horizontal .uberbox-carousel-wrapper {
+    left: 0px;
+    bottom: 0px;
+    height: 130px;
+    right: 0px;
 }
 
 

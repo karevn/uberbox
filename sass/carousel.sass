@@ -1,0 +1,48 @@
+.uberbox-carousel-wrapper
+	position: fixed
+	z-index: 100003
+	display: none
+	+respond-to(wide-screens)
+		display: block
+	.uberbox-carousel-content
+		position: absolute
+		left: 0
+		top: 0
+		right: 0
+		bottom: 0
+	.uberbox-carousel-item
+		opacity: 0
+		position: absolute
+		transition: opacity 0.3s
+		cursor: pointer
+		background: black
+		&.uberbox-loaded
+			opacity: 1
+			transition: opacity 0.3s ease-in-out, left 0.3s ease-in-out, top 0.3s ease-in-out
+		&.uberbox-faded
+			opacity: 0
+		img
+			display: block
+			height: 100%
+			width: 100%
+			opacity: 0.5
+			transition: opacity 0.3s
+			border-radius: 2px
+		&:hover img
+			opacity: 1
+		&.uberbox-current
+			cursor: default
+
+			img
+				opacity: 1
+
+.uberbox-vertical .uberbox-carousel-wrapper
+	right: 15px
+	bottom: 0
+	top: 0px
+	width: 150px
+.uberbox-horizontal .uberbox-carousel-wrapper
+	left: 0px
+	bottom: 0px
+	height: 130px
+	right: 0px

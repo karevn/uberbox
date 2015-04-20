@@ -1,0 +1,416 @@
+.uberbox-lightbox-wrapper
+	position: absolute
+	z-index: 100002
+	left: 0px
+	right: 0px
+	bottom: 0px
+	top: 0px
+	.uberbox-lightbox-content
+		width: 100%
+		height: 100%
+		position: absolute
+		left: 0
+		top: 0
+.uberbox-next, .uberbox-prev
+	position: fixed
+	color: white
+	font-size: 54px
+	cursor: pointer
+	z-index: 5
+	+hover-active
+	&.uberbox-disabled
+		opacity: 0.15
+		cursor: default
+		&:hover
+			opacity: 0.15
+	i
+		position: absolute
+		display: block
+.uberbox-vertical
+	.uberbox-next, .uberbox-prev
+		left: 50%
+	.uberbox-next, .uberbox-prev
+		left: 20%
+		right: 20%
+		height: 90px
+	.uberbox-prev 
+		top: 0
+		i
+			+uberbox-icon
+			top: 9px
+			margin-left: -26px
+			left: 50%
+			&:before
+				content: '\e800'
+				transform: rotate(-90deg)
+				transform-origin: center
+	.uberbox-next
+		bottom: 0
+		i
+			+uberbox-icon
+			bottom: 9px
+			left: 50%
+			margin-left: -26px
+			&:before
+				content: '\e800'
+				transform: rotate(90deg)
+				transform-origin: center
+	
+	&.uberbox-has-carousel
+		.uberbox-next, .uberbox-prev
+			margin-left: -180px
+.uberbox-horizontal
+	.uberbox-next, .uberbox-prev
+		top: 45px
+		bottom: 0px
+		width: 60px
+		i
+			text-align: center
+			display: inline-block
+			width: 100%
+			+uberbox-icon
+			margin: -70px 0 0 0
+			top: 50%
+			&:before
+				margin: 0
+	.uberbox-prev 
+		left: 0
+		width: 54px
+		i
+			&:before
+				content: '\e800'
+				transform: rotate(180deg)
+				transform-origin: 50% 50%
+	.uberbox-next
+		right: 0
+		i
+			&:before
+				content: '\e800'
+				transform-origin: 50% 50%
+
+.uberbox-lightbox-item
+	position: fixed
+	transition: opacity 0.3s, left 0.3s, top 0.3s, transform 0.3s
+	opacity: 0
+	z-index: 1
+	&.uberbox-visible
+		opacity: 1
+	&.uberbox-enable-transition
+		transition: opacity 0.3s, left 0.3s, top 0.3s
+	&.uberbox-current
+		z-index: 2
+.uberbox-vertical
+	.uberbox-lightbox-item
+		left: 30px
+		right: 30px
+		top: 90px
+		bottom: 90px
+		&.uberbox-flyout-next
+			transform: translate(0, 200%)
+		&.uberbox-flyout-prev
+			transform: translate(0, -200%)
+	&.uberbox-has-carousel .uberbox-lightbox-item
+		right: 30px
+		+respond-to(wide-screens)
+			right: 180px
+				
+&.uberbox-horizontal 
+	.uberbox-lightbox-item
+		left: 0
+		right: 0
+		bottom: 45px
+		top: 45px
+	&.uberbox-has-carousel
+		+respond-to(wide-screens)
+			.uberbox-lightbox-item
+				bottom: 130px
+.uberbox-lightbox-item
+	&.uberbox-description-mini
+		.uberbox-lightbox-item-content-wrapper
+			position: absolute
+			left: 0
+			right: 0
+			top: 0
+			bottom: 0
+			transform: none
+		.uberbox-item-object
+			position: absolute
+			left: 60px
+			right: 60px
+			bottom: 60px
+			top: 0
+		.uberbox-item-description
+			position: absolute
+			bottom: 0
+			left: 50%
+			transform: translate(-50%, 0)
+			width: 400px
+			padding: 10px 0 0 0
+			line-height: 18px
+			margin: 0 auto
+			color: white
+			font-family: myriad-pro, 'Myriad Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif
+			line-height: 20px
+			height: 40px
+			overflow-y: hidden
+			font-smoothing: auto
+			text-rendering: optimizeLegibility
+			font-weight: 200
+			font-size: 11px 
+			color: #bbb
+			text-align: center
+			h2
+				font-size: 13px
+				font-weight: normal
+				line-height: 20px
+				font-family: myriad-pro, 'Myriad Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif
+				margin: 0
+				padding: 0
+				color: #ccc
+		.uberbox-iframe-content
+			width: 100%
+			height: 100%
+			iframe
+				width: 100%
+				height: 100%
+		&.uberbox-natural-fit
+			.uberbox-item-object
+				position: absolute
+				left: 60px
+				right: 60px
+				bottom: 50px
+				top: 0
+			.uberbox-image-content
+				position: absolute
+				top: 0
+				left: 0
+				right: 0
+				bottom: 0
+				img
+					display: block
+					position: absolute
+					top: 50%
+					left: 50%
+					transform: translate(-50%, -50%)
+					max-height: 100%
+					max-width: 100%
+		&.uberbox-fit-width
+			.uberbox-image-content
+				position: absolute
+				top: 50%
+				transform: translate(0, -50%)
+				img
+					width: 100%
+					margin: 0 auto
+		&.uberbox-fit-height
+			.uberbox-image-content
+				position: absolute
+				left: 0
+				right: 0
+				top: 0
+				bottom: 0
+				img
+					height: 100%
+					display: block
+					margin: 0 auto
+	&.uberbox-description-right, &.uberbox-description-bottom
+		font-weight: 200
+		color: #444
+		line-height: 20px
+		font-size: 13px
+		
+		&:after
+			display: none
+			clear: both
+		h2
+			color: #000
+			font-weight: 200
+			font-size: 24px
+			padding-bottom: 12px
+		h3
+			color: #888
+			font-weight: 200
+			text-transform: uppercase
+			font-size: 13px
+		p
+			margin-bottom: 18px
+		+respond-to(wide-screens)
+			font-size: 16px
+			line-height: 28px
+			h2
+				font-size: 32px
+				line-height: 40px
+				padding-bottom: 8px
+			h3
+				font-size: 15px
+				line-height: 20px
+				margin-bottom: 12px
+			p
+				margin-bottom: 24px
+	&.uberbox-description-right
+		.uberbox-lightbox-item-content-wrapper
+			position: absolute
+			top: 50%
+			left: 50%
+			transform: translate(-50%, -50%)
+			width: 80%
+			height: 100%
+			max-width: 1200px
+			
+		.uberbox-item-object
+			position: relative
+			margin-right: 329.5px
+			height: 100%
+			overflow: hidden
+			+respond-to(wide-screens)
+				margin-right: 55%
+			.uberbox-image-content
+				height: 100%
+				overflow: hidden
+				img
+					position: absolute
+					top: 50%
+					left: 50%
+					transform: translate(-50%, -50%)
+					max-width: 100%
+					max-height: 100%
+		&.uberbox-fit-oversized
+			.uberbox-image-content
+				position: absolute
+				top: 0
+				bottom: 0
+				left: 0
+				right: 0
+				width: auto
+				height: auto
+		&.uberbox-fit-width-oversized
+			.uberbox-image-content img
+				width: 100%
+				max-height: none
+		&.uberbox-fit-height-oversized
+			.uberbox-image-content img
+				height: 100%
+				max-width: none
+		&.uberbox-fit-height
+			.uberbox-image-content img
+				transform: none
+				left: auto
+				right: 0
+				top: 0
+				height: 100%
+		.uberbox-item-description
+			position: absolute
+			top: 0
+			right: 0
+			width: 350px
+			+respond-to(wide-screens)
+				width: 55%
+			bottom: 0
+			background: #fff
+			box-sizing: border-box
+			overflow: hidden
+			padding: 24px 18px 24px 24px
+			+respond-to(wide-screens)
+				padding: 30px 36px 20px 42px
+		&.uberbox-skin-dark
+			.uberbox-lightbox-item-content-wrapper
+				top: 0
+				bottom: 0
+				left: 30px
+				right: 30px
+				transform: none
+				width: auto
+			.uberbox-item-description
+				color: white
+				background: transparent
+				h1, h2, h3
+					color: white
+			.uberbox-item-object
+				width: 50%
+				iframe
+					width: 100%
+			.uberbox-item-description
+				width: 50%
+				padding-top: 0
+			
+	&.uberbox-description-bottom
+		overflow: scroll
+		.uberbox-lightbox-item-content-wrapper
+			max-height: 100%
+		.uberbox-item-description, .uberbox-item-object
+			width: 650px
+			margin: 0 auto
+			max-width: 100%
+		+respond-to(handhelds)
+			width: 100%
+			bottom: 0
+			.uberbox-item-description, .uberbox-item-object
+				width: 100%
+		.uberbox-item-object
+			overflow: hidden
+			margin: 0 auto
+			.uberbox-image-content 
+				overflow: hidden
+				width: 100%
+				position: relative
+				height: 300px
+				img
+					display: block
+					position: absolute
+					top: 50%
+					left: 50%
+					transform: translate(-50%, -50%)
+					width: 100.1%
+			.uberbox-iframe-content
+				iframe
+					width: 100%
+					height: 365px
+		&.uberbox-fit-height-oversized
+			.uberbox-image-content
+				img
+					height: 100.1%
+					width: auto
+		&.uberbox-center-vertically .uberbox-lightbox-item-content-wrapper
+			position: absolute
+			top: 50%
+			left: 50%
+			transform: translate(-50%, -50%)
+		.uberbox-item-description
+			box-sizing: border-box
+			background: white
+			padding: 24px 36px 20px 36px
+	+respond-to(handhelds)
+		left: 0
+		right: 0
+		> .uberbox-lightbox-item-content-wrapper
+			width: 100%
+			bottom: 0
+			left: 0
+			height: auto
+			transform: none !important
+			position: static !important
++respond-to(handhelds)
+	.uberbox-prev, .uberbox-next
+		font-size: 36px !important
+	&.uberbox-vertical
+		.uberbox-next, .uberbox-prev
+	.uberbox-lightbox-item
+		left: 6px !important
+		right: 6px !important
+		top: 45px !important
+		bottom: 6px !important
+		width: auto !important
+	&.uberbox-vertical
+		.uberbox-prev, .uberbox-next
+			display: none !important
+	.uberbox-description-bottom, .uberbox-description-right
+		.uberbox-item-description
+			padding: 24px !important
+.uberbox-description-mini
+	.uberbox-bandcamp-content iframe
+		position: absolute
+		left: 50%
+		top: 50%
+		transform: translate(-50%, -50%)
+.uberbox-bandcamp-content iframe
+	max-width: 700px

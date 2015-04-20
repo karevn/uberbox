@@ -1,0 +1,31 @@
+$break-large: 1024px
+$break-small: 440px
+
+@mixin hover-active
+	color: white
+	opacity: 0.6
+	transition: opacity 0.3s
+	&:hover
+		opacity: 1
+.uberbox-overlay
+	background: rgba(#000, 0.9)
+	position: fixed
+	left: 0
+	top: 0
+	width: 100%
+	height: 100%
+	opacity: 0
+	transition: all 0.6s
+	z-index: 100000
+	&.visible
+		opacity: 1
+@mixin respond-to($media) 
+	@if $media == handhelds 
+		@media only screen and (max-width: $break-small)
+			@content
+	@else if $media == medium-screens
+		@media only screen and (min-width: $break-small + 1) and (max-width: $break-large - 1) 
+			@content
+	@else if $media==wide-screens
+		@media only screen and (min-width: $break-large)
+			@content

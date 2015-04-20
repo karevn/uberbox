@@ -19,7 +19,17 @@ class Uberbox.ToolbarView extends Marionette.ItemView
 		super
 		@render()
 		@bindUIElements()
+		setTimeout((=>
+			@layout()
+			@$el.addClass('uberbox-visible')
+			setTimeout((=>@layout()), 200)
+			), 500)
 	serializeData: -> {model: @model}
+	layout: ->
+		item = @getOption('bindTo')
+		offset = item.currentItemView.getOffset()
+		@$el.width(item.currentItemView.getWidth()).css(left: offset.left, top: offset.top - jQuery(window).scrollTop())
+		
 	onFullscreenClick: (e)-> 
 		e.preventDefault()
 		e.stopPropagation()

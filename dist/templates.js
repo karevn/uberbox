@@ -79,7 +79,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '\n<div class="uberbox-lightbox-item-content-wrapper">\n\t<div class="uberbox-toolbar-wrapper"></div>\n\t<div class="uberbox-lightbox-item-content">\n\t\t<div class="uberbox-item-object"></div>\n\t\t<div class="uberbox-item-description">\n\t\t\t';
+__p += '<div class="uberbox-lightbox-item-content-wrapper">\n\t\t<div class="uberbox-item-object"></div>\n\t\t<div class="uberbox-item-description">\n\t\t\t';
  if (obj.model.get('title')) { ;
 __p += '<h2>' +
 ((__t = ( obj.model.get('title') )) == null ? '' : __t) +
@@ -87,7 +87,7 @@ __p += '<h2>' +
  } ;
 __p += '\n\t\t\t' +
 ((__t = ( obj.model.get('description') )) == null ? '' : __t) +
-'\n\t\t</div>\n\t</div>\n</div>';
+'\n\t\t</div>\n</div>';
 
 }
 return __p
@@ -119,7 +119,7 @@ __p += '\n\t\t<a data-action="download" href="' +
  } ;
 __p += '\n\t';
  if (services = obj.model.get('share')) { ;
-__p += '\n\t\t<button data-action="share">\n\t\t\t<i class="uberbox-icon-share"></i>\n\t\t\t<span class="uberbox-tooltip">' +
+__p += '\n\t\t<button href="#" data-action="share">\n\t\t\t<i class="uberbox-icon-share"></i>\n\t\t\t<span class="uberbox-tooltip">' +
 ((__t = ( obj.model.get('share_tooltip') )) == null ? '' : __t) +
 '</span>\n\t\t\t<div class="uberbox-share-menu">\n\t\t\t\t';
  for (service in services) { ;

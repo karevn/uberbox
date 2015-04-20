@@ -4,6 +4,7 @@ class Uberbox extends Marionette.LayoutView
 	regions:
 		lightbox: '.uberbox-lightbox-wrapper'
 		carousel: '.uberbox-carousel-wrapper'
+		toolbar: '.uberbox-toolbar-wrapper'
 	ui:{}
 	@contentViewTypes: ->
 		image:
@@ -35,6 +36,7 @@ class Uberbox extends Marionette.LayoutView
 
 
 	@show: (items, options = {})->
+		jQuery('html').css('')
 		options = _.extend({
 			current: 0
 			orientation: 'vertical'
@@ -72,7 +74,7 @@ class Uberbox extends Marionette.LayoutView
 		@bindUIElements()
 		@$el.addClass("uberbox-#{@getOption('orientation')}")
 		@showOverlay()
-		@listenTo @collection, 'activate', @onItemActivated
+
 		lightboxOptions = _.extend {}, @options, {root: @$el}
 		delete lightboxOptions.el
 		@lightbox.show(new Uberbox.Lightbox(lightboxOptions))
@@ -82,15 +84,28 @@ class Uberbox extends Marionette.LayoutView
 			@carousel.show(new Uberbox.Carousel(lightboxOptions))
 		else
 			@$('.uberbox-carousel-wrapper').remove()
-		@getOption('collection').at(@getOption('current')).activate()
+		current = @getOption('collection').at(@getOption('current'))
+		@listenTo @getOption('collection'), 'activate', @onItemActivated
+		current.activate()
 
 		jQuery('body').on 'keydown.uberbox', @onKeyDown
+		@overflow = jQuery('html').css('overflow')
+		jQuery('html').css('overflow', 'hidden')
+	onItemActivated: (model)->
+		if @toolbar.currentView
+			jQuery(window).off 'resize.uberbox-main'
+			@toolbar.empty()
+		@toolbar.show new Uberbox.ToolbarView(model: model, bindTo: @lightbox.currentView)
+		@listenTo @toolbar.currentView, 'close', => @remove()
+		jQuery(window).on 'resize.uberbox-main', =>
+			@toolbar.currentView.layout()
 	remove: ->
 		super
 		if Uberbox.Utils.isFullscreen()
 			Uberbox.Utils.exitFullscreen()
 		@ui.overlay.removeClass('visible')
 		jQuery('body').off 'keydown.uberbox', @onKeyDown
+		jQuery('html').css('overflow', @overflow)
 		setTimeout((=> @ui.overlay.remove()), 600)
 	onKeyDown: (e)=>
 		if e.which == 27
