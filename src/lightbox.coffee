@@ -7,17 +7,20 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 	regions:
 		object: '.uberbox-item-object'
 		description: '.uberbox-item-description'
+		toolbar: '.uberbox-toolbar-wrapper'
 	ui:
 		content: '> .uberbox-lightbox-item-content'
 		description: '.uberbox-item-description'
 	padding: 20
 	initialize: ->
 		super
-		@once 'load', =>
+		@once 'load', => @showContent()
+			
+	showContent: ->
+		_.defer => 
+			@layout()
 			_.defer => 
-				@layout()
-				_.defer => 
-					@$el.addClass('uberbox-visible')
+				@$el.addClass('uberbox-visible')
 	serializeData: -> {model: @model}
 	layout: =>
 		return if @waitForLoad and !@loaded
@@ -45,6 +48,8 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		else
 			@$el.removeClass('uberbox-center-vertically')
 	layoutWithMiniDescription: ->
+		width = @object.$el.width()
+		height = @object.$el.height()
 		item = @$el.closest('.uberbox-lightbox-item')
 		objectView = @object.currentView
 		@$el.css('margin-left', '')
@@ -96,6 +101,9 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 				@hideLoader()
 		else
 			@trigger 'load'
+			@showContent()
+		@toolbar.show new Uberbox.ToolbarView(model: @model)
+		@listenTo @toolbar.currentView, 'close', => @remove()
 	layoutAsCurrent: ->
 		@$el.css(transform: '')
 		@layout()
@@ -138,7 +146,6 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 	ui:
 		next: '.uberbox-next'
 		prev: '.uberbox-prev'
-		toolbarWrapper: '.uberbox-toolbar-wrapper'
 	events:
 		'click @ui.next': (-> @currentItemView.model.next().activate() unless @ui.next.is('.uberbox-disabled'))
 		'click @ui.prev': (-> @currentItemView.model.prev().activate() unless @ui.prev.is('.uberbox-disabled'))
@@ -154,14 +161,9 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 		@render()
 		@bindUIElements()
 	render: -> @$el.html(Marionette.Renderer.render(@template))
-	showToolbar: (item)->
-		if @toolbar
-			@stopListening(@toolbar, 'close')
-			@toolbar.remove() 
-		@toolbar = new Uberbox.ToolbarView(el: @ui.toolbarWrapper, model: item, root: @getOption('root'))
-		@listenTo @toolbar, 'close', => @trigger('close')
+
+		
 	onItemActivated: (item)->
-		@showToolbar(item) if @getOption('toolbar')
 		if !@currentItemView
 			@rebuild()
 		else

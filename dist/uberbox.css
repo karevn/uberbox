@@ -646,6 +646,156 @@
     width: 100%;
     height: 100%;
     z-index: 100001;
+    overflow: hidden;
+}
+
+.uberbox .uberbox-toolbar-wrapper {
+    position: absolute;
+    top: -42px;
+    right: 0;
+    padding: 0;
+    z-index: 100005;
+    height: 42px;
+    width: 100%;
+}
+
+.uberbox .uberbox-toolbar-wrapper a[data-action], .uberbox .uberbox-toolbar-wrapper button[data-action] {
+    position: relative;
+    float: right;
+    font-size: 15px;
+    border: none;
+    line-height: 1;
+    padding: 0;
+    margin: 0 0 0 18px;
+    background: transparent;
+    color: white;
+    text-decoration: none;
+    color: #aaa;
+    line-height: 40px;
+    -webkit-transition: color 0.3s;
+    transition: color 0.3s;
+}
+
+.uberbox .uberbox-toolbar-wrapper a[data-action]:disabled, .uberbox .uberbox-toolbar-wrapper button[data-action]:disabled {
+    display: none;
+}
+
+.uberbox .uberbox-toolbar-wrapper a[data-action]:active, .uberbox .uberbox-toolbar-wrapper button[data-action]:active {
+    box-shadow: none;
+    outline: none;
+}
+
+.uberbox .uberbox-toolbar-wrapper a[data-action][data-action="close"], .uberbox .uberbox-toolbar-wrapper button[data-action][data-action="close"] {
+    opacity: 1;
+    color: white;
+}
+
+.uberbox .uberbox-toolbar-wrapper a[data-action]:hover, .uberbox .uberbox-toolbar-wrapper button[data-action]:hover {
+    color: white;
+}
+
+.uberbox .uberbox-toolbar-wrapper a[data-action]:hover .uberbox-tooltip, .uberbox .uberbox-toolbar-wrapper button[data-action]:hover .uberbox-tooltip {
+    opacity: 1;
+}
+
+.uberbox .uberbox-share-menu {
+    position: absolute;
+    top: 100%;
+    right: -40px;
+    background: white;
+    z-index: 6;
+    width: 200px;
+    text-align: left;
+    border-radius: 3px;
+    -webkit-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+}
+
+.uberbox .uberbox-share-menu:after {
+    position: absolute;
+    top: -6px;
+    right: 43px;
+    display: block;
+    content: '';
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid white;
+}
+
+.uberbox .uberbox-share-menu a {
+    display: block;
+    line-height: 24px;
+    font-size: 13px;
+    padding: 3px 18px 3px 9px;
+    text-decoration: none;
+    color: #444;
+    -webkit-transition: background-color 0.3s;
+    transition: background-color 0.3s;
+}
+
+.uberbox .uberbox-share-menu a i {
+    font-size: 16px;
+    margin-right: 0.75em;
+}
+
+.uberbox .uberbox-share-menu a:hover {
+    background: #eee;
+}
+
+.uberbox *[data-action=share] .uberbox-share-menu {
+    display: none;
+    opacity: 0;
+}
+
+.uberbox *[data-action=share].uberbox-active .uberbox-share-overlay {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: black;
+    opacity: 0.3;
+    cursor: default;
+    z-index: 5;
+}
+
+.uberbox *[data-action=share].uberbox-active .uberbox-share-menu {
+    display: block;
+}
+
+.uberbox *[data-action=share].uberbox-active .uberbox-share-menu.uberbox-active {
+    opacity: 1;
+}
+
+.uberbox .uberbox-tooltip {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    font-size: 12px;
+    color: white;
+    line-height: 18px;
+    -webkit-transform: translate(-50%, 100%);
+    -ms-transform: translate(-50%, 100%);
+    transform: translate(-50%, 100%);
+    opacity: 0;
+    background: #444;
+    border-radius: 2px;
+    padding: 3px 9px;
+    -webkit-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+}
+
+.uberbox .uberbox-tooltip:after {
+    display: block;
+    content: '';
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-bottom: 3px solid #444;
+    position: absolute;
+    left: 50%;
+    margin-left: -3px;
+    top: -3px;
 }
 
 .uberbox .uberbox-lightbox-wrapper {
@@ -655,7 +805,6 @@
     right: 0px;
     bottom: 0px;
     top: 0px;
-    overflow: hidden;
 }
 
 .uberbox .uberbox-lightbox-wrapper .uberbox-lightbox-content {
@@ -667,7 +816,7 @@
 }
 
 .uberbox .uberbox-lightbox-wrapper .uberbox-next, .uberbox .uberbox-lightbox-wrapper .uberbox-prev {
-    position: absolute;
+    position: fixed;
     color: white;
     font-size: 54px;
     cursor: pointer;
@@ -676,7 +825,6 @@
     opacity: 0.7;
     -webkit-transition: opacity 0.3s;
     transition: opacity 0.3s;
-    background: black;
 }
 
 .uberbox .uberbox-lightbox-wrapper .uberbox-next:hover, .uberbox .uberbox-lightbox-wrapper .uberbox-prev:hover {
@@ -697,157 +845,8 @@
     display: block;
 }
 
-.uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper {
-    position: fixed;
-    top: 3px;
-    right: 0;
-    padding: 0;
-    z-index: 100003;
-    line-height: 42px;
-    height: 42px;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > a, .uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > button {
-    position: relative;
-    float: right;
-    font-size: 15px;
-    border: none;
-    line-height: 1;
-    padding: 0;
-    margin: 0 18px 0 0;
-    background: transparent;
-    color: white;
-    text-decoration: none;
-    color: #aaa;
-    line-height: 40px;
-    -webkit-transition: color 0.3s;
-    transition: color 0.3s;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > a:disabled, .uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > button:disabled {
-    display: none;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > a:active, .uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > button:active {
-    box-shadow: none;
-    outline: none;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > a[data-action="close"], .uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > button[data-action="close"] {
-    opacity: 1;
-    color: white;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > a:hover, .uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > button:hover {
-    color: white;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > a:hover .uberbox-tooltip, .uberbox .uberbox-lightbox-wrapper .uberbox-toolbar-wrapper > div > button:hover .uberbox-tooltip {
-    opacity: 1;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-share-menu {
-    position: absolute;
-    top: 100%;
-    right: -40px;
-    background: white;
-    z-index: 6;
-    width: 200px;
-    text-align: left;
-    border-radius: 3px;
-    -webkit-transition: opacity 0.3s;
-    transition: opacity 0.3s;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-share-menu:after {
-    position: absolute;
-    top: -6px;
-    right: 43px;
-    display: block;
-    content: '';
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 6px solid white;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-share-menu a {
-    display: block;
-    line-height: 24px;
-    font-size: 13px;
-    padding: 3px 18px 3px 9px;
-    text-decoration: none;
-    color: #444;
-    -webkit-transition: background-color 0.3s;
-    transition: background-color 0.3s;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-share-menu a i {
-    font-size: 16px;
-    margin-right: 0.75em;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-share-menu a:hover {
-    background: #eee;
-}
-
-.uberbox .uberbox-lightbox-wrapper *[data-action=share] .uberbox-share-menu {
-    display: none;
-    opacity: 0;
-}
-
-.uberbox .uberbox-lightbox-wrapper *[data-action=share].uberbox-active .uberbox-share-overlay {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background: black;
-    opacity: 0.3;
-    cursor: default;
-    z-index: 5;
-}
-
-.uberbox .uberbox-lightbox-wrapper *[data-action=share].uberbox-active .uberbox-share-menu {
-    display: block;
-}
-
-.uberbox .uberbox-lightbox-wrapper *[data-action=share].uberbox-active .uberbox-share-menu.uberbox-active {
-    opacity: 1;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-tooltip {
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    font-size: 12px;
-    color: white;
-    line-height: 18px;
-    -webkit-transform: translate(-50%, 100%);
-    -ms-transform: translate(-50%, 100%);
-    transform: translate(-50%, 100%);
-    opacity: 0;
-    background: #444;
-    border-radius: 2px;
-    padding: 3px 9px;
-    -webkit-transition: opacity 0.3s;
-    transition: opacity 0.3s;
-    white-space: nowrap;
-}
-
-.uberbox .uberbox-lightbox-wrapper .uberbox-tooltip:after {
-    display: block;
-    content: '';
-    border-left: 3px solid transparent;
-    border-right: 3px solid transparent;
-    border-bottom: 3px solid #444;
-    position: absolute;
-    left: 50%;
-    margin-left: -3px;
-    top: -3px;
-}
-
 .uberbox .uberbox-lightbox-item {
-    position: absolute;
+    position: fixed;
     -webkit-transition: opacity 0.3s, left 0.3s, top 0.3s, -webkit-transform 0.3s;
     transition: opacity 0.3s, left 0.3s, top 0.3s, transform 0.3s;
     opacity: 0;
@@ -870,7 +869,14 @@
 
 .uberbox .uberbox-carousel-wrapper {
     position: fixed;
-    z-index: 100001;
+    z-index: 100003;
+    display: none;
+}
+
+@media only screen and (min-width: 1024px) {
+    .uberbox .uberbox-carousel-wrapper {
+        display: block;
+    }
 }
 
 .uberbox .uberbox-carousel-wrapper .uberbox-carousel-content {
@@ -922,10 +928,6 @@
     opacity: 1;
 }
 
-.uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-lightbox-wrapper {
-    right: 150px;
-}
-
 .uberbox.uberbox-vertical .uberbox-lightbox-item {
     left: 30px;
     right: 30px;
@@ -965,9 +967,8 @@
 }
 
 .uberbox.uberbox-vertical .uberbox-next, .uberbox.uberbox-vertical .uberbox-prev {
-    left: 0;
-    right: 0;
-    bottom: 54px;
+    left: 20%;
+    right: 20%;
     height: 90px;
 }
 
@@ -1016,6 +1017,24 @@
     transform-origin: center;
 }
 
+.uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-lightbox-item {
+    right: 30px;
+}
+
+@media only screen and (min-width: 1024px) {
+    .uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-lightbox-item {
+        right: 180px;
+    }
+}
+
+.uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-next, .uberbox.uberbox-vertical.uberbox-has-carousel .uberbox-prev {
+    margin-left: -180px;
+}
+
+.uberbox.uberbox-vertical .uberbox-next {
+    bottom: 0;
+}
+
 .uberbox.uberbox-vertical .uberbox-next i {
     bottom: 15px;
     left: 50%;
@@ -1032,19 +1051,19 @@
     width: 1em;
     margin-right: .2em;
     text-align: center;
-      /* opacity: .8; */
-      /* For safety - reset parent styles, that can break glyph codes */
+        /* opacity: .8; */
+        /* For safety - reset parent styles, that can break glyph codes */
     font-variant: normal;
     text-transform: none;
-      /* fix buttons height, for twitter bootstrap */
+        /* fix buttons height, for twitter bootstrap */
     line-height: 1em;
-      /* Animation center compensation - margins should be symmetric */
-      /* remove if not needed */
+        /* Animation center compensation - margins should be symmetric */
+        /* remove if not needed */
     margin-left: .2em;
-      /* you can be more comfortable with increased icons size */
-      /* font-size: 120%; */
-      /* Uncomment for 3D effect */
-      /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+        /* you can be more comfortable with increased icons size */
+        /* font-size: 120%; */
+        /* Uncomment for 3D effect */
+        /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
 .uberbox.uberbox-vertical .uberbox-next i:before {
@@ -1057,20 +1076,16 @@
     transform-origin: center;
 }
 
-.uberbox.uberbox-horizontal.uberbox-has-carousel .uberbox-lightbox-wrapper {
-    bottom: 130px;
-}
-
 .uberbox.uberbox-horizontal .uberbox-lightbox-item {
     left: 0;
     right: 0;
-    bottom: 0;
-    top: 42px;
+    bottom: 45px;
+    top: 45px;
 }
 
 .uberbox.uberbox-horizontal .uberbox-next, .uberbox.uberbox-horizontal .uberbox-prev {
-    top: 60px;
-    bottom: 60px;
+    top: 45px;
+    bottom: 0px;
     width: 60px;
 }
 
@@ -1078,7 +1093,7 @@
     text-align: center;
     display: inline-block;
     width: 100%;
-    margin: -27px 0 0 0;
+    margin: -70px 0 0 0;
     top: 50%;
 }
 
@@ -1142,15 +1157,16 @@
     bottom: 0px;
     height: 130px;
     right: 0px;
+    background: rgba(0, 0, 0, 0.8);
 }
 
-.uberbox .uberbox-lightbox-item .uberbox-close {
-    right: 0;
-    top: 0;
-    opacity: 0.7;
+@media only screen and (min-width: 1024px) {
+    .uberbox.uberbox-horizontal.uberbox-has-carousel .uberbox-lightbox-item {
+        bottom: 130px;
+    }
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-lightbox-item-content {
+.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-lightbox-item-content-wrapper {
     position: absolute;
     left: 0;
     right: 0;
@@ -1181,11 +1197,10 @@
     line-height: 18px;
     margin: 0 auto;
     color: white;
-    overflow: hidden;
     font-family: myriad-pro, 'Myriad Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     line-height: 20px;
     height: 40px;
-    overflow: hidden;
+    overflow-y: hidden;
     font-smoothing: auto;
     text-rendering: optimizeLegibility;
     font-weight: 200;
@@ -1204,6 +1219,16 @@
     color: #ccc;
 }
 
+.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-iframe-content {
+    width: 100%;
+    height: 100%;
+}
+
+.uberbox .uberbox-lightbox-item.uberbox-description-mini .uberbox-iframe-content iframe {
+    width: 100%;
+    height: 100%;
+}
+
 .uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-item-object {
     position: absolute;
     left: 60px;
@@ -1212,7 +1237,7 @@
     top: 0;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-image-content, .uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-iframe-content {
+.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-image-content {
     position: absolute;
     top: 0;
     left: 0;
@@ -1220,7 +1245,7 @@
     bottom: 0;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-image-content img, .uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-image-content iframe, .uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-iframe-content img, .uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-iframe-content iframe {
+.uberbox .uberbox-lightbox-item.uberbox-description-mini.uberbox-natural-fit .uberbox-image-content img {
     display: block;
     position: absolute;
     top: 50%;
@@ -1260,11 +1285,10 @@
 }
 
 .uberbox .uberbox-lightbox-item.uberbox-description-right, .uberbox .uberbox-lightbox-item.uberbox-description-bottom {
-    font-size: 16px;
-    line-height: 28px;
     font-weight: 200;
     color: #444;
-    overflow: hidden;
+    line-height: 20px;
+    font-size: 13px;
 }
 
 .uberbox .uberbox-lightbox-item.uberbox-description-right:after, .uberbox .uberbox-lightbox-item.uberbox-description-bottom:after {
@@ -1274,26 +1298,46 @@
 
 .uberbox .uberbox-lightbox-item.uberbox-description-right h2, .uberbox .uberbox-lightbox-item.uberbox-description-bottom h2 {
     color: #000;
-    font-size: 32px;
     font-weight: 200;
-    line-height: 40px;
-    padding-bottom: 8px;
+    font-size: 24px;
+    padding-bottom: 12px;
 }
 
 .uberbox .uberbox-lightbox-item.uberbox-description-right h3, .uberbox .uberbox-lightbox-item.uberbox-description-bottom h3 {
-    font-size: 15px;
-    font-weight: 200;
     color: #888;
+    font-weight: 200;
     text-transform: uppercase;
-    line-height: 20px;
-    margin-bottom: 12px;
+    font-size: 13px;
 }
 
 .uberbox .uberbox-lightbox-item.uberbox-description-right p, .uberbox .uberbox-lightbox-item.uberbox-description-bottom p {
-    margin-bottom: 24px;
+    margin-bottom: 18px;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-lightbox-item-content {
+@media only screen and (min-width: 1024px) {
+    .uberbox .uberbox-lightbox-item.uberbox-description-right, .uberbox .uberbox-lightbox-item.uberbox-description-bottom {
+        font-size: 16px;
+        line-height: 28px;
+    }
+
+    .uberbox .uberbox-lightbox-item.uberbox-description-right h2, .uberbox .uberbox-lightbox-item.uberbox-description-bottom h2 {
+        font-size: 32px;
+        line-height: 40px;
+        padding-bottom: 8px;
+    }
+
+    .uberbox .uberbox-lightbox-item.uberbox-description-right h3, .uberbox .uberbox-lightbox-item.uberbox-description-bottom h3 {
+        font-size: 15px;
+        line-height: 20px;
+        margin-bottom: 12px;
+    }
+
+    .uberbox .uberbox-lightbox-item.uberbox-description-right p, .uberbox .uberbox-lightbox-item.uberbox-description-bottom p {
+        margin-bottom: 24px;
+    }
+}
+
+.uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-lightbox-item-content-wrapper {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1307,9 +1351,16 @@
 
 .uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-object {
     position: relative;
-    margin-right: 560px;
+    margin-right: 329.5px;
     height: 100%;
     overflow: hidden;
+    border-radius: 3px 0 0 3px;
+}
+
+@media only screen and (min-width: 1024px) {
+    .uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-object {
+        margin-right: 567.5px !important;
+    }
 }
 
 .uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-object .uberbox-image-content {
@@ -1362,17 +1413,70 @@
     position: absolute;
     top: 0;
     right: 0;
-    width: 568px;
+    width: 350px;
     bottom: 0;
     background: #fff;
     box-sizing: border-box;
     overflow: hidden;
-    padding: 42px 36px 20px 42px;
+    border-radius: 0 3px 3px 0;
+    padding: 24px 18px 24px 24px;
+}
+
+@media only screen and (min-width: 1024px) {
+    .uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-description {
+        width: 568px;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+    .uberbox .uberbox-lightbox-item.uberbox-description-right .uberbox-item-description {
+        padding: 30px 36px 20px 42px;
+    }
+}
+
+.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-lightbox-item-content-wrapper {
+    top: 0;
+    bottom: 0;
+    left: 30px;
+    right: 30px;
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
+    width: auto;
+}
+
+.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description {
+    color: white;
+    background: transparent;
+}
+
+.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description h1, .uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description h2, .uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description h3 {
+    color: white;
+}
+
+.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-object {
+    width: 50%;
+}
+
+.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-object iframe {
+    width: 100%;
+}
+
+.uberbox .uberbox-lightbox-item.uberbox-description-right.uberbox-skin-dark .uberbox-item-description {
+    width: 50%;
+    padding-top: 0;
 }
 
 .uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-lightbox-item-content {
+    overflow: scroll;
+    height: 100%;
+    position: relative;
+    width: 100%;
+    max-height: 100%;
+}
+
+.uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-lightbox-item-content-wrapper {
     border-radius: 3px;
-    overflow: hidden;
     max-height: 100%;
 }
 
@@ -1380,6 +1484,17 @@
     width: 650px;
     margin: 0 auto;
     max-width: 100%;
+}
+
+@media only screen and (max-width: 440px) {
+    .uberbox .uberbox-lightbox-item.uberbox-description-bottom {
+        width: 100%;
+        bottom: 0;
+    }
+
+    .uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-description, .uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object {
+        width: 100%;
+    }
 }
 
 .uberbox .uberbox-lightbox-item.uberbox-description-bottom .uberbox-item-object {
@@ -1417,7 +1532,7 @@
     width: auto;
 }
 
-.uberbox .uberbox-lightbox-item.uberbox-description-bottom.uberbox-center-vertically .uberbox-lightbox-item-content {
+.uberbox .uberbox-lightbox-item.uberbox-description-bottom.uberbox-center-vertically .uberbox-lightbox-item-content-wrapper {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1431,6 +1546,65 @@
     background: white;
     padding: 24px 36px 20px 36px;
     border-radius: 0 0 3px 3px;
+}
+
+@media only screen and (max-width: 440px) {
+    .uberbox .uberbox-lightbox-item {
+        left: 0;
+        right: 0;
+        border-radius: 0;
+    }
+
+    .uberbox .uberbox-lightbox-item > .uberbox-lightbox-item-content-wrapper {
+        border-radius: 0 !important;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+        height: auto;
+        -webkit-transform: none !important;
+        -ms-transform: none !important;
+        transform: none !important;
+        position: static !important;
+    }
+}
+
+@media only screen and (max-width: 440px) {
+    .uberbox .uberbox-prev, .uberbox .uberbox-next {
+        font-size: 36px !important;
+    }
+
+    .uberbox .uberbox-lightbox-item {
+        left: 6px !important;
+        right: 6px !important;
+        top: 45px !important;
+        bottom: 6px !important;
+        width: auto !important;
+    }
+
+    .uberbox .uberbox-lightbox-item .uberbox-image-content img, .uberbox .uberbox-lightbox-item .uberbox-image-content iframe, .uberbox .uberbox-lightbox-item .uberbox-iframe-content img, .uberbox .uberbox-lightbox-item .uberbox-iframe-content iframe {
+        border-radius: 0 !important;
+    }
+
+    .uberbox.uberbox-vertical .uberbox-prev, .uberbox.uberbox-vertical .uberbox-next {
+        display: none !important;
+    }
+
+    .uberbox .uberbox-description-bottom .uberbox-item-description, .uberbox .uberbox-description-right .uberbox-item-description {
+        padding: 24px !important;
+    }
+}
+
+.uberbox .uberbox-description-mini .uberbox-bandcamp-content iframe {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.uberbox .uberbox-bandcamp-content iframe {
+    max-width: 700px;
 }
 
 

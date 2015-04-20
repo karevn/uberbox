@@ -9,21 +9,27 @@ class Uberbox extends Marionette.LayoutView
 		image:
 			condition: /\.(gif|png|jpeg|jpg)$/i
 			class: Uberbox.ImageObjectView
-		audio:
-			condition: /\.(mp3|ogg)$/i
-			class: Uberbox.AudioObjectView
 		youtube:
 			condition: /((\(\/\/)?(www\.)?youtube\.com\/watch\?v=.+)|((\/\/)(www\.)?youtu\.be\/.*)/i
 			class: Uberbox.YoutubeObjectView
 		vimeo:
-			condition: /(\/\/)?vimeo\.com\/\d+121137859/i
+			condition: /(\/\/)?vimeo\.com\/\d+/i
 			class: Uberbox.VimeoObjectView
+		soundcloud:
+			condition: /soundcloud\.com/i
+			class: Uberbox.SoundcloudObjectView
+		bandcamp:
+			condition: /bandcamp\.com/i
+			class: Uberbox.BandcampObjectView
 		iframe:
 			condition: /(\/|\.html|\.htm|\.php|.aspx)$/i
 			class: Uberbox.IframeObjectView
 		gmap:
 			condition: /(google\.(\w+)\/maps\/)|(maps\.google\.(\w+))|(goo\.gl\/maps\/)/i
 			class: Uberbox.GoogleMapsObjectView
+		html:
+			condition: (item)-> !!item.get('html')
+			class: Uberbox.HTMLObjectView
 		unknown:
 			class: Uberbox.UnknownItemView
 
@@ -42,12 +48,7 @@ class Uberbox extends Marionette.LayoutView
 		if @instances.length > 0
 			instance = @instances.pop()
 			instance.remove()
-	showToolbar: (item)->
-		if @toolbar
-			@stopListening(@toolbar, 'close')
-			@toolbar.remove() 
-		@toolbar = new Uberbox.ToolbarView(el: @ui.toolbarWrapper, model: item, root: @getOption('root'))
-		@listenTo @toolbar, 'close', => @close()
+	
 	
 	@getPixelRatio: -> if window.devicePixelRatio > 0 then window.devicePixelRatio else 1
 	@getObjectViewType: (item)=>
@@ -55,7 +56,7 @@ class Uberbox extends Marionette.LayoutView
 		for type, config of @contentViewTypes()
 			condition = false
 			if config.condition
-				if _.isRegExp(config.condition)
+				if _.isRegExp(config.condition) and url = item.get('url')
 					condition = item.get('url').match(config.condition)
 				if _.isFunction(config.condition)
 					condition = config.condition(item)
@@ -71,6 +72,7 @@ class Uberbox extends Marionette.LayoutView
 		@bindUIElements()
 		@$el.addClass("uberbox-#{@getOption('orientation')}")
 		@showOverlay()
+		@listenTo @collection, 'activate', @onItemActivated
 		lightboxOptions = _.extend {}, @options, {root: @$el}
 		delete lightboxOptions.el
 		@lightbox.show(new Uberbox.Lightbox(lightboxOptions))
@@ -78,7 +80,10 @@ class Uberbox extends Marionette.LayoutView
 		if @getOption('carousel')
 			@$el.addClass('uberbox-has-carousel')
 			@carousel.show(new Uberbox.Carousel(lightboxOptions))
+		else
+			@$('.uberbox-carousel-wrapper').remove()
 		@getOption('collection').at(@getOption('current')).activate()
+
 		jQuery('body').on 'keydown.uberbox', @onKeyDown
 	remove: ->
 		super

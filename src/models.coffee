@@ -61,10 +61,6 @@ class Uberbox.Item extends Backbone.Model
 	isPrev: -> @collection.activeItem == @next()
 	
 
-	
-		
-		
-
 class Uberbox.ItemCollection extends Backbone.Collection
 	model: Uberbox.Item
 	current: null

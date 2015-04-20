@@ -1,6 +1,7 @@
 class Uberbox.ToolbarView extends Marionette.ItemView
 	template: -> Uberbox.Templates.toolbar
 	getTemplate: -> @template()
+	className: 'uberbox-toolbar'
 	ui: 
 		fullscreen: '*[data-action=fullscreen]'
 		exitFullscreen: '*[data-action=exit-fullscreen]'

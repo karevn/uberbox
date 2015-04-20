@@ -68,17 +68,21 @@
                     condition: /\.(gif|png|jpeg|jpg)$/i,
                     "class": Uberbox.ImageObjectView
                 },
-                audio: {
-                    condition: /\.(mp3|ogg)$/i,
-                    "class": Uberbox.AudioObjectView
-                },
                 youtube: {
                     condition: /((\(\/\/)?(www\.)?youtube\.com\/watch\?v=.+)|((\/\/)(www\.)?youtu\.be\/.*)/i,
                     "class": Uberbox.YoutubeObjectView
                 },
                 vimeo: {
-                    condition: /(\/\/)?vimeo\.com\/\d+121137859/i,
+                    condition: /(\/\/)?vimeo\.com\/\d+/i,
                     "class": Uberbox.VimeoObjectView
+                },
+                soundcloud: {
+                    condition: /soundcloud\.com/i,
+                    "class": Uberbox.SoundcloudObjectView
+                },
+                bandcamp: {
+                    condition: /bandcamp\.com/i,
+                    "class": Uberbox.BandcampObjectView
                 },
                 iframe: {
                     condition: /(\/|\.html|\.htm|\.php|.aspx)$/i,
@@ -87,6 +91,12 @@
                 gmap: {
                     condition: /(google\.(\w+)\/maps\/)|(maps\.google\.(\w+))|(goo\.gl\/maps\/)/i,
                     "class": Uberbox.GoogleMapsObjectView
+                },
+                html: {
+                    condition: function(item) {
+                        return !!item.get('html');
+                    },
+                    "class": Uberbox.HTMLObjectView
                 },
                 unknown: {
                     "class": Uberbox.UnknownItemView
@@ -120,23 +130,6 @@
             }
         };
 
-        Uberbox.prototype.showToolbar = function(item) {
-            if (this.toolbar) {
-                this.stopListening(this.toolbar, 'close');
-                this.toolbar.remove();
-            }
-            this.toolbar = new Uberbox.ToolbarView({
-                el: this.ui.toolbarWrapper,
-                model: item,
-                root: this.getOption('root')
-            });
-            return this.listenTo(this.toolbar, 'close', (function(_this) {
-                return function() {
-                    return _this.close();
-                };
-            })(this));
-        };
-
         Uberbox.getPixelRatio = function() {
             if (window.devicePixelRatio > 0) {
                 return window.devicePixelRatio;
@@ -146,7 +139,7 @@
         };
 
         Uberbox.getObjectViewType = function(item) {
-            var condition, config, type, _ref;
+            var condition, config, type, url, _ref;
             if (type = item.get('type')) {
                 return Uberbox.contentViewTypes[type];
             }
@@ -155,7 +148,7 @@
                 config = _ref[type];
                 condition = false;
                 if (config.condition) {
-                    if (_.isRegExp(config.condition)) {
+                    if (_.isRegExp(config.condition) && (url = item.get('url'))) {
                         condition = item.get('url').match(config.condition);
                     }
                     if (_.isFunction(config.condition)) {
@@ -184,6 +177,7 @@
             this.bindUIElements();
             this.$el.addClass("uberbox-" + (this.getOption('orientation')));
             this.showOverlay();
+            this.listenTo(this.collection, 'activate', this.onItemActivated);
             lightboxOptions = _.extend({}, this.options, {
                 root: this.$el
             });
@@ -197,6 +191,8 @@
             if (this.getOption('carousel')) {
                 this.$el.addClass('uberbox-has-carousel');
                 this.carousel.show(new Uberbox.Carousel(lightboxOptions));
+            } else {
+                this.$('.uberbox-carousel-wrapper').remove();
             }
             this.getOption('collection').at(this.getOption('current')).activate();
             return jQuery('body').on('keydown.uberbox', this.onKeyDown);
@@ -1128,6 +1124,8 @@
             return this.template();
         };
 
+        ToolbarView.prototype.className = 'uberbox-toolbar';
+
         ToolbarView.prototype.ui = {
             fullscreen: '*[data-action=fullscreen]',
             exitFullscreen: '*[data-action=exit-fullscreen]',
@@ -1347,6 +1345,7 @@
         __extends(IframeObjectView, _super);
 
         function IframeObjectView() {
+            this.onWindowResized = __bind(this.onWindowResized, this);
             return IframeObjectView.__super__.constructor.apply(this, arguments);
         }
 
@@ -1358,16 +1357,27 @@
             iframe: 'iframe'
         };
 
+        IframeObjectView.prototype.template = function() {
+            return Uberbox.Templates['content-iframe'];
+        };
+
         IframeObjectView.prototype.bindUIElements = function() {
             IframeObjectView.__super__.bindUIElements.apply(this, arguments);
             this.ui.iframe.one('load.uberbox', this.onObjectLoaded);
             if (this.isObjectLoaded()) {
-                return this.onObjectLoaded();
+                this.onObjectLoaded();
             }
+            jQuery(window).on('resize.uberbox', this.onWindowResized);
+            return _.defer((function(_this) {
+                return function() {
+                    return _this.onWindowResized();
+                };
+            })(this));
         };
 
         IframeObjectView.prototype.unbindUIElements = function() {
-            return this.ui.iframe.off('load.uberbox');
+            this.ui.iframe.off('load.uberbox');
+            return jQuery(window).off('resize.uberbox');
         };
 
         IframeObjectView.prototype.getObjectWidth = function() {
@@ -1384,6 +1394,22 @@
             });
         };
 
+        IframeObjectView.prototype.onWindowResized = function() {
+            return this.ui.iframe.height(this.ui.iframe.width() / this.getObjectNaturalAspectRatio());
+        };
+
+        IframeObjectView.prototype.getIframeUrl = function() {
+            return this.model.get('url');
+        };
+
+        IframeObjectView.prototype.getObjectNaturalWidth = function() {
+            return this.$el.parent().width();
+        };
+
+        IframeObjectView.prototype.getObjectNaturalHeight = function() {
+            return this.$el.parent().height();
+        };
+
         return IframeObjectView;
 
     })(ObjectView);
@@ -1396,10 +1422,6 @@
         }
 
         YoutubeObjectView.prototype.className = 'uberbox-iframe-content uberbox-youtube-content';
-
-        YoutubeObjectView.prototype.template = function() {
-            return Uberbox.Templates['content-youtube'];
-        };
 
         YoutubeObjectView.prototype.getIframeUrl = function() {
             return "//www.youtube.com/embed/" + (this.getVideoID());
@@ -1415,6 +1437,10 @@
             }
         };
 
+        YoutubeObjectView.prototype.getObjectNaturalAspectRatio = function() {
+            return 16.0 / 9.0;
+        };
+
         return YoutubeObjectView;
 
     })(Uberbox.IframeObjectView);
@@ -1428,13 +1454,103 @@
 
         VimeoObjectView.prototype.className = 'uberbox-iframe-content uberbox-vimeo-content';
 
-        VimeoObjectView.prototype.template = function() {
-            return Uberbox.Templates['content-vimeo'];
+        VimeoObjectView.prototype.getIframeUrl = function() {
+            return "//player.vimeo.com/video/" + (this.getVideoID());
+        };
+
+        VimeoObjectView.prototype.getVideoID = function() {
+            return this.model.get('url').replace(/(https?:)?(\/\/)?vimeo\.com\//i, '');
+        };
+
+        VimeoObjectView.prototype.getObjectNaturalAspectRatio = function() {
+            return 16.0 / 9.0;
         };
 
         return VimeoObjectView;
 
     })(Uberbox.IframeObjectView);
+
+    Uberbox.GoogleMapsObjectView = (function(_super) {
+        __extends(GoogleMapsObjectView, _super);
+
+        function GoogleMapsObjectView() {
+            return GoogleMapsObjectView.__super__.constructor.apply(this, arguments);
+        }
+
+        GoogleMapsObjectView.prototype.className = 'uberbox-iframe-content uberbox-gmap-content';
+
+        GoogleMapsObjectView.prototype.getIframeUrl = function() {
+            return "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d17445.16630767115!2d60.755398270861825!3d56.86916950021604!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sru!4v1429115765389";
+        };
+
+        GoogleMapsObjectView.prototype.getObjectNaturalAspectRatio = function() {
+            return this.$el.parent().width() / this.$el.parent().height();
+        };
+
+        return GoogleMapsObjectView;
+
+    })(Uberbox.IframeObjectView);
+
+    Uberbox.SoundcloudObjectView = (function(_super) {
+        __extends(SoundcloudObjectView, _super);
+
+        function SoundcloudObjectView() {
+            return SoundcloudObjectView.__super__.constructor.apply(this, arguments);
+        }
+
+        SoundcloudObjectView.prototype.className = 'uberbox-iframe-content uberbox-soundcloud-content';
+
+        SoundcloudObjectView.prototype.getIframeUrl = function() {
+            return "//w.soundcloud.com/player/?url=" + encodeURIComponent(this.model.get('url'));
+        };
+
+        return SoundcloudObjectView;
+
+    })(Uberbox.IframeObjectView);
+
+    Uberbox.BandcampObjectView = (function(_super) {
+        __extends(BandcampObjectView, _super);
+
+        function BandcampObjectView() {
+            return BandcampObjectView.__super__.constructor.apply(this, arguments);
+        }
+
+        BandcampObjectView.prototype.className = 'uberbox-iframe-content uberbox-bandcamp-content';
+
+        BandcampObjectView.prototype.getIframeUrl = function() {
+            return this.model.get('url');
+        };
+
+        return BandcampObjectView;
+
+    })(Uberbox.IframeObjectView);
+
+    Uberbox.HTMLObjectView = (function(_super) {
+        __extends(HTMLObjectView, _super);
+
+        function HTMLObjectView() {
+            return HTMLObjectView.__super__.constructor.apply(this, arguments);
+        }
+
+        HTMLObjectView.prototype.className = 'uberbox-html-content';
+
+        HTMLObjectView.prototype.waitForLoad = false;
+
+        HTMLObjectView.prototype.template = function() {
+            return Uberbox.Templates['html-content'];
+        };
+
+        HTMLObjectView.prototype.getObjectNaturalWidth = function() {
+            return 650;
+        };
+
+        HTMLObjectView.prototype.getObjectNaturalHeight = function() {
+            return 400;
+        };
+
+        return HTMLObjectView;
+
+    })(ObjectView);
 
     var __bind = function(fn, me) {
             return function() {
@@ -1478,7 +1594,8 @@
 
         LightboxItem.prototype.regions = {
             object: '.uberbox-item-object',
-            description: '.uberbox-item-description'
+            description: '.uberbox-item-description',
+            toolbar: '.uberbox-toolbar-wrapper'
         };
 
         LightboxItem.prototype.ui = {
@@ -1492,11 +1609,17 @@
             LightboxItem.__super__.initialize.apply(this, arguments);
             return this.once('load', (function(_this) {
                 return function() {
+                    return _this.showContent();
+                };
+            })(this));
+        };
+
+        LightboxItem.prototype.showContent = function() {
+            return _.defer((function(_this) {
+                return function() {
+                    _this.layout();
                     return _.defer(function() {
-                        _this.layout();
-                        return _.defer(function() {
-                            return _this.$el.addClass('uberbox-visible');
-                        });
+                        return _this.$el.addClass('uberbox-visible');
                     });
                 };
             })(this));
@@ -1546,7 +1669,9 @@
         };
 
         LightboxItem.prototype.layoutWithMiniDescription = function() {
-            var availableRatio, item, objectRatio, objectView;
+            var availableRatio, height, item, objectRatio, objectView, width;
+            width = this.object.$el.width();
+            height = this.object.$el.height();
             item = this.$el.closest('.uberbox-lightbox-item');
             objectView = this.object.currentView;
             this.$el.css('margin-left', '');
@@ -1614,15 +1739,24 @@
             })));
             if (this.object.currentView.waitForLoad) {
                 this.showLoader();
-                return this.listenToOnce(this.object.currentView, 'load', (function(_this) {
+                this.listenToOnce(this.object.currentView, 'load', (function(_this) {
                     return function() {
                         _this.trigger('load');
                         return _this.hideLoader();
                     };
                 })(this));
             } else {
-                return this.trigger('load');
+                this.trigger('load');
+                this.showContent();
             }
+            this.toolbar.show(new Uberbox.ToolbarView({
+                model: this.model
+            }));
+            return this.listenTo(this.toolbar.currentView, 'close', (function(_this) {
+                return function() {
+                    return _this.remove();
+                };
+            })(this));
         };
 
         LightboxItem.prototype.layoutAsCurrent = function() {
@@ -1741,8 +1875,7 @@
 
         Lightbox.prototype.ui = {
             next: '.uberbox-next',
-            prev: '.uberbox-prev',
-            toolbarWrapper: '.uberbox-toolbar-wrapper'
+            prev: '.uberbox-prev'
         };
 
         Lightbox.prototype.events = {
@@ -1779,27 +1912,7 @@
             return this.$el.html(Marionette.Renderer.render(this.template));
         };
 
-        Lightbox.prototype.showToolbar = function(item) {
-            if (this.toolbar) {
-                this.stopListening(this.toolbar, 'close');
-                this.toolbar.remove();
-            }
-            this.toolbar = new Uberbox.ToolbarView({
-                el: this.ui.toolbarWrapper,
-                model: item,
-                root: this.getOption('root')
-            });
-            return this.listenTo(this.toolbar, 'close', (function(_this) {
-                return function() {
-                    return _this.trigger('close');
-                };
-            })(this));
-        };
-
         Lightbox.prototype.onItemActivated = function(item) {
-            if (this.getOption('toolbar')) {
-                this.showToolbar(item);
-            }
             if (!this.currentItemView) {
                 this.rebuild();
             } else {

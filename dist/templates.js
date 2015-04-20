@@ -17,12 +17,27 @@ return __p
 window["Uberbox"] = window["Uberbox"] || {};
 window["Uberbox"]["Templates"] = window["Uberbox"]["Templates"] || {};
 
+window["Uberbox"]["Templates"]["content-iframe"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape;
+with (obj) {
+__p += '<iframe src="' +
+((__t = ( obj.url )) == null ? '' : __t) +
+'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+
+}
+return __p
+}})();
+(function() {
+window["Uberbox"] = window["Uberbox"] || {};
+window["Uberbox"]["Templates"] = window["Uberbox"]["Templates"] || {};
+
 window["Uberbox"]["Templates"]["content-image"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<img src="' +
-((__t = ( url )) == null ? '' : __t) +
+((__t = ( obj.model.get('url') )) == null ? '' : __t) +
 '"/>';
 
 }
@@ -32,13 +47,12 @@ return __p
 window["Uberbox"] = window["Uberbox"] || {};
 window["Uberbox"]["Templates"] = window["Uberbox"]["Templates"] || {};
 
-window["Uberbox"]["Templates"]["content-youtube"] = function(obj) {
+window["Uberbox"]["Templates"]["html-content"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<iframe src="' +
-((__t = ( obj.url )) == null ? '' : __t) +
-'" frameborder="0" allowfullscreen></iframe>';
+__p +=
+((__t = ( obj.model.get('html') )) == null ? '' : __t);
 
 }
 return __p
@@ -51,7 +65,7 @@ window["Uberbox"]["Templates"]["lightbox-content"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class="uberbox-toolbar-wrapper"></div>\n<div class="uberbox-prev"><i></i></div>\n<div class="uberbox-next"><i></i></div>\n';
+__p += '<div class="uberbox-prev"><i></i></div>\n<div class="uberbox-next"><i></i></div>\n';
 
 }
 return __p
@@ -65,15 +79,15 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="uberbox-lightbox-item-content">\n\t<div class="uberbox-item-object"></div>\n\t<div class="uberbox-item-description">\n\t\t';
+__p += '\n<div class="uberbox-lightbox-item-content-wrapper">\n\t<div class="uberbox-toolbar-wrapper"></div>\n\t<div class="uberbox-lightbox-item-content">\n\t\t<div class="uberbox-item-object"></div>\n\t\t<div class="uberbox-item-description">\n\t\t\t';
  if (obj.model.get('title')) { ;
 __p += '<h2>' +
 ((__t = ( obj.model.get('title') )) == null ? '' : __t) +
 '</h2>';
  } ;
-__p += '\n\t\t' +
+__p += '\n\t\t\t' +
 ((__t = ( obj.model.get('description') )) == null ? '' : __t) +
-'\n\t</div>\n</div>';
+'\n\t\t</div>\n\t</div>\n</div>';
 
 }
 return __p
@@ -95,7 +109,7 @@ __p += '\n\t\t<button data-action="fullscreen">\n\t\t\t<i class="uberbox-icon-fu
 ((__t = ( obj.model.get('exit_fullscreen_tooltip' ))) == null ? '' : __t) +
 '</span>\n\t\t</button>\n\t';
  } ;
-__p += '\n\t\n\t';
+__p += '\n\t';
  if (obj.model.get('download_url')) { ;
 __p += '\n\t\t<a data-action="download" href="' +
 ((__t = ( obj.model.get('download_url') )) == null ? '' : __t) +
@@ -146,7 +160,7 @@ window["Uberbox"]["Templates"]["uberbox"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class="uberbox-lightbox-wrapper"></div>\n<div class="uberbox-carousel-wrapper"></div>';
+__p += '<div class="uberbox-lightbox-wrapper"></div>\n<div class="uberbox-carousel-wrapper"></div>\n<div class="uberbox-toolbar-wrapper"></div>';
 
 }
 return __p
