@@ -13,8 +13,10 @@ class ObjectView extends Marionette.ItemView
 	getObjectNaturalAspectRatio: -> @getObjectNaturalWidth() / @getObjectNaturalHeight()
 	onObjectError: -> @trigger 'error'
 	onObjectLoaded: => @trigger 'load'
+	serializeData: -> model: @model
+	getOffset: -> @$el.offset()
+		
 	
-	serializeData: -> {model: @model}
 
 class Uberbox.ImageObjectView extends ObjectView
 	className: 'uberbox-image-content'
@@ -28,17 +30,21 @@ class Uberbox.ImageObjectView extends ObjectView
 		@onObjectLoaded() if @isObjectLoaded()
 		@ui.image.one 'load.uberbox', @onObjectLoaded
 		@ui.image.one 'error.uberbox', @onObjectError
-	
 	unbindUIElements: ->
 		@ui.image.off 'load.uberbox'
 		@ui.image.off 'error.uberbox'
 		super
-	
 	getObjectWidth: -> @ui.image.width()
 	isObjectLoaded: -> @ui.image[0].complete
 	getObjectNaturalWidth: -> @ui.image[0].naturalWidth
 	getObjectNaturalHeight: -> @ui.image[0].naturalHeight
-	
+	getOffset: -> 
+		offset = @ui.image.offset()
+		return {
+			left: offset.left
+			top: offset.top - jQuery(window).scrollTop()
+		}
+	getWidth: -> @ui.image.width()
 	
 	
 class Uberbox.IframeObjectView extends ObjectView
@@ -80,7 +86,6 @@ class Uberbox.VimeoObjectView extends Uberbox.IframeObjectView
 	getIframeUrl: -> "//player.vimeo.com/video/#{@getVideoID()}"
 	getVideoID: -> @model.get('url').replace(/(https?:)?(\/\/)?vimeo\.com\//i, '')
 	getObjectNaturalAspectRatio: -> 16.0 / 9.0
-		
 
 class Uberbox.GoogleMapsObjectView extends Uberbox.IframeObjectView
 	className: 'uberbox-iframe-content uberbox-gmap-content'
@@ -102,4 +107,3 @@ class Uberbox.HTMLObjectView extends ObjectView
 	getObjectNaturalWidth: -> 650
 	getObjectNaturalHeight: -> 400
 	
-

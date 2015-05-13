@@ -26,10 +26,12 @@ class Uberbox.ToolbarView extends Marionette.ItemView
 			), 500)
 	serializeData: -> {model: @model}
 	layout: ->
-		item = @getOption('bindTo')
-		offset = item.currentItemView.getOffset()
-		@$el.width(item.currentItemView.getWidth()).css(left: offset.left, top: offset.top - jQuery(window).scrollTop())
-		
+		if jQuery(window).width() > 639
+			item = @getOption('bindTo')
+			itemView = item.currentItemView
+			@$el.width(itemView.getWidth()).css itemView.getOffset()
+		else
+			@$el.css(left: '', top: 42)
 	onFullscreenClick: (e)-> 
 		e.preventDefault()
 		e.stopPropagation()

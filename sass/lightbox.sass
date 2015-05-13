@@ -26,6 +26,9 @@
 	i
 		position: absolute
 		display: block
+	+respond-to(handhelds)
+		display: none
+		
 .uberbox-vertical
 	.uberbox-next, .uberbox-prev
 		left: 50%
@@ -99,12 +102,19 @@
 		transition: opacity 0.3s, left 0.3s, top 0.3s
 	&.uberbox-current
 		z-index: 2
+		
+	+respond-to(handhelds)
+		left: 6px
+		top: 45px
+		right: 6px
+		bottom: 6px
 .uberbox-vertical
 	.uberbox-lightbox-item
-		left: 30px
-		right: 30px
-		top: 90px
-		bottom: 90px
+		+respond-to(wide-screens)
+			left: 30px
+			right: 30px
+			top: 90px
+			bottom: 90px
 		&.uberbox-flyout-next
 			transform: translate(0, 200%)
 		&.uberbox-flyout-prev
@@ -116,16 +126,25 @@
 				
 &.uberbox-horizontal 
 	.uberbox-lightbox-item
-		left: 0
-		right: 0
-		bottom: 45px
-		top: 45px
+		+respond-to(wide-screens)
+			left: 0
+			right: 0
+			bottom: 45px
+			top: 45px
 	&.uberbox-has-carousel
 		+respond-to(wide-screens)
 			.uberbox-lightbox-item
 				bottom: 130px
 .uberbox-lightbox-item
 	&.uberbox-description-mini
+		.uberbox-item-object
+			bottom: 50px
+			top: 0
+			left: 0
+			right: 0
+			> div
+				max-width: 100%
+				max-height: 100%
 		.uberbox-lightbox-item-content-wrapper
 			position: absolute
 			left: 0
@@ -133,18 +152,12 @@
 			top: 0
 			bottom: 0
 			transform: none
-		.uberbox-item-object
-			position: absolute
-			left: 60px
-			right: 60px
-			bottom: 60px
-			top: 0
 		.uberbox-item-description
 			position: absolute
 			bottom: 0
 			left: 50%
 			transform: translate(-50%, 0)
-			width: 400px
+			
 			padding: 10px 0 0 0
 			line-height: 18px
 			margin: 0 auto
@@ -213,12 +226,40 @@
 					height: 100%
 					display: block
 					margin: 0 auto
+		+respond-to(handhelds)
+			top: 0
+			.uberbox-item-object
+				position: absolute
+				left: 0
+				right: 0
+				top: 42px
+				bottom: 50px
+			.uberbox-item-description
+				width: 90%
+		+respond-to(handhelds-landscape)
+			.uberbox-item-object
+				bottom: 30px
+				top: 20px
+			.uberbox-item-description
+				line-height: 12px
+				height: 26px
+				h2
+					line-height: 12px
+				
+		+respond-to(wide-screens)
+			.uberbox-item-object
+				position: absolute
+				left: 60px
+				right: 60px
+				bottom: 60px
+				top: 0
+			.uberbox-item-description
+				width: 400px
 	&.uberbox-description-right, &.uberbox-description-bottom
 		font-weight: 200
 		color: #444
 		line-height: 20px
 		font-size: 13px
-		
 		&:after
 			display: none
 			clear: both
@@ -248,22 +289,23 @@
 			p
 				margin-bottom: 24px
 	&.uberbox-description-right
-		.uberbox-lightbox-item-content-wrapper
-			position: absolute
-			top: 50%
-			left: 50%
-			transform: translate(-50%, -50%)
-			width: 80%
-			height: 100%
-			max-width: 1200px
-			
-		.uberbox-item-object
-			position: relative
-			margin-right: 329.5px
-			height: 100%
-			overflow: hidden
-			+respond-to(wide-screens)
-				margin-right: 55%
+		.uberbox-item-description
+			background: #fff
+			box-sizing: border-box
+			overflow: auto
+		+respond-to(wide-screens)
+			.uberbox-lightbox-item-content-wrapper
+				position: absolute
+				top: 50%
+				left: 50%
+				transform: translate(-50%, -50%)
+				width: 80%
+				height: 100%
+				max-width: 1200px
+			.uberbox-item-object
+					position: static
+					float: none
+					margin-right: 55%
 			.uberbox-image-content
 				height: 100%
 				overflow: hidden
@@ -274,43 +316,39 @@
 					transform: translate(-50%, -50%)
 					max-width: 100%
 					max-height: 100%
-		&.uberbox-fit-oversized
-			.uberbox-image-content
+			&.uberbox-fit-oversized
+				.uberbox-image-content
+					position: absolute
+					top: 0
+					bottom: 0
+					left: 0
+					right: 0
+					width: auto
+					height: auto
+			&.uberbox-fit-width-oversized
+				.uberbox-image-content img
+					width: 100%
+					max-height: none
+			&.uberbox-fit-height-oversized
+				.uberbox-image-content img
+					height: 100%
+					max-width: none
+			&.uberbox-fit-height
+				.uberbox-image-content img
+					transform: none
+					left: auto
+					right: 0
+					top: 0
+					height: 100%
+			.uberbox-item-description
 				position: absolute
 				top: 0
-				bottom: 0
-				left: 0
 				right: 0
-				width: auto
-				height: auto
-		&.uberbox-fit-width-oversized
-			.uberbox-image-content img
-				width: 100%
-				max-height: none
-		&.uberbox-fit-height-oversized
-			.uberbox-image-content img
-				height: 100%
-				max-width: none
-		&.uberbox-fit-height
-			.uberbox-image-content img
-				transform: none
-				left: auto
-				right: 0
-				top: 0
-				height: 100%
-		.uberbox-item-description
-			position: absolute
-			top: 0
-			right: 0
-			width: 350px
-			+respond-to(wide-screens)
 				width: 55%
-			bottom: 0
-			background: #fff
-			box-sizing: border-box
-			overflow: hidden
-			padding: 24px 18px 24px 24px
-			+respond-to(wide-screens)
+				bottom: 0
+				background: #fff
+				box-sizing: border-box
+				overflow: auto
 				padding: 30px 36px 20px 42px
 		&.uberbox-skin-dark
 			.uberbox-lightbox-item-content-wrapper
@@ -341,7 +379,7 @@
 			width: 650px
 			margin: 0 auto
 			max-width: 100%
-		+respond-to(handhelds)
+		+respond-to(handhelds-portrait)
 			width: 100%
 			bottom: 0
 			.uberbox-item-description, .uberbox-item-object
@@ -379,33 +417,21 @@
 			box-sizing: border-box
 			background: white
 			padding: 24px 36px 20px 36px
-	+respond-to(handhelds)
-		left: 0
-		right: 0
-		> .uberbox-lightbox-item-content-wrapper
-			width: 100%
-			bottom: 0
-			left: 0
-			height: auto
-			transform: none !important
-			position: static !important
-+respond-to(handhelds)
-	.uberbox-prev, .uberbox-next
-		font-size: 36px !important
-	&.uberbox-vertical
-		.uberbox-next, .uberbox-prev
-	.uberbox-lightbox-item
-		left: 6px !important
-		right: 6px !important
-		top: 45px !important
-		bottom: 6px !important
-		width: auto !important
-	&.uberbox-vertical
-		.uberbox-prev, .uberbox-next
-			display: none !important
-	.uberbox-description-bottom, .uberbox-description-right
-		.uberbox-item-description
-			padding: 24px !important
+	&.uberbox-description-right, &.uberbox-description-bottom
+		+respond-to(handhelds-portrait)
+			position: fixed
+			top: 45px
+			left: 6px
+			right: 6px
+			bottom: 6px
+			overflow: scroll
+			.uberbox-item-object
+				.uberbox-image-content img
+					display: block
+					width: 100%
+			.uberbox-item-description
+				background: white
+				padding: 24px
 .uberbox-description-mini
 	.uberbox-bandcamp-content iframe
 		position: absolute

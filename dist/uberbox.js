@@ -63,6 +63,75 @@
 
         Uberbox.prototype.ui = {};
 
+        Uberbox.prototype.events = {
+            touchstart: 'onTouchStart',
+            touchmove: 'onTouchMove',
+            touchend: 'onTouchEnd'
+        };
+
+        Uberbox.prototype.onTouchStart = function(e) {
+            return this.touchStartedAt = {
+                left: e.originalEvent.pageX,
+                top: e.originalEvent.pageY
+            };
+        };
+
+        Uberbox.prototype.onTouchMove = function(e) {
+            var diffX, diffY, original, threshold;
+            threshold = 10;
+            original = e.originalEvent;
+            diffX = original.pageX - this.touchStartedAt.left;
+            diffY = original.pageY - this.touchStartedAt.top;
+            if (this.getOption('orientation') === 'horizontal' && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+                this.lightbox.currentView.currentItemView.swipeHorizontally(diffX > 0 ? diffX - threshold : diffX + threshold);
+                return e.preventDefault();
+            } else if (this.getOption('orientation') === 'vertical' && Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > threshold) {
+                this.lightbox.currentView.currentItemView.swipeVertically(diffY > 0 ? diffY - threshold : diffY + threshold);
+                return e.preventDefault();
+            } else {
+                this.lightbox.currentView.currentItemView.swipeBack();
+                if (this.collection.activeItem.get('description_style') === 'mini') {
+                    return e.preventDefault();
+                } else {
+                    return e.stopPropagation();
+                }
+            }
+        };
+
+        Uberbox.prototype.shouldBotherWithTouch = function(e) {
+            return this.getOption('orientation') === 'horizontal' && Math.abs() > threshold || this.getOption('orientation') === 'vertical' && Math.abs(e.pageY - this.touchStartedAt.top) > threshold;
+        };
+
+        Uberbox.prototype.onTouchEnd = function(e) {
+            var diffX, diffY, original, threshold;
+            original = e.originalEvent;
+            threshold = 40;
+            diffX = original.pageX - this.touchStartedAt.left;
+            diffY = original.pageY - this.touchStartedAt.top;
+            if (this.getOption('orientation') === 'horizontal') {
+                if (diffX > threshold && this.lightbox.currentView.currentItemView.model.prev()) {
+                    this.lightbox.currentView.currentItemView.swipeBack();
+                    this.lightbox.currentView.currentItemView.model.prev().activate();
+                }
+                if (diffX < -threshold && this.lightbox.currentView.currentItemView.model.next()) {
+                    this.lightbox.currentView.currentItemView.swipeBack();
+                    this.lightbox.currentView.currentItemView.model.next().activate();
+                }
+            }
+            if (this.getOption('orientation') === 'vertical') {
+                if (diffY > threshold && this.lightbox.currentView.currentItemView.model.prev()) {
+                    this.lightbox.currentView.currentItemView.swipeBack();
+                    this.lightbox.currentView.currentItemView.model.prev().activate();
+                }
+                if (diffY < -threshold && this.lightbox.currentView.currentItemView.model.next()) {
+                    this.lightbox.currentView.currentItemView.swipeBack();
+                    this.lightbox.currentView.currentItemView.model.next().activate();
+                }
+            }
+            this.lightbox.currentView.currentItemView.swipeBack();
+            return this.touchStartedAt = null;
+        };
+
         Uberbox.contentViewTypes = function() {
             return {
                 image: {
@@ -167,6 +236,9 @@
 
         function Uberbox(options) {
             this.onKeyDown = __bind(this.onKeyDown, this);
+            this.onTouchEnd = __bind(this.onTouchEnd, this);
+            this.onTouchMove = __bind(this.onTouchMove, this);
+            this.onTouchStart = __bind(this.onTouchStart, this);
             Uberbox.__super__.constructor.call(this, _.extend({
                 el: jQuery('<div class="uberbox" />').appendTo(jQuery('body'))
             }, options));
@@ -1191,13 +1263,17 @@
         };
 
         ToolbarView.prototype.layout = function() {
-            var item, offset;
-            item = this.getOption('bindTo');
-            offset = item.currentItemView.getOffset();
-            return this.$el.width(item.currentItemView.getWidth()).css({
-                left: offset.left,
-                top: offset.top - jQuery(window).scrollTop()
-            });
+            var item, itemView;
+            if (jQuery(window).width() > 639) {
+                item = this.getOption('bindTo');
+                itemView = item.currentItemView;
+                return this.$el.width(itemView.getWidth()).css(itemView.getOffset());
+            } else {
+                return this.$el.css({
+                    left: '',
+                    top: 42
+                });
+            }
         };
 
         ToolbarView.prototype.onFullscreenClick = function(e) {
@@ -1327,6 +1403,10 @@
             };
         };
 
+        ObjectView.prototype.getOffset = function() {
+            return this.$el.offset();
+        };
+
         return ObjectView;
 
     })(Marionette.ItemView);
@@ -1381,6 +1461,19 @@
 
         ImageObjectView.prototype.getObjectNaturalHeight = function() {
             return this.ui.image[0].naturalHeight;
+        };
+
+        ImageObjectView.prototype.getOffset = function() {
+            var offset;
+            offset = this.ui.image.offset();
+            return {
+                left: offset.left,
+                top: offset.top - jQuery(window).scrollTop()
+            };
+        };
+
+        ImageObjectView.prototype.getWidth = function() {
+            return this.ui.image.width();
         };
 
         return ImageObjectView;
@@ -1696,23 +1789,36 @@
         };
 
         LightboxItem.prototype.getOffset = function() {
-            var left, offset;
-            offset = jQuery(this.$el).offset();
-            if (this.model.get('description_style') === 'bottom' || this.model.get('description_style') === 'mini') {
-                left = this.object.currentView.$el.offset().left;
-                return {
-                    left: left,
-                    top: this.object.currentView.$el.offset().top
-                };
-            }
-            return this.object.currentView.$el.offset();
+            return this.object.currentView.getOffset();
         };
 
         LightboxItem.prototype.getWidth = function() {
-            if (this.model.get('description_style') === 'bottom' || this.model.get('description_style') === 'mini') {
+            if (this.model.get('description_style') === 'bottom') {
                 return this.object.currentView.$el.width();
             }
+            if (this.model.get('description_style') === 'mini') {
+                return this.object.currentView.getWidth();
+            }
             return this.object.currentView.$el.width() + this.ui.description.outerWidth();
+        };
+
+        LightboxItem.prototype.swipeVertically = function(amount) {
+            console.info("Swipe vert " + amount);
+            return this.$el.css({
+                transform: "translate(0, " + amount + "px)"
+            });
+        };
+
+        LightboxItem.prototype.swipeHorizontally = function(amount) {
+            return this.$el.css({
+                transform: "translate(" + amount + "px, 0)"
+            });
+        };
+
+        LightboxItem.prototype.swipeBack = function() {
+            return this.$el.css({
+                transform: "translate(0, 0)"
+            });
         };
 
         LightboxItem.prototype.layoutWithDescriptionAtBottom = function() {
@@ -1743,7 +1849,7 @@
             if (objectView.getObjectNaturalWidth() < width && objectView.getObjectNaturalHeight() < height) {
                 return this.fitNaturally();
             } else {
-                availableRatio = item.width() / (item.height() - (this.description.currentView ? this.description.$el.outerHeight() : 0));
+                availableRatio = objectView.$el.width() / objectView.$el.height();
                 objectRatio = objectView.getObjectNaturalAspectRatio();
                 if (availableRatio > objectRatio) {
                     return this.fitHeight();

@@ -32,16 +32,16 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			@layoutWithMiniDescription()
 		else if @model.get('description_style') == 'bottom'
 			@layoutWithDescriptionAtBottom()
-	getOffset: ->
-		offset = jQuery(@$el).offset()
-		if @model.get('description_style') == 'bottom' || @model.get('description_style') == 'mini'
-			left = @object.currentView.$el.offset().left
-			return left: left, top: @object.currentView.$el.offset().top
-		@object.currentView.$el.offset()
+	getOffset: -> @object.currentView.getOffset()
 	getWidth: ->
-		if @model.get('description_style') == 'bottom' || @model.get('description_style') == 'mini'
-			return @object.currentView.$el.width()
+		return @object.currentView.$el.width() if @model.get('description_style') == 'bottom'
+		return @object.currentView.getWidth() if @model.get('description_style') == 'mini'
 		@object.currentView.$el.width() + @ui.description.outerWidth()
+	swipeVertically: (amount)-> 
+		console.info "Swipe vert #{amount}"
+		@$el.css(transform: "translate(0, #{amount}px)")
+	swipeHorizontally: (amount)-> @$el.css(transform: "translate(#{amount}px, 0)")
+	swipeBack: -> @$el.css(transform: "translate(0, 0)")
 	layoutWithDescriptionAtBottom: ->
 		unless @object.currentView.supportsOversizing
 			@$el.addClass('uberbox-fit-height')
@@ -64,7 +64,8 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		if (objectView.getObjectNaturalWidth() < width and objectView.getObjectNaturalHeight() < height)
 			@fitNaturally()
 		else
-			availableRatio = item.width() / (item.height() - if @description.currentView then @description.$el.outerHeight() else 0)
+			#availableRatio = item.width() / (item.height() - if @description.currentView then @description.$el.outerHeight() else 0)
+			availableRatio = objectView.$el.width() / objectView.$el.height()
 			objectRatio = objectView.getObjectNaturalAspectRatio()
 			if availableRatio > objectRatio
 				@fitHeight()
@@ -166,7 +167,6 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 		@bindUIElements()
 	render: -> @$el.html(Marionette.Renderer.render(@template))
 
-		
 	onItemActivated: (item)->
 		if !@currentItemView
 			@rebuild()

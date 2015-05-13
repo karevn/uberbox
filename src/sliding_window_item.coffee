@@ -50,12 +50,3 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 	onItemActivated: -> @$el.addClass('uberbox-current')
 	onItemDeactivated: -> @$el.removeClass('uberbox-current')
 	onClicked: => @model.activate()
-	
-
-	
-		
-		
-
-	
-		
-		

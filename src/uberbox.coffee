@@ -6,6 +6,58 @@ class Uberbox extends Marionette.LayoutView
 		carousel: '.uberbox-carousel-wrapper'
 		toolbar: '.uberbox-toolbar-wrapper'
 	ui:{}
+	events:
+		touchstart: 'onTouchStart'
+		touchmove: 'onTouchMove'
+		touchend: 'onTouchEnd'
+	onTouchStart: (e)=>
+		@touchStartedAt = 
+			left: e.originalEvent.pageX
+			top: e.originalEvent.pageY
+	onTouchMove: (e)=>
+		threshold = 10
+		original = e.originalEvent
+		diffX = original.pageX - @touchStartedAt.left
+		diffY = original.pageY - @touchStartedAt.top
+		if @getOption('orientation') == 'horizontal' and Math.abs(diffX) > Math.abs(diffY) and Math.abs(diffX) > threshold
+			@lightbox.currentView.currentItemView.swipeHorizontally(if diffX > 0 then diffX - threshold else diffX + threshold)
+			e.preventDefault()
+		else if @getOption('orientation') == 'vertical' and Math.abs(diffY) > Math.abs(diffX) and Math.abs(diffY) > threshold
+			@lightbox.currentView.currentItemView.swipeVertically(if diffY > 0 then diffY - threshold else diffY + threshold)
+			e.preventDefault()
+		else
+			@lightbox.currentView.currentItemView.swipeBack()
+			if @collection.activeItem.get('description_style') == 'mini'
+				e.preventDefault()
+			else
+				e.stopPropagation()
+			
+	shouldBotherWithTouch: (e)->
+		@getOption('orientation') == 'horizontal' and Math.abs() > threshold or
+			@getOption('orientation') == 'vertical' and Math.abs(e.pageY - @touchStartedAt.top) > threshold
+	onTouchEnd: (e)=>
+		original = e.originalEvent
+		threshold = 40
+		diffX = original.pageX - @touchStartedAt.left
+		diffY = original.pageY - @touchStartedAt.top
+		if @getOption('orientation') == 'horizontal'
+			if diffX > threshold and @lightbox.currentView.currentItemView.model.prev()
+				@lightbox.currentView.currentItemView.swipeBack()
+				@lightbox.currentView.currentItemView.model.prev().activate()
+			if diffX <  -threshold and @lightbox.currentView.currentItemView.model.next()
+				@lightbox.currentView.currentItemView.swipeBack()
+				@lightbox.currentView.currentItemView.model.next().activate()
+		if @getOption('orientation') == 'vertical'
+			if diffY > threshold and @lightbox.currentView.currentItemView.model.prev()
+				@lightbox.currentView.currentItemView.swipeBack()
+				@lightbox.currentView.currentItemView.model.prev().activate()
+			if diffY <  -threshold and @lightbox.currentView.currentItemView.model.next()
+				@lightbox.currentView.currentItemView.swipeBack()
+				@lightbox.currentView.currentItemView.model.next().activate()
+		@lightbox.currentView.currentItemView.swipeBack()
+				
+			
+		@touchStartedAt = null
 	@contentViewTypes: ->
 		image:
 			condition: /\.(gif|png|jpeg|jpg)$/i
@@ -33,8 +85,7 @@ class Uberbox extends Marionette.LayoutView
 			class: Uberbox.HTMLObjectView
 		unknown:
 			class: Uberbox.UnknownItemView
-
-
+				
 	@show: (items, options = {})->
 		jQuery('html').css('')
 		options = _.extend({

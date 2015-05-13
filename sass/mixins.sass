@@ -20,12 +20,21 @@ $break-small: 440px
 	&.visible
 		opacity: 1
 @mixin respond-to($media) 
-	@if $media == handhelds 
-		@media only screen and (max-width: $break-small)
+	@if $media == handhelds
+		@media only screen and (max-width: 767px)
 			@content
-	@else if $media == medium-screens
-		@media only screen and (min-width: $break-small + 1) and (max-width: $break-large - 1) 
+	@if $media == handhelds-portrait
+		@media only screen and (max-width: 639px) and (orientation: portrait)
+			@content
+	@else if $media == handhelds-landscape
+		@media only screen and (max-width: 767px) and (orientation: landscape)
+			@content
+	@else if $media == medium-screens-portrait
+		@media only screen and (min-width: 768px) and (max-width: $break-large - 1)  and (orientation: portrait)
+			@content
+	@else if $media == medium-screens-landscape
+		@media only screen and (min-width: $break-small + 1) and (max-width: $break-large - 1)  and (orientation: portrait)
 			@content
 	@else if $media==wide-screens
-		@media only screen and (min-width: $break-large)
+		@media only screen and (min-width: $break-small)
 			@content
