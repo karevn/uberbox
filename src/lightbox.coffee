@@ -8,13 +8,12 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		object: '.uberbox-item-object'
 		description: '.uberbox-item-description'
 	ui:
-		content: '> .uberbox-lightbox-item-content'
+		content: '> .uberbox-lightbox-item-content-wrapper'
 		description: '.uberbox-item-description'
 	padding: 20
 	initialize: ->
 		super
 		@once 'load', => @showContent()
-			
 	showContent: ->
 		_.defer => 
 			@layout()
@@ -32,11 +31,17 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			@layoutWithMiniDescription()
 		else if @model.get('description_style') == 'bottom'
 			@layoutWithDescriptionAtBottom()
-	getOffset: -> @object.currentView.getOffset()
+	getOffset: ->
+		if @model.get('description_style') == 'mini'
+			return @object.currentView.getOffset()
+		offset = @ui.content.offset()
+		offset.top -= jQuery(window).scrollTop()
+		offset
+		
 	getWidth: ->
 		return @object.currentView.$el.width() if @model.get('description_style') == 'bottom'
 		return @object.currentView.getWidth() if @model.get('description_style') == 'mini'
-		@object.currentView.$el.width() + @ui.description.outerWidth()
+		@ui.content.width()
 	swipeVertically: (amount)-> 
 		console.info "Swipe vert #{amount}"
 		@$el.css(transform: "translate(0, #{amount}px)")
@@ -218,6 +223,9 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 			@prevItemView = null
 	layout: =>
 		@currentItemView.layoutAsCurrent()
-		_.debounce (=> @nextItemView.layoutAsNext()), 200 if @nextItemView
-		_.debounce (=> @prevItemView.layoutAsPrev()), 200 if @prevItemView
+		#_.debounce (=> @nextItemView.layoutAsNext()), 200 if @nextItemView
+		#_.debounce (=> @prevItemView.layoutAsPrev()), 200 if @prevItemView
+		_.defer =>
+			@nextItemView.layoutAsNext() if @nextItemView
+			@prevItemView.layoutAsPrev() if @prevItemView
 		

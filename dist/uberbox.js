@@ -489,7 +489,7 @@
         }
 
         Item.prototype.defaults = {
-            description_style: 'bottom',
+            description_style: 'mini',
             download_tooltip: 'Download',
             share_tooltip: 'Share',
             fullscreen_tooltip: 'Fullscreen',
@@ -1058,21 +1058,21 @@
             }
         };
 
-        Carousel.prototype.layout = function() {
-            var item, _results;
-            this.currentItemView.layoutAsCurrent();
-            item = this.currentItemView.getOption('next');
-            while (item) {
-                item.layoutAsNext();
-                item = item.getOption('next');
+        Carousel.prototype.hide = function() {
+            var item;
+            if (!this.currentItemView) {
+                return;
             }
-            item = this.currentItemView.getOption('prev');
-            _results = [];
-            while (item) {
-                item.layoutAsPrev();
-                _results.push(item = item.getOption('prev'));
+            this.currentItemView.remove();
+            item = this.currentItemView;
+            while (item = item.getOption('next')) {
+                item.remove();
             }
-            return _results;
+            item = this.currentItemView;
+            while (item = item.getOption('prev')) {
+                item.remove();
+            }
+            return this.currentItemView = null;
         };
 
         Carousel.prototype.buildFromScratch = function(item) {
@@ -1097,13 +1097,21 @@
         };
 
         Carousel.prototype.layout = function() {
-            this.currentItemView.layoutAsCurrent();
-            return this.currentItemView.runAction((function(_this) {
-                return function() {
-                    _this.layoutPrevItems(_this.currentItemView);
-                    return _this.layoutNextItems(_this.currentItemView);
-                };
-            })(this));
+            if (!this.$el.is(':visible')) {
+                return this.hide();
+            } else {
+                if (!this.currentItemView) {
+                    this.buildFromScratch(this.collection.activeItem);
+                    return;
+                }
+                this.currentItemView.layoutAsCurrent();
+                return this.currentItemView.runAction((function(_this) {
+                    return function() {
+                        _this.layoutPrevItems(_this.currentItemView);
+                        return _this.layoutNextItems(_this.currentItemView);
+                    };
+                })(this));
+            }
         };
 
         Carousel.prototype.layoutNextItems = function(prev) {
@@ -1737,7 +1745,7 @@
         };
 
         LightboxItem.prototype.ui = {
-            content: '> .uberbox-lightbox-item-content',
+            content: '> .uberbox-lightbox-item-content-wrapper',
             description: '.uberbox-item-description'
         };
 
@@ -1789,7 +1797,13 @@
         };
 
         LightboxItem.prototype.getOffset = function() {
-            return this.object.currentView.getOffset();
+            var offset;
+            if (this.model.get('description_style') === 'mini') {
+                return this.object.currentView.getOffset();
+            }
+            offset = this.ui.content.offset();
+            offset.top -= jQuery(window).scrollTop();
+            return offset;
         };
 
         LightboxItem.prototype.getWidth = function() {
@@ -1799,7 +1813,7 @@
             if (this.model.get('description_style') === 'mini') {
                 return this.object.currentView.getWidth();
             }
-            return this.object.currentView.$el.width() + this.ui.description.outerWidth();
+            return this.ui.content.width();
         };
 
         LightboxItem.prototype.swipeVertically = function(amount) {
@@ -2155,20 +2169,16 @@
 
         Lightbox.prototype.layout = function() {
             this.currentItemView.layoutAsCurrent();
-            if (this.nextItemView) {
-                _.debounce(((function(_this) {
-                    return function() {
-                        return _this.nextItemView.layoutAsNext();
-                    };
-                })(this)), 200);
-            }
-            if (this.prevItemView) {
-                return _.debounce(((function(_this) {
-                    return function() {
+            return _.defer((function(_this) {
+                return function() {
+                    if (_this.nextItemView) {
+                        _this.nextItemView.layoutAsNext();
+                    }
+                    if (_this.prevItemView) {
                         return _this.prevItemView.layoutAsPrev();
-                    };
-                })(this)), 200);
-            }
+                    }
+                };
+            })(this));
         };
 
         return Lightbox;

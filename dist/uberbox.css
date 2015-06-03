@@ -1044,6 +1044,10 @@
     transition: opacity 0.3s, left 0.3s, top 0.3s, transform 0.3s;
     opacity: 0;
     z-index: 1;
+    left: 6px;
+    top: 42px;
+    right: 6px;
+    bottom: 20px;
 }
 
 .uberbox-lightbox-item.uberbox-visible {
@@ -1068,7 +1072,7 @@
     }
 }
 
-@media only screen and (min-width: 440px) {
+@media only screen and (min-width: 1024px) {
     .uberbox-vertical .uberbox-lightbox-item {
         left: 30px;
         right: 30px;
@@ -1093,13 +1097,13 @@
     right: 30px;
 }
 
-@media only screen and (min-width: 440px) {
+@media only screen and (min-width: 1024px) {
     .uberbox-vertical.uberbox-has-carousel .uberbox-lightbox-item {
         right: 180px;
     }
 }
 
-@media only screen and (min-width: 440px) {
+@media only screen and (min-width: 1024px) {
     .uberbox-horizontal .uberbox-lightbox-item {
         left: 0;
         right: 0;
@@ -1108,7 +1112,7 @@
     }
 }
 
-@media only screen and (min-width: 440px) {
+@media only screen and (min-width: 1024px) {
     .uberbox-horizontal.uberbox-has-carousel .uberbox-lightbox-item {
         bottom: 130px;
     }
@@ -1269,7 +1273,7 @@
     }
 }
 
-@media only screen and (min-width: 440px) {
+@media only screen and (min-width: 1024px) {
     .uberbox-lightbox-item.uberbox-description-mini .uberbox-item-object {
         position: absolute;
         left: 60px;
@@ -1313,7 +1317,7 @@
     margin-bottom: 18px;
 }
 
-@media only screen and (min-width: 440px) {
+@media only screen and (min-width: 1024px) {
     .uberbox-lightbox-item.uberbox-description-right, .uberbox-lightbox-item.uberbox-description-bottom {
         font-size: 16px;
         line-height: 28px;
@@ -1342,7 +1346,7 @@
     overflow: auto;
 }
 
-@media only screen and (min-width: 440px) {
+@media only screen and (min-width: 1024px) {
     .uberbox-lightbox-item.uberbox-description-right .uberbox-lightbox-item-content-wrapper {
         position: absolute;
         top: 50%;
@@ -1566,7 +1570,7 @@
     display: none;
 }
 
-@media only screen and (min-width: 440px) {
+@media only screen and (min-width: 1024px) {
     .uberbox-carousel-wrapper {
         display: block;
     }

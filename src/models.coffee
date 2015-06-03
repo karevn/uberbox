@@ -39,7 +39,7 @@ class Uberbox.ShareService extends Backbone.Model
 	
 class Uberbox.Item extends Backbone.Model
 	defaults:
-		description_style: 'bottom'
+		description_style: 'mini'
 		download_tooltip: 'Download'
 		share_tooltip: 'Share'
 		fullscreen_tooltip: 'Fullscreen'

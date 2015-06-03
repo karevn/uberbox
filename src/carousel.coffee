@@ -19,17 +19,14 @@ class Uberbox.CarouselItem extends Uberbox.SlidingWindowItem
 	onImageLoaded: => @trigger('load')
 	layoutContent: ->
 	hideLoader: ->
-
 	layoutAsCurrent: ->
 		@calculateCoordinatesAsCurrent()
 		@layoutContent() if @loaded
 		@applyLayout()
-
 	layoutAsNext: ->
 		@calculateCoordinatesAsNext()
 		@layoutContent() if @loaded
 		@applyLayout()
-
 	layoutAsPrev: ->
 		@calculateCoordinatesAsPrev()
 		@layoutContent() if @loaded
@@ -91,16 +88,15 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 			return Uberbox.VerticalCarouselItem
 		else
 			return Uberbox.HorizontalCarouselItem
-	layout: =>
-		@currentItemView.layoutAsCurrent()
-		item = @currentItemView.getOption('next')
-		while item
-			item.layoutAsNext()
-			item = item.getOption('next')
-		item = @currentItemView.getOption('prev')
-		while item
-			item.layoutAsPrev()
-			item = item.getOption('prev')
+	hide: ->
+		return unless @currentItemView
+		@currentItemView.remove()
+		item = @currentItemView
+		item.remove() while item = item.getOption('next')
+		item = @currentItemView
+		item.remove() while item = item.getOption('prev')
+		@currentItemView = null
+			
 	buildFromScratch: (item)->
 		@currentItemView = @createChildView(item)
 		@currentItemView.layoutAsCurrent()
@@ -112,11 +108,17 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 		@currentItemView.runAction =>
 			@currentItemView = item
 			@layout()
-	layout: ->
-		@currentItemView.layoutAsCurrent()
-		@currentItemView.runAction =>
-			@layoutPrevItems(@currentItemView)
-			@layoutNextItems(@currentItemView)
+	layout: =>
+		if !@$el.is(':visible')
+			@hide()
+		else
+			unless @currentItemView
+				@buildFromScratch(@collection.activeItem)
+				return
+			@currentItemView.layoutAsCurrent()
+			@currentItemView.runAction =>
+				@layoutPrevItems(@currentItemView)
+				@layoutNextItems(@currentItemView)
 
 	layoutNextItems: (prev)->
 		if prev != @currentItemView
