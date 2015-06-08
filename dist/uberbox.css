@@ -688,6 +688,7 @@
     line-height: 40px;
     -webkit-transition: color 0.3s;
     transition: color 0.3s;
+    cursor: pointer;
 }
 
 .uberbox-toolbar a[data-action]:disabled, .uberbox-toolbar button[data-action]:disabled {
