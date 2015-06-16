@@ -8,7 +8,7 @@ var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<img src="' +
 ((__t = ( thumbnail )) == null ? '' : __t) +
-'">';
+'">\n<div class="uberbox-loader"></div>';
 
 }
 return __p

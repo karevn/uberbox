@@ -1604,10 +1604,17 @@
     opacity: 0;
 }
 
+.uberbox-carousel-wrapper .uberbox-carousel-item .uberbox-loader {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: red;
+}
+
 .uberbox-carousel-wrapper .uberbox-carousel-item img {
     display: block;
-    height: 100%;
-    width: 100%;
     opacity: 0.5;
     -webkit-transition: opacity 0.3s;
     transition: opacity 0.3s;
@@ -1633,11 +1640,19 @@
     width: 150px;
 }
 
+.uberbox-vertical .uberbox-carousel-wrapper .uberbox-carousel-item img {
+    width: 100%;
+}
+
 .uberbox-horizontal .uberbox-carousel-wrapper {
     left: 0px;
     bottom: 0px;
     height: 130px;
     right: 0px;
+}
+
+.uberbox-horizontal .uberbox-carousel-wrapper .uberbox-carousel-item img {
+    height: 100%;
 }
 
 

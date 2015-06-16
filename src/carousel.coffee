@@ -2,10 +2,9 @@ class Uberbox.CarouselItem extends Uberbox.SlidingWindowItem
 	template: -> Uberbox.Templates['carousel-item']
 	className: 'uberbox-carousel-item'
 	padding: 15
-	events: -> _.extend super,
-		'load @ui.image': 'onImageLoaded'
 	ui:
 		image: 'img'
+		loader: '.uberbox-loader'
 	getImageAspectRatio: ->
 		image = @ui.image[0]
 		aspect = image.naturalWidth / image.naturalHeight
@@ -16,9 +15,12 @@ class Uberbox.CarouselItem extends Uberbox.SlidingWindowItem
 		super
 		if @ui.image[0].complete
 			_.defer => @onImageLoaded()
-	onImageLoaded: => @trigger('load')
+		@$el.find('img').on 'load', @onImageLoaded
+	onImageLoaded: => 
+		@trigger('load')
 	layoutContent: ->
 	hideLoader: ->
+		@ui.loader.remove()
 	layoutAsCurrent: ->
 		@calculateCoordinatesAsCurrent()
 		@layoutContent() if @loaded
@@ -31,6 +33,8 @@ class Uberbox.CarouselItem extends Uberbox.SlidingWindowItem
 		@calculateCoordinatesAsPrev()
 		@layoutContent() if @loaded
 		@applyLayout()
+	remove: ->
+		@$el.find('img').off 'load', @onImageLoaded
 	fits: -> 
 		return true if @belongs()
 		offset = @$el.offset()
@@ -99,9 +103,9 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 			
 	buildFromScratch: (item)->
 		@currentItemView = @createChildView(item)
-		@currentItemView.layoutAsCurrent()
-		@currentItemView.reveal()
 		@currentItemView.runAction =>
+			@currentItemView.layoutAsCurrent()
+			@currentItemView.reveal()
 			@layoutNextItems(@currentItemView)
 			@layoutPrevItems(@currentItemView)
 	slideTo: (item)->
@@ -126,7 +130,7 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 			unless prev.fits()
 				prev.remove()
 				return null
-		if prev.model.next() and !prev.getOption('next') and prev.belongs()
+		if prev.model.next() and !prev.getOption('next') and prev.fits()
 			view = @createChildView(prev.model.next(), prev: prev)
 			prev.options.next = view
 			view.options.prev = prev
@@ -142,7 +146,7 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 			unless next.fits()
 				next.remove()
 				return null
-		if next.model.prev()  and !next.getOption('prev') and next.belongs()
+		if next.model.prev()  and !next.getOption('prev') and next.fits()
 			view = @createChildView(next.model.prev(), next: next)
 			next.options.prev = view
 			view.options.next = next

@@ -270,7 +270,7 @@
             current = this.getOption('collection').at(this.getOption('current'));
             this.listenTo(this.getOption('collection'), 'activate', this.onItemActivated);
             current.activate();
-            jQuery('body').on('keydown.uberbox', this.onKeyDown);
+            jQuery('body').on('keydown', this.onKeyDown);
             this.overflow = jQuery('html').css('overflow');
             return jQuery('html').css('overflow', 'hidden');
         };
@@ -587,14 +587,14 @@
         };
 
         ItemCollection.prototype.activateNext = function() {
-            if (this.current && this.current.next()) {
-                return this.current.next().activate();
+            if (this.activeItem && this.activeItem.next()) {
+                return this.activeItem.next().activate();
             }
         };
 
         ItemCollection.prototype.activatePrev = function() {
-            if (this.current && this.current.prev()) {
-                return this.current.prev().activate();
+            if (this.activeItem && this.activeItem.prev()) {
+                return this.activeItem.prev().activate();
             }
         };
 
@@ -699,7 +699,7 @@
                 this.loaderTimeout = setTimeout(this.showLoader, 200);
                 return this.listenToOnce(this, 'load', (function(_this) {
                     return function() {
-                        return setTimeout(callback, 200);
+                        return callback();
                     };
                 })(this));
             }
@@ -866,14 +866,9 @@
 
         CarouselItem.prototype.padding = 15;
 
-        CarouselItem.prototype.events = function() {
-            return _.extend(CarouselItem.__super__.events.apply(this, arguments), {
-                'load @ui.image': 'onImageLoaded'
-            });
-        };
-
         CarouselItem.prototype.ui = {
-            image: 'img'
+            image: 'img',
+            loader: '.uberbox-loader'
         };
 
         CarouselItem.prototype.getImageAspectRatio = function() {
@@ -893,12 +888,13 @@
         CarouselItem.prototype.bindUIElements = function() {
             CarouselItem.__super__.bindUIElements.apply(this, arguments);
             if (this.ui.image[0].complete) {
-                return _.defer((function(_this) {
+                _.defer((function(_this) {
                     return function() {
                         return _this.onImageLoaded();
                     };
                 })(this));
             }
+            return this.$el.find('img').on('load', this.onImageLoaded);
         };
 
         CarouselItem.prototype.onImageLoaded = function() {
@@ -907,7 +903,9 @@
 
         CarouselItem.prototype.layoutContent = function() {};
 
-        CarouselItem.prototype.hideLoader = function() {};
+        CarouselItem.prototype.hideLoader = function() {
+            return this.ui.loader.remove();
+        };
 
         CarouselItem.prototype.layoutAsCurrent = function() {
             this.calculateCoordinatesAsCurrent();
@@ -931,6 +929,10 @@
                 this.layoutContent();
             }
             return this.applyLayout();
+        };
+
+        CarouselItem.prototype.remove = function() {
+            return this.$el.find('img').off('load', this.onImageLoaded);
         };
 
         CarouselItem.prototype.fits = function() {
@@ -1077,10 +1079,10 @@
 
         Carousel.prototype.buildFromScratch = function(item) {
             this.currentItemView = this.createChildView(item);
-            this.currentItemView.layoutAsCurrent();
-            this.currentItemView.reveal();
             return this.currentItemView.runAction((function(_this) {
                 return function() {
+                    _this.currentItemView.layoutAsCurrent();
+                    _this.currentItemView.reveal();
                     _this.layoutNextItems(_this.currentItemView);
                     return _this.layoutPrevItems(_this.currentItemView);
                 };
@@ -1123,7 +1125,7 @@
                     return null;
                 }
             }
-            if (prev.model.next() && !prev.getOption('next') && prev.belongs()) {
+            if (prev.model.next() && !prev.getOption('next') && prev.fits()) {
                 view = this.createChildView(prev.model.next(), {
                     prev: prev
                 });
@@ -1150,7 +1152,7 @@
                     return null;
                 }
             }
-            if (next.model.prev() && !next.getOption('prev') && next.belongs()) {
+            if (next.model.prev() && !next.getOption('prev') && next.fits()) {
                 view = this.createChildView(next.model.prev(), {
                     next: next
                 });

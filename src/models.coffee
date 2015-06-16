@@ -78,5 +78,5 @@ class Uberbox.ItemCollection extends Backbone.Collection
 		index = @indexOf(item)
 		return if index == 0
 		@at(index - 1)
-	activateNext: -> @current.next().activate() if @current and @current.next()
-	activatePrev: -> @current.prev().activate() if @current and @current.prev()
+	activateNext: -> @activeItem.next().activate() if @activeItem and @activeItem.next()
+	activatePrev: -> @activeItem.prev().activate() if @activeItem and @activeItem.prev()

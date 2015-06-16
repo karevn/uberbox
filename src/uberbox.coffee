@@ -139,7 +139,7 @@ class Uberbox extends Marionette.LayoutView
 		@listenTo @getOption('collection'), 'activate', @onItemActivated
 		current.activate()
 
-		jQuery('body').on 'keydown.uberbox', @onKeyDown
+		jQuery('body').on 'keydown', @onKeyDown
 		@overflow = jQuery('html').css('overflow')
 		jQuery('html').css('overflow', 'hidden')
 	onItemActivated: (model)->

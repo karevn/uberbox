@@ -21,10 +21,16 @@
 			transition: opacity 0.3s ease-in-out, left 0.3s ease-in-out, top 0.3s ease-in-out
 		&.uberbox-faded
 			opacity: 0
+		.uberbox-loader
+			position: absolute
+			left: 0
+			right: 0
+			top: 0
+			bottom: 0
+			background: red
 		img
 			display: block
-			height: 100%
-			width: 100%
+			
 			opacity: 0.5
 			transition: opacity 0.3s
 			border-radius: 2px
@@ -41,8 +47,13 @@
 	bottom: 0
 	top: 0px
 	width: 150px
+	.uberbox-carousel-item img
+		width: 100%
 .uberbox-horizontal .uberbox-carousel-wrapper
 	left: 0px
 	bottom: 0px
 	height: 130px
 	right: 0px
+	.uberbox-carousel-item img
+		height: 100%
+	

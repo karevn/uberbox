@@ -32,7 +32,7 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 			callback()
 		else
 			@loaderTimeout = setTimeout @showLoader, 200
-			@listenToOnce this, 'load', => setTimeout(callback, 200)
+			@listenToOnce this, 'load', => callback()
 	getParent: ->
 		@parent = @$el.parent() unless @parent
 		@parent
