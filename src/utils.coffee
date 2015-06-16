@@ -7,7 +7,7 @@ class Uberbox.Utils
 		false
 	@isFullscreen: ->
 		for method in ['fullscreenEnabled', 'webkitFullscreenEnabled', 'mozFullscreenEnabled', 'msFullscreenEnabled']
-			if _.isUndefined(document[method])
+			if !_.isUndefined(document[method])
 				return document[method]
 		
 	@enterFullscreen: (el)->

@@ -65,7 +65,8 @@ class Uberbox.IframeObjectView extends ObjectView
 	getObjectWidth: -> @ui.iframe.width()
 	isObjectLoaded: -> @ui.iframe[0].complete
 	serializeData: -> _.extend(super, url: @getIframeUrl())
-	onWindowResized: => @ui.iframe.height(@ui.iframe.width() / @getObjectNaturalAspectRatio())
+	onWindowResized: => 
+		@ui.iframe.height(Math.min(@ui.iframe.width() / @getObjectNaturalAspectRatio(), @$el.height()))
 	getIframeUrl: -> @model.get('url')
 	getObjectNaturalWidth: -> @$el.parent().width()
 	getObjectNaturalHeight: -> @$el.parent().height()
