@@ -100,7 +100,9 @@ class Uberbox extends Marionette.LayoutView
 	@close: ->
 		if @instances.length > 0
 			instance = @instances.pop()
+			Uberbox.Utils.exitFullscreen() if Uberbox.Utils.isFullscreen()
 			instance.remove()
+			
 	
 	
 	@getPixelRatio: -> if window.devicePixelRatio > 0 then window.devicePixelRatio else 1

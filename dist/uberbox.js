@@ -197,6 +197,9 @@
             var instance;
             if (this.instances.length > 0) {
                 instance = this.instances.pop();
+                if (Uberbox.Utils.isFullscreen()) {
+                    Uberbox.Utils.exitFullscreen();
+                }
                 return instance.remove();
             }
         };
@@ -368,7 +371,7 @@
             _ref = ['fullscreenEnabled', 'webkitFullscreenEnabled', 'mozFullscreenEnabled', 'msFullscreenEnabled'];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                 method = _ref[_i];
-                if (_.isUndefined(document[method])) {
+                if (!_.isUndefined(document[method])) {
                     return document[method];
                 }
             }
@@ -1574,7 +1577,7 @@
         };
 
         IframeObjectView.prototype.onWindowResized = function() {
-            return this.ui.iframe.height(this.ui.iframe.width() / this.getObjectNaturalAspectRatio());
+            return this.ui.iframe.height(Math.min(this.ui.iframe.width() / this.getObjectNaturalAspectRatio(), this.$el.height()));
         };
 
         IframeObjectView.prototype.getIframeUrl = function() {
@@ -2187,12 +2190,16 @@
                 this.currentItemView = this.createChildView(item, {
                     fromNext: true
                 });
-                this.prevItemView = this.createChildView(item.prev(), {
-                    next: this.currentItemView
-                });
-                this.nextItemView = this.createChildView(item.next(), {
-                    prev: this.currentItemView
-                });
+                if (item.prev()) {
+                    this.prevItemView = this.createChildView(item.prev(), {
+                        next: this.currentItemView
+                    });
+                }
+                if (item.next()) {
+                    this.nextItemView = this.createChildView(item.next(), {
+                        prev: this.currentItemView
+                    });
+                }
                 return this.currentItemView.layoutAsCurrent();
             }
         };
@@ -2221,12 +2228,16 @@
                 this.currentItemView = this.createChildView(item, {
                     fromPrev: true
                 });
-                this.nextItemView = this.createChildView(item.next(), {
-                    prev: this.currentItemView
-                });
-                this.prevItemView = this.createChildView(item.prev(), {
-                    next: this.currentItemView
-                });
+                if (item.next()) {
+                    this.nextItemView = this.createChildView(item.next(), {
+                        prev: this.currentItemView
+                    });
+                }
+                if (item.prev()) {
+                    this.prevItemView = this.createChildView(item.prev(), {
+                        next: this.currentItemView
+                    });
+                }
                 return this.currentItemView.layoutAsCurrent();
             }
         };
