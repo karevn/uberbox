@@ -176,12 +176,10 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 		if !@currentItemView
 			@rebuild()
 		else
-			if item == @currentItemView.model.next()
-				@scrollNext()
-			else if item == @currentItemView.model.prev()
-				@scrollPrev()
+			if item.follows(@currentItemView.model)
+				@scrollNext(item)
 			else
-				@rebuild()
+				@scrollPrev(item)
 		if @currentItemView.model.next()
 			@ui.next.removeClass('uberbox-disabled')
 		else
@@ -194,33 +192,50 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 	rebuild: ->
 		@currentItemView.remove() if @currentItemView
 		@prevItemView.remove() if @prevItemView
-		@nextItemView.remove() if @nextItemView
-			
+		@nextItemView.remove() if @nextItemView	
 		@currentItemView = @createChildView(@collection.activeItem)
 		if next = @collection.activeItem.next()
 			@nextItemView = @createChildView(next, prev: @currentItemView)
 		if prev = @collection.activeItem.prev()
 			@prevItemView = @createChildView(prev, next: @currentItemView)
-	scrollNext: ->
+	scrollNext: (item)->
 		@prevItemView.remove() if @prevItemView
 		@currentItemView.layoutAsPrev()
-		@prevItemView = @currentItemView
-		@nextItemView.layoutAsCurrent()
-		@currentItemView = @nextItemView
-		if @nextItemView.model.next()
-			@nextItemView = @createChildView(@nextItemView.model.next(), prev: @nextItemView)
+		if @currentItemView.model.isPrev(item)
+			@prevItemView = @currentItemView
+			@currentItemView = @nextItemView
+			@currentItemView.layoutAsCurrent()
+			@currentItemView = @nextItemView
+			if @currentItemView.model.next()
+				@nextItemView = @createChildView(@currentItemView.model.next(), prev: @currentItemView)
+			else
+				@nextItemView = null
 		else
-			@nextItemView = null
-	scrollPrev: ->
+			@nextItemView.remove() if @nextItemView
+			@currentItemView = @createChildView(item, fromNext: true)
+			@prevItemView = @createChildView(item.prev(), next: @currentItemView)
+			@nextItemView = @createChildView(item.next(), prev: @currentItemView)
+			@currentItemView.layoutAsCurrent()
+		
+	scrollPrev: (item)->
 		@nextItemView.remove() if @nextItemView
 		@currentItemView.layoutAsNext()
-		@nextItemView = @currentItemView
-		@prevItemView.layoutAsCurrent()
-		@currentItemView = @prevItemView
-		if @prevItemView.model.prev()
-			@prevItemView = @createChildView(@prevItemView.model.prev(), next: @prevItemView)
+		if @currentItemView.model.isNext(item)
+			@nextItemView = @currentItemView
+			@currentItemView = @prevItemView
+			@currentItemView.layoutAsCurrent()
+			@currentItemView = @prevItemView
+			if @currentItemView.model.next()
+				@prevItemView = @createChildView(@currentItemView.model.prev(), next: @currentItemView)
+			else
+				@prevItemView = null
 		else
-			@prevItemView = null
+			@prevItemView.remove() if @prevItemView
+			@currentItemView = @createChildView(item, fromPrev: true)
+			@nextItemView = @createChildView(item.next(), prev: @currentItemView)
+			@prevItemView = @createChildView(item.prev(), next: @currentItemView)
+			@currentItemView.layoutAsCurrent()
+			
 	layout: =>
 		@currentItemView.layoutAsCurrent()
 		#_.debounce (=> @nextItemView.layoutAsNext()), 200 if @nextItemView

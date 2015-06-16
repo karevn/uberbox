@@ -59,7 +59,16 @@ class Uberbox.Item extends Backbone.Model
 	isActive: -> @collection.activeItem == this
 	isNext: -> @collection.activeItem == @prev()
 	isPrev: -> @collection.activeItem == @next()
-	
+	follows: (item)->
+		next = item.next()
+		return true if next == this
+		return @follows(next) if next
+		false
+	precedes: (item)->
+		prev = item.prev()
+		return true if prev == this
+		return @precedes(prev) if prev
+		false
 
 class Uberbox.ItemCollection extends Backbone.Collection
 	model: Uberbox.Item

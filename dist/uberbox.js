@@ -541,6 +541,30 @@
             return this.collection.activeItem === this.next();
         };
 
+        Item.prototype.follows = function(item) {
+            var next;
+            next = item.next();
+            if (next === this) {
+                return true;
+            }
+            if (next) {
+                return this.follows(next);
+            }
+            return false;
+        };
+
+        Item.prototype.precedes = function(item) {
+            var prev;
+            prev = item.prev();
+            if (prev === this) {
+                return true;
+            }
+            if (prev) {
+                return this.precedes(prev);
+            }
+            return false;
+        };
+
         return Item;
 
     })(Backbone.Model);
@@ -813,15 +837,21 @@
                 orientation: this.getOption('orientation')
             }, Marionette._getValue(this.getOption('childViewOptions'), this, [child])), options);
             view = new viewClass(options);
-            if (options.prev) {
+            if (options.prev && !options.next) {
                 view.$el.insertAfter(options.prev.$el);
                 view.layoutAsNext();
-            } else if (options.next) {
+            } else if (options.next && !options.prev) {
                 view.$el.insertBefore(options.next.$el);
                 view.layoutAsPrev();
             } else {
                 view.$el.appendTo(this.$el);
-                view.layoutAsCurrent();
+                if (options.fromPrev) {
+                    view.layoutAsPrev();
+                } else if (options.fromNext) {
+                    view.layoutAsNext();
+                } else {
+                    view.layoutAsCurrent();
+                }
             }
             return view;
         };
@@ -2089,12 +2119,10 @@
             if (!this.currentItemView) {
                 this.rebuild();
             } else {
-                if (item === this.currentItemView.model.next()) {
-                    this.scrollNext();
-                } else if (item === this.currentItemView.model.prev()) {
-                    this.scrollPrev();
+                if (item.follows(this.currentItemView.model)) {
+                    this.scrollNext(item);
                 } else {
-                    this.rebuild();
+                    this.scrollPrev(item);
                 }
             }
             if (this.currentItemView.model.next()) {
@@ -2135,37 +2163,71 @@
             }
         };
 
-        Lightbox.prototype.scrollNext = function() {
+        Lightbox.prototype.scrollNext = function(item) {
             if (this.prevItemView) {
                 this.prevItemView.remove();
             }
             this.currentItemView.layoutAsPrev();
-            this.prevItemView = this.currentItemView;
-            this.nextItemView.layoutAsCurrent();
-            this.currentItemView = this.nextItemView;
-            if (this.nextItemView.model.next()) {
-                return this.nextItemView = this.createChildView(this.nextItemView.model.next(), {
-                    prev: this.nextItemView
-                });
+            if (this.currentItemView.model.isPrev(item)) {
+                this.prevItemView = this.currentItemView;
+                this.currentItemView = this.nextItemView;
+                this.currentItemView.layoutAsCurrent();
+                this.currentItemView = this.nextItemView;
+                if (this.currentItemView.model.next()) {
+                    return this.nextItemView = this.createChildView(this.currentItemView.model.next(), {
+                        prev: this.currentItemView
+                    });
+                } else {
+                    return this.nextItemView = null;
+                }
             } else {
-                return this.nextItemView = null;
+                if (this.nextItemView) {
+                    this.nextItemView.remove();
+                }
+                this.currentItemView = this.createChildView(item, {
+                    fromNext: true
+                });
+                this.prevItemView = this.createChildView(item.prev(), {
+                    next: this.currentItemView
+                });
+                this.nextItemView = this.createChildView(item.next(), {
+                    prev: this.currentItemView
+                });
+                return this.currentItemView.layoutAsCurrent();
             }
         };
 
-        Lightbox.prototype.scrollPrev = function() {
+        Lightbox.prototype.scrollPrev = function(item) {
             if (this.nextItemView) {
                 this.nextItemView.remove();
             }
             this.currentItemView.layoutAsNext();
-            this.nextItemView = this.currentItemView;
-            this.prevItemView.layoutAsCurrent();
-            this.currentItemView = this.prevItemView;
-            if (this.prevItemView.model.prev()) {
-                return this.prevItemView = this.createChildView(this.prevItemView.model.prev(), {
-                    next: this.prevItemView
-                });
+            if (this.currentItemView.model.isNext(item)) {
+                this.nextItemView = this.currentItemView;
+                this.currentItemView = this.prevItemView;
+                this.currentItemView.layoutAsCurrent();
+                this.currentItemView = this.prevItemView;
+                if (this.currentItemView.model.next()) {
+                    return this.prevItemView = this.createChildView(this.currentItemView.model.prev(), {
+                        next: this.currentItemView
+                    });
+                } else {
+                    return this.prevItemView = null;
+                }
             } else {
-                return this.prevItemView = null;
+                if (this.prevItemView) {
+                    this.prevItemView.remove();
+                }
+                this.currentItemView = this.createChildView(item, {
+                    fromPrev: true
+                });
+                this.nextItemView = this.createChildView(item.next(), {
+                    prev: this.currentItemView
+                });
+                this.prevItemView = this.createChildView(item.prev(), {
+                    next: this.currentItemView
+                });
+                return this.currentItemView.layoutAsCurrent();
             }
         };
 

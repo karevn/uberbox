@@ -16,13 +16,18 @@ class Uberbox.SlidingWindow extends Marionette.View
 			Marionette._getValue(@getOption('childViewOptions'), this, [child])), options
 		)
 		view = new viewClass(options)
-		if options.prev
+		if options.prev and !options.next
 			view.$el.insertAfter(options.prev.$el)
 			view.layoutAsNext()
-		else if options.next
+		else if options.next and !options.prev
 			view.$el.insertBefore(options.next.$el)
 			view.layoutAsPrev()
 		else
 			view.$el.appendTo(@$el)
-			view.layoutAsCurrent()
+			if options.fromPrev
+				view.layoutAsPrev()
+			else if options.fromNext
+				view.layoutAsNext()
+			else
+				view.layoutAsCurrent()
 		view
