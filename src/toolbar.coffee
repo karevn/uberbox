@@ -62,10 +62,7 @@ class Uberbox.ToolbarView extends Marionette.ItemView
 				@ui.share.find('.uberbox-share-overlay').remove()
 				@ui.share.removeClass('uberbox-active')
 			), 300)
-		
-		
-		
-		
+
 	remove: ->
 		@stopListening()
 		@$el.html('')

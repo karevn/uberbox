@@ -135,6 +135,11 @@ class Uberbox extends Marionette.LayoutView
 		if @getOption('carousel')
 			@$el.addClass('uberbox-has-carousel')
 			@carousel.show(new Uberbox.Carousel(lightboxOptions))
+			jQuery(window).on 'resize.uberbox-main', =>
+				if jQuery(window).width() < 1024
+					@carousel.empty()
+				else if !@carousel.currentView
+					@carousel.show(new Uberbox.Carousel(lightboxOptions))
 		else
 			@$('.uberbox-carousel-wrapper').remove()
 		current = @getOption('collection').at(@getOption('current'))
@@ -144,6 +149,7 @@ class Uberbox extends Marionette.LayoutView
 		jQuery('body').on 'keydown', @onKeyDown
 		@overflow = jQuery('html').css('overflow')
 		jQuery('html').css('overflow', 'hidden')
+		
 	onItemActivated: (model)->
 		if @toolbar.currentView
 			jQuery(window).off 'resize.uberbox-main'
@@ -153,6 +159,7 @@ class Uberbox extends Marionette.LayoutView
 		jQuery(window).on 'resize.uberbox-main', =>
 			@toolbar.currentView.layout()
 	remove: ->
+		@trigger('close')
 		super
 		if Uberbox.Utils.isFullscreen()
 			Uberbox.Utils.exitFullscreen()

@@ -14,7 +14,10 @@ class ObjectView extends Marionette.ItemView
 	onObjectError: -> @trigger 'error'
 	onObjectLoaded: => @trigger 'load'
 	serializeData: -> model: @model
-	getOffset: -> @$el.offset()
+	getOffset: -> 
+		offset = @$el.offset()
+		offset.top -= jQuery(window).scrollTop()
+		offset
 		
 	
 

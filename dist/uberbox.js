@@ -267,6 +267,15 @@
             if (this.getOption('carousel')) {
                 this.$el.addClass('uberbox-has-carousel');
                 this.carousel.show(new Uberbox.Carousel(lightboxOptions));
+                jQuery(window).on('resize.uberbox-main', (function(_this) {
+                    return function() {
+                        if (jQuery(window).width() < 1024) {
+                            return _this.carousel.empty();
+                        } else if (!_this.carousel.currentView) {
+                            return _this.carousel.show(new Uberbox.Carousel(lightboxOptions));
+                        }
+                    };
+                })(this));
             } else {
                 this.$('.uberbox-carousel-wrapper').remove();
             }
@@ -300,6 +309,7 @@
         };
 
         Uberbox.prototype.remove = function() {
+            this.trigger('close');
             Uberbox.__super__.remove.apply(this, arguments);
             if (Uberbox.Utils.isFullscreen()) {
                 Uberbox.Utils.exitFullscreen();
@@ -820,7 +830,7 @@
         };
 
         SlidingWindow.prototype.remove = function() {
-            jQuery(window).off('resize.uberbox', this.layout);
+            jQuery(window).off('resize.uberbox');
             return SlidingWindow.__super__.remove.apply(this, arguments);
         };
 
@@ -1447,7 +1457,10 @@
         };
 
         ObjectView.prototype.getOffset = function() {
-            return this.$el.offset();
+            var offset;
+            offset = this.$el.offset();
+            offset.top -= jQuery(window).scrollTop();
+            return offset;
         };
 
         return ObjectView;
@@ -2002,19 +2015,6 @@
 
     })(Uberbox.SlidingWindowItem);
 
-    Uberbox.DownloadView = (function(_super) {
-        __extends(DownloadView, _super);
-
-        function DownloadView() {
-            return DownloadView.__super__.constructor.apply(this, arguments);
-        }
-
-        DownloadView.prototype.template = '#uberbox-template-download';
-
-        return DownloadView;
-
-    })(Marionette.ItemView);
-
     Uberbox.VerticalLightboxItem = (function(_super) {
         __extends(VerticalLightboxItem, _super);
 
@@ -2144,6 +2144,7 @@
 
         Lightbox.prototype.rebuild = function() {
             var next, prev;
+            console.info('rebuild');
             if (this.currentItemView) {
                 this.currentItemView.remove();
             }
@@ -2214,7 +2215,7 @@
                 this.currentItemView = this.prevItemView;
                 this.currentItemView.layoutAsCurrent();
                 this.currentItemView = this.prevItemView;
-                if (this.currentItemView.model.next()) {
+                if (this.currentItemView.model.prev()) {
                     return this.prevItemView = this.createChildView(this.currentItemView.model.prev(), {
                         next: this.currentItemView
                     });
@@ -2243,17 +2244,23 @@
         };
 
         Lightbox.prototype.layout = function() {
-            this.currentItemView.layoutAsCurrent();
-            return _.defer((function(_this) {
+            return _.debounce(((function(_this) {
                 return function() {
-                    if (_this.nextItemView) {
-                        _this.nextItemView.layoutAsNext();
+                    console.info('layout');
+                    if (!_this.$el.is(':visible')) {
+                        return;
                     }
-                    if (_this.prevItemView) {
-                        return _this.prevItemView.layoutAsPrev();
-                    }
+                    _this.currentItemView.layoutAsCurrent();
+                    return _.defer(function() {
+                        if (_this.nextItemView) {
+                            _this.nextItemView.layoutAsNext();
+                        }
+                        if (_this.prevItemView) {
+                            return _this.prevItemView.layoutAsPrev();
+                        }
+                    });
                 };
-            })(this));
+            })(this)), 3000);
         };
 
         return Lightbox;

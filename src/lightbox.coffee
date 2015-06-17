@@ -131,8 +131,6 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		setTimeout((=>super()), 600)
 	
 		
-class Uberbox.DownloadView extends Marionette.ItemView
-	template: '#uberbox-template-download'
 	
 class Uberbox.VerticalLightboxItem extends Uberbox.LightboxItem
 	layoutAsNext: ->
@@ -190,6 +188,7 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 			@ui.prev.addClass('uberbox-disabled')
 	checkPrevNext: ->
 	rebuild: ->
+		console.info 'rebuild'
 		@currentItemView.remove() if @currentItemView
 		@prevItemView.remove() if @prevItemView
 		@nextItemView.remove() if @nextItemView	
@@ -225,7 +224,7 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 			@currentItemView = @prevItemView
 			@currentItemView.layoutAsCurrent()
 			@currentItemView = @prevItemView
-			if @currentItemView.model.next()
+			if @currentItemView.model.prev()
 				@prevItemView = @createChildView(@currentItemView.model.prev(), next: @currentItemView)
 			else
 				@prevItemView = null
@@ -236,11 +235,14 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
 			@currentItemView.layoutAsCurrent()
 			
-	layout: =>
-		@currentItemView.layoutAsCurrent()
-		#_.debounce (=> @nextItemView.layoutAsNext()), 200 if @nextItemView
-		#_.debounce (=> @prevItemView.layoutAsPrev()), 200 if @prevItemView
-		_.defer =>
-			@nextItemView.layoutAsNext() if @nextItemView
-			@prevItemView.layoutAsPrev() if @prevItemView
+	layout: => _.debounce((=>
+			console.info 'layout'
+			return unless @$el.is(':visible')
+			@currentItemView.layoutAsCurrent()
+			#_.debounce (=> @nextItemView.layoutAsNext()), 200 if @nextItemView
+			#_.debounce (=> @prevItemView.layoutAsPrev()), 200 if @prevItemView
+			_.defer =>
+				@nextItemView.layoutAsNext() if @nextItemView
+				@prevItemView.layoutAsPrev() if @prevItemView
+		), 3000)
 		
