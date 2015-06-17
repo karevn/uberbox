@@ -1122,6 +1122,7 @@
 
         Carousel.prototype.buildFromScratch = function(item) {
             this.currentItemView = this.createChildView(item);
+            this.currentItemView.layoutAsCurrent();
             return this.currentItemView.runAction((function(_this) {
                 return function() {
                     _this.currentItemView.layoutAsCurrent();

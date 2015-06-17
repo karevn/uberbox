@@ -103,6 +103,7 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 			
 	buildFromScratch: (item)->
 		@currentItemView = @createChildView(item)
+		@currentItemView.layoutAsCurrent()
 		@currentItemView.runAction =>
 			@currentItemView.layoutAsCurrent()
 			@currentItemView.reveal()
