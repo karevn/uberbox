@@ -9,7 +9,7 @@ class Uberbox.SlidingWindow extends Marionette.View
 	remove: ->
 		jQuery(window).off 'resize.uberbox'
 		super
-	getChildView: (child)-> childView = @getOption('childView') || @constructor
+	getChildView: (child)-> childView = @getOption('childView')
 	createChildView: (child, options = {})->
 		viewClass = @getChildViewClass()
 		options = _.extend(_.extend({model: child, orientation: @getOption('orientation')},
@@ -17,17 +17,11 @@ class Uberbox.SlidingWindow extends Marionette.View
 		)
 		view = new viewClass(options)
 		if options.prev and !options.next
+			options.prev.options.next = view
 			view.$el.insertAfter(options.prev.$el)
-			view.layoutAsNext()
 		else if options.next and !options.prev
+			options.next.options.prev = view
 			view.$el.insertBefore(options.next.$el)
-			view.layoutAsPrev()
 		else
 			view.$el.appendTo(@$el)
-			if options.fromPrev
-				view.layoutAsPrev()
-			else if options.fromNext
-				view.layoutAsNext()
-			else
-				view.layoutAsCurrent()
 		view

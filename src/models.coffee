@@ -51,7 +51,6 @@ class Uberbox.Item extends Backbone.Model
 			share = Uberbox.ShareService.services if _.isBoolean(share)
 			@set 'share', _.map share, (config, name)->
 				new Uberbox.ShareService(_.extend({}, {slug: name}, config))
-
 	activate: -> @trigger('activate', this) unless @collection.activeItem == this
 	deactivate: -> @trigger('deactivate')
 	next: -> @collection.next(this)

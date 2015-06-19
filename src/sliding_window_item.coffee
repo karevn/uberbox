@@ -11,8 +11,9 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 		super
 		@listenToOnce this, 'load', => 
 			@loaded = true
-			@$el.addClass 'uberbox-loaded'
 			clearTimeout(@loaderTimeout) if @loaderTimeout
+			@$el.addClass 'uberbox-loaded'
+			@layout()
 			@hideLoader()
 		@render()
 		@bindUIElements()
@@ -26,7 +27,6 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 		return this if @model == item
 		return next.getPrevToScrollTo(item) if next = @getOption('prev')
 		null
-		
 	runAction: (callback)->
 		if @loaded
 			callback()
@@ -36,6 +36,9 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 	getParent: ->
 		@parent = @$el.parent() unless @parent
 		@parent
+	isNext: -> @model.follows(@model.collection.activeItem)
+	isPrev: -> @model.precedes(@model.collection.activeItem)
+	isCurrent: -> @model.isActive()
 	remove: ->
 		@$el.removeClass 'uberbox-visible'
 		if @getOption('next')
@@ -43,7 +46,7 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 		if @getOption('prev')
 			@getOption('prev').options.next = null
 		setTimeout((=>super()), 600)
-	reveal: -> _.defer => @$el.addClass('uberbox-visible')
+	reveal: -> 
 	bindUIElements: ->
 		super
 		@onItemActivated() if @model.collection.activeItem == @model

@@ -689,10 +689,11 @@
             this.listenToOnce(this, 'load', (function(_this) {
                 return function() {
                     _this.loaded = true;
-                    _this.$el.addClass('uberbox-loaded');
                     if (_this.loaderTimeout) {
                         clearTimeout(_this.loaderTimeout);
                     }
+                    _this.$el.addClass('uberbox-loaded');
+                    _this.layout();
                     return _this.hideLoader();
                 };
             })(this));
@@ -749,6 +750,18 @@
             return this.parent;
         };
 
+        SlidingWindowItem.prototype.isNext = function() {
+            return this.model.follows(this.model.collection.activeItem);
+        };
+
+        SlidingWindowItem.prototype.isPrev = function() {
+            return this.model.precedes(this.model.collection.activeItem);
+        };
+
+        SlidingWindowItem.prototype.isCurrent = function() {
+            return this.model.isActive();
+        };
+
         SlidingWindowItem.prototype.remove = function() {
             this.$el.removeClass('uberbox-visible');
             if (this.getOption('next')) {
@@ -764,13 +777,7 @@
             })(this)), 600);
         };
 
-        SlidingWindowItem.prototype.reveal = function() {
-            return _.defer((function(_this) {
-                return function() {
-                    return _this.$el.addClass('uberbox-visible');
-                };
-            })(this));
-        };
+        SlidingWindowItem.prototype.reveal = function() {};
 
         SlidingWindowItem.prototype.bindUIElements = function() {
             SlidingWindowItem.__super__.bindUIElements.apply(this, arguments);
@@ -836,7 +843,7 @@
 
         SlidingWindow.prototype.getChildView = function(child) {
             var childView;
-            return childView = this.getOption('childView') || this.constructor;
+            return childView = this.getOption('childView');
         };
 
         SlidingWindow.prototype.createChildView = function(child, options) {
@@ -851,20 +858,13 @@
             }, Marionette._getValue(this.getOption('childViewOptions'), this, [child])), options);
             view = new viewClass(options);
             if (options.prev && !options.next) {
+                options.prev.options.next = view;
                 view.$el.insertAfter(options.prev.$el);
-                view.layoutAsNext();
             } else if (options.next && !options.prev) {
+                options.next.options.prev = view;
                 view.$el.insertBefore(options.next.$el);
-                view.layoutAsPrev();
             } else {
                 view.$el.appendTo(this.$el);
-                if (options.fromPrev) {
-                    view.layoutAsPrev();
-                } else if (options.fromNext) {
-                    view.layoutAsNext();
-                } else {
-                    view.layoutAsCurrent();
-                }
             }
             return view;
         };
@@ -897,7 +897,7 @@
         __extends(CarouselItem, _super);
 
         function CarouselItem() {
-            this.onImageLoaded = __bind(this.onImageLoaded, this);
+            this.triggerLoad = __bind(this.triggerLoad, this);
             return CarouselItem.__super__.constructor.apply(this, arguments);
         }
 
@@ -931,17 +931,20 @@
         CarouselItem.prototype.bindUIElements = function() {
             CarouselItem.__super__.bindUIElements.apply(this, arguments);
             if (this.ui.image[0].complete) {
-                _.defer((function(_this) {
-                    return function() {
-                        return _this.onImageLoaded();
-                    };
-                })(this));
+                this.triggerLoad();
             }
-            return this.$el.find('img').on('load', this.onImageLoaded);
+            return this.$el.find('img').on('load', this.triggerLoad);
         };
 
-        CarouselItem.prototype.onImageLoaded = function() {
-            return this.trigger('load');
+        CarouselItem.prototype.triggerLoad = function() {
+            return _.defer(((function(_this) {
+                return function() {
+                    _this.trigger('load');
+                    return _.defer(function() {
+                        return _this.$el.addClass('uberbox-enable-transition');
+                    });
+                };
+            })(this)));
         };
 
         CarouselItem.prototype.layoutContent = function() {};
@@ -950,24 +953,14 @@
             return this.ui.loader.remove();
         };
 
-        CarouselItem.prototype.layoutAsCurrent = function() {
-            this.calculateCoordinatesAsCurrent();
-            if (this.loaded) {
-                this.layoutContent();
+        CarouselItem.prototype.layout = function() {
+            if (this.model.isActive()) {
+                this.calculateCoordinatesAsCurrent();
+            } else if (this.model.follows(this.model.collection.activeItem)) {
+                this.calculateCoordinatesAsNext();
+            } else if (this.model.precedes(this.model.collection.activeItem)) {
+                this.calculateCoordinatesAsPrev();
             }
-            return this.applyLayout();
-        };
-
-        CarouselItem.prototype.layoutAsNext = function() {
-            this.calculateCoordinatesAsNext();
-            if (this.loaded) {
-                this.layoutContent();
-            }
-            return this.applyLayout();
-        };
-
-        CarouselItem.prototype.layoutAsPrev = function() {
-            this.calculateCoordinatesAsPrev();
             if (this.loaded) {
                 this.layoutContent();
             }
@@ -1082,6 +1075,8 @@
 
         function Carousel() {
             this.layout = __bind(this.layout, this);
+            this.buildPrev = __bind(this.buildPrev, this);
+            this.buildNext = __bind(this.buildNext, this);
             return Carousel.__super__.constructor.apply(this, arguments);
         }
 
@@ -1120,97 +1115,63 @@
             return this.currentItemView = null;
         };
 
-        Carousel.prototype.buildFromScratch = function(item) {
+        Carousel.prototype.build = function(item) {
             this.currentItemView = this.createChildView(item);
-            this.currentItemView.layoutAsCurrent();
             return this.currentItemView.runAction((function(_this) {
                 return function() {
-                    _this.currentItemView.layoutAsCurrent();
-                    _this.currentItemView.reveal();
-                    _this.layoutNextItems(_this.currentItemView);
-                    return _this.layoutPrevItems(_this.currentItemView);
+                    _this.buildNext(_this.currentItemView);
+                    return _this.buildPrev(_this.currentItemView);
                 };
             })(this));
         };
 
-        Carousel.prototype.slideTo = function(item) {
-            return this.currentItemView.runAction((function(_this) {
-                return function() {
-                    _this.currentItemView = item;
-                    return _this.layout();
-                };
-            })(this));
+        Carousel.prototype.buildNext = function(item) {
+            var next;
+            if (item.belongs() && item.model.next() && !item.getOption('next')) {
+                next = this.createChildView(item.model.next(), {
+                    prev: item
+                });
+                return next.runAction((function(_this) {
+                    return function() {
+                        return _this.buildNext(next);
+                    };
+                })(this));
+            }
+        };
+
+        Carousel.prototype.buildPrev = function(item) {
+            var prev;
+            if (item.belongs() && item.model.prev() && !item.getOption('prev')) {
+                prev = this.createChildView(item.model.prev(), {
+                    next: item
+                });
+                return prev.runAction((function(_this) {
+                    return function() {
+                        return _this.buildPrev(prev);
+                    };
+                })(this));
+            }
         };
 
         Carousel.prototype.layout = function() {
+            var next, prev, _results;
             if (!this.$el.is(':visible')) {
                 return this.hide();
             } else {
                 if (!this.currentItemView) {
-                    this.buildFromScratch(this.collection.activeItem);
-                    return;
+                    return this.build(this.collection.activeItem);
+                } else {
+                    this.currentItemView.layout();
+                    prev = next = this.currentItemView;
+                    while (next = next.getOption('next')) {
+                        next.layout();
+                    }
+                    _results = [];
+                    while (prev = prev.getOption('prev')) {
+                        _results.push(prev.layout());
+                    }
+                    return _results;
                 }
-                this.currentItemView.layoutAsCurrent();
-                return this.currentItemView.runAction((function(_this) {
-                    return function() {
-                        _this.layoutPrevItems(_this.currentItemView);
-                        return _this.layoutNextItems(_this.currentItemView);
-                    };
-                })(this));
-            }
-        };
-
-        Carousel.prototype.layoutNextItems = function(prev) {
-            var view;
-            if (prev !== this.currentItemView) {
-                prev.layoutAsNext();
-                if (!prev.fits()) {
-                    prev.remove();
-                    return null;
-                }
-            }
-            if (prev.model.next() && !prev.getOption('next') && prev.fits()) {
-                view = this.createChildView(prev.model.next(), {
-                    prev: prev
-                });
-                prev.options.next = view;
-                view.options.prev = prev;
-                view.layoutAsNext();
-                view.reveal();
-                return view.runAction((function(_this) {
-                    return function() {
-                        return _this.layoutNextItems(view);
-                    };
-                })(this));
-            } else if (prev.getOption('next')) {
-                return this.layoutNextItems(prev.getOption('next'));
-            }
-        };
-
-        Carousel.prototype.layoutPrevItems = function(next) {
-            var view;
-            if (next !== this.currentItemView) {
-                next.layoutAsPrev();
-                if (!next.fits()) {
-                    next.remove();
-                    return null;
-                }
-            }
-            if (next.model.prev() && !next.getOption('prev') && next.fits()) {
-                view = this.createChildView(next.model.prev(), {
-                    next: next
-                });
-                next.options.prev = view;
-                view.options.next = next;
-                view.layoutAsPrev();
-                view.reveal();
-                return view.runAction((function(_this) {
-                    return function() {
-                        return _this.layoutPrevItems(view);
-                    };
-                })(this));
-            } else if (next.getOption('prev')) {
-                return this.layoutPrevItems(next.getOption('prev'));
             }
         };
 
@@ -1220,13 +1181,15 @@
                 return;
             }
             if (!this.currentItemView) {
-                this.buildFromScratch(item);
+                this.build(item);
                 return;
             }
             if (next = this.currentItemView.getNextToScrollTo(item)) {
-                return this.slideTo(next);
+                this.currentItemView = next;
+                return this.layout();
             } else if (prev = this.currentItemView.getPrevToScrollTo(item)) {
-                return this.slideTo(prev);
+                this.currentItemView = prev;
+                return this.layout();
             } else {
                 this.currentItemView.remove();
                 next = this.currentItemView.getOption('next');
@@ -1239,7 +1202,7 @@
                     prev.remove();
                     prev = prev.getOption('prev');
                 }
-                return this.buildFromScratch(item);
+                return this.build(item);
             }
         };
 
@@ -1768,11 +1731,193 @@
             return child;
         };
 
+    Uberbox.Lightbox = (function(_super) {
+        __extends(Lightbox, _super);
+
+        function Lightbox() {
+            this.layout = __bind(this.layout, this);
+            return Lightbox.__super__.constructor.apply(this, arguments);
+        }
+
+        Lightbox.prototype.className = 'uberbox-lightbox-content';
+
+        Lightbox.prototype.template = function() {
+            return Uberbox.Templates['lightbox-content'];
+        };
+
+        Lightbox.prototype.ui = {
+            next: '.uberbox-next',
+            prev: '.uberbox-prev'
+        };
+
+        Lightbox.prototype.events = {
+            'click @ui.next': (function() {
+                if (!this.ui.next.is('.uberbox-disabled')) {
+                    return this.currentItemView.model.next().activate();
+                }
+            }),
+            'click @ui.prev': (function() {
+                if (!this.ui.prev.is('.uberbox-disabled')) {
+                    return this.currentItemView.model.prev().activate();
+                }
+            }),
+            'click @ui.close': function() {
+                return this.trigger('close');
+            }
+        };
+
+        Lightbox.prototype.getChildViewClass = function() {
+            return Uberbox.LightboxItem;
+        };
+
+        Lightbox.prototype.onShow = function() {
+            Lightbox.__super__.onShow.apply(this, arguments);
+            this.render();
+            return this.bindUIElements();
+        };
+
+        Lightbox.prototype.render = function() {
+            return this.$el.html(Marionette.Renderer.render(this.template));
+        };
+
+        Lightbox.prototype.onItemActivated = function(item) {
+            if (!this.currentItemView) {
+                this.currentItemView = this.createChildView(item);
+                if (item.next()) {
+                    this.nextItemView = this.createChildView(item.next(), {
+                        prev: this.currentItemView
+                    });
+                }
+                if (item.prev()) {
+                    this.prevItemView = this.createChildView(item.prev(), {
+                        prev: this.currentItemView
+                    });
+                }
+            } else {
+                if (item.follows(this.currentItemView.model)) {
+                    this.scrollNext(item);
+                } else {
+                    this.scrollPrev(item);
+                }
+            }
+            if (this.currentItemView.model.next()) {
+                this.ui.next.removeClass('uberbox-disabled');
+            } else {
+                this.ui.next.addClass('uberbox-disabled');
+            }
+            if (this.currentItemView.model.prev()) {
+                return this.ui.prev.removeClass('uberbox-disabled');
+            } else {
+                return this.ui.prev.addClass('uberbox-disabled');
+            }
+        };
+
+        Lightbox.prototype.checkPrevNext = function() {};
+
+        Lightbox.prototype.scrollNext = function(item) {
+            if (this.prevItemView) {
+                this.prevItemView.remove();
+            }
+            if (this.currentItemView.model.isPrev(item)) {
+                this.prevItemView = this.currentItemView;
+                this.prevItemView.layout();
+                this.currentItemView = this.nextItemView;
+                this.currentItemView.layout();
+                this.currentItemView = this.nextItemView;
+                if (this.currentItemView.model.next()) {
+                    return this.nextItemView = this.createChildView(this.currentItemView.model.next(), {
+                        prev: this.currentItemView
+                    });
+                } else {
+                    return this.nextItemView = null;
+                }
+            } else {
+                if (this.nextItemView) {
+                    this.nextItemView.remove();
+                }
+                this.currentItemView.layout();
+                this.currentItemView = this.createChildView(item);
+                this.currentItemView.positionAsNext();
+                if (item.prev()) {
+                    this.prevItemView = this.createChildView(item.prev(), {
+                        next: this.currentItemView
+                    });
+                }
+                if (item.next()) {
+                    return this.nextItemView = this.createChildView(item.next(), {
+                        prev: this.currentItemView
+                    });
+                }
+            }
+        };
+
+        Lightbox.prototype.scrollPrev = function(item) {
+            if (this.nextItemView) {
+                this.nextItemView.remove();
+            }
+            if (this.currentItemView.model.isNext(item)) {
+                this.nextItemView = this.currentItemView;
+                this.nextItemView.layout();
+                this.currentItemView = this.prevItemView;
+                this.currentItemView.layout();
+                this.currentItemView = this.prevItemView;
+                if (this.currentItemView.model.prev()) {
+                    return this.prevItemView = this.createChildView(this.currentItemView.model.prev(), {
+                        next: this.currentItemView
+                    });
+                } else {
+                    return this.prevItemView = null;
+                }
+            } else {
+                if (this.prevItemView) {
+                    this.prevItemView.remove();
+                }
+                this.currentItemView.layout();
+                this.currentItemView = this.createChildView(item, {
+                    fromPrev: true
+                });
+                this.currentItemView.positionAsPrev();
+                if (item.next()) {
+                    this.nextItemView = this.createChildView(item.next(), {
+                        prev: this.currentItemView
+                    });
+                }
+                if (item.prev()) {
+                    return this.prevItemView = this.createChildView(item.prev(), {
+                        next: this.currentItemView
+                    });
+                }
+            }
+        };
+
+        Lightbox.prototype.layout = function() {
+            return _.debounce(((function(_this) {
+                return function() {
+                    if (!_this.$el.is(':visible')) {
+                        return;
+                    }
+                    _this.currentItemView.layout();
+                    return _.defer(function() {
+                        if (_this.nextItemView) {
+                            _this.nextItemView.layout();
+                        }
+                        if (_this.prevItemView) {
+                            return _this.prevItemView.layout();
+                        }
+                    });
+                };
+            })(this)), 200);
+        };
+
+        return Lightbox;
+
+    })(Uberbox.SlidingWindow);
+
     Uberbox.LightboxItem = (function(_super) {
         __extends(LightboxItem, _super);
 
         function LightboxItem() {
-            this.layout = __bind(this.layout, this);
+            this.layoutContent = __bind(this.layoutContent, this);
             return LightboxItem.__super__.constructor.apply(this, arguments);
         }
 
@@ -1800,33 +1945,13 @@
 
         LightboxItem.prototype.padding = 20;
 
-        LightboxItem.prototype.initialize = function() {
-            LightboxItem.__super__.initialize.apply(this, arguments);
-            return this.once('load', (function(_this) {
-                return function() {
-                    return _this.showContent();
-                };
-            })(this));
-        };
-
-        LightboxItem.prototype.showContent = function() {
-            return _.defer((function(_this) {
-                return function() {
-                    _this.layout();
-                    return _.defer(function() {
-                        return _this.$el.addClass('uberbox-visible');
-                    });
-                };
-            })(this));
-        };
-
         LightboxItem.prototype.serializeData = function() {
             return {
                 model: this.model
             };
         };
 
-        LightboxItem.prototype.layout = function() {
+        LightboxItem.prototype.layoutContent = function() {
             var height, width;
             if (this.waitForLoad && !this.loaded) {
                 return;
@@ -1866,7 +1991,6 @@
         };
 
         LightboxItem.prototype.swipeVertically = function(amount) {
-            console.info("Swipe vert " + amount);
             return this.$el.css({
                 transform: "translate(0, " + amount + "px)"
             });
@@ -1985,11 +2109,47 @@
             }
         };
 
-        LightboxItem.prototype.layoutAsCurrent = function() {
-            this.$el.css({
-                transform: ''
-            });
-            return this.layout();
+        LightboxItem.prototype.layout = function() {
+            if (this.isCurrent()) {
+                this.$el.css({
+                    transform: ''
+                });
+            } else if (this.isNext()) {
+                this.positionAsNext();
+            } else if (this.isPrev()) {
+                this.positionAsPrev();
+            } else {
+                setTimeout(this.remove, 400);
+            }
+            return this.layoutContent();
+        };
+
+        LightboxItem.prototype.isVertical = function() {
+            return this.getOption('orientation') === 'vertical';
+        };
+
+        LightboxItem.prototype.positionAsNext = function() {
+            if (this.isVertical()) {
+                return this.$el.css({
+                    transform: "translate(0, " + (jQuery(window).height()) + "px)"
+                });
+            } else {
+                return this.$el.css({
+                    transform: "translate(" + (jQuery(window).width()) + "px, 0)"
+                });
+            }
+        };
+
+        LightboxItem.prototype.positionAsPrev = function() {
+            if (this.isVertical()) {
+                return this.$el.css({
+                    transform: "translate(0, -" + (jQuery(window).height()) + "px)"
+                });
+            } else {
+                return this.$el.css({
+                    transform: "translate(-" + (jQuery(window).width()) + "px, 0)"
+                });
+            }
         };
 
         LightboxItem.prototype.remove = function() {
@@ -2015,258 +2175,6 @@
         return LightboxItem;
 
     })(Uberbox.SlidingWindowItem);
-
-    Uberbox.VerticalLightboxItem = (function(_super) {
-        __extends(VerticalLightboxItem, _super);
-
-        function VerticalLightboxItem() {
-            return VerticalLightboxItem.__super__.constructor.apply(this, arguments);
-        }
-
-        VerticalLightboxItem.prototype.layoutAsNext = function() {
-            this.$el.css({
-                transform: "translate(0, " + (jQuery(window).height()) + "px)"
-            });
-            return this.layout();
-        };
-
-        VerticalLightboxItem.prototype.layoutAsPrev = function() {
-            this.$el.css({
-                transform: "translate(0, -" + (jQuery(window).height()) + "px)"
-            });
-            return this.layout();
-        };
-
-        return VerticalLightboxItem;
-
-    })(Uberbox.LightboxItem);
-
-    Uberbox.HorizontalLightboxItem = (function(_super) {
-        __extends(HorizontalLightboxItem, _super);
-
-        function HorizontalLightboxItem() {
-            return HorizontalLightboxItem.__super__.constructor.apply(this, arguments);
-        }
-
-        HorizontalLightboxItem.prototype.layoutAsNext = function() {
-            this.$el.css({
-                transform: 'translate(120%, 0)'
-            });
-            return this.layout();
-        };
-
-        HorizontalLightboxItem.prototype.layoutAsPrev = function() {
-            this.$el.css({
-                transform: 'translate(-120%, 0)'
-            });
-            return this.layout();
-        };
-
-        return HorizontalLightboxItem;
-
-    })(Uberbox.LightboxItem);
-
-    Uberbox.Lightbox = (function(_super) {
-        __extends(Lightbox, _super);
-
-        function Lightbox() {
-            this.layout = __bind(this.layout, this);
-            return Lightbox.__super__.constructor.apply(this, arguments);
-        }
-
-        Lightbox.prototype.className = 'uberbox-lightbox-content';
-
-        Lightbox.prototype.template = function() {
-            return Uberbox.Templates['lightbox-content'];
-        };
-
-        Lightbox.prototype.ui = {
-            next: '.uberbox-next',
-            prev: '.uberbox-prev'
-        };
-
-        Lightbox.prototype.events = {
-            'click @ui.next': (function() {
-                if (!this.ui.next.is('.uberbox-disabled')) {
-                    return this.currentItemView.model.next().activate();
-                }
-            }),
-            'click @ui.prev': (function() {
-                if (!this.ui.prev.is('.uberbox-disabled')) {
-                    return this.currentItemView.model.prev().activate();
-                }
-            }),
-            'click @ui.close': function() {
-                return this.trigger('close');
-            }
-        };
-
-        Lightbox.prototype.getChildViewClass = function() {
-            if (this.getOption('orientation') === 'horizontal') {
-                return Uberbox.HorizontalLightboxItem;
-            } else {
-                return Uberbox.VerticalLightboxItem;
-            }
-        };
-
-        Lightbox.prototype.onShow = function() {
-            Lightbox.__super__.onShow.apply(this, arguments);
-            this.render();
-            return this.bindUIElements();
-        };
-
-        Lightbox.prototype.render = function() {
-            return this.$el.html(Marionette.Renderer.render(this.template));
-        };
-
-        Lightbox.prototype.onItemActivated = function(item) {
-            if (!this.currentItemView) {
-                this.rebuild();
-            } else {
-                if (item.follows(this.currentItemView.model)) {
-                    this.scrollNext(item);
-                } else {
-                    this.scrollPrev(item);
-                }
-            }
-            if (this.currentItemView.model.next()) {
-                this.ui.next.removeClass('uberbox-disabled');
-            } else {
-                this.ui.next.addClass('uberbox-disabled');
-            }
-            if (this.currentItemView.model.prev()) {
-                return this.ui.prev.removeClass('uberbox-disabled');
-            } else {
-                return this.ui.prev.addClass('uberbox-disabled');
-            }
-        };
-
-        Lightbox.prototype.checkPrevNext = function() {};
-
-        Lightbox.prototype.rebuild = function() {
-            var next, prev;
-            console.info('rebuild');
-            if (this.currentItemView) {
-                this.currentItemView.remove();
-            }
-            if (this.prevItemView) {
-                this.prevItemView.remove();
-            }
-            if (this.nextItemView) {
-                this.nextItemView.remove();
-            }
-            this.currentItemView = this.createChildView(this.collection.activeItem);
-            if (next = this.collection.activeItem.next()) {
-                this.nextItemView = this.createChildView(next, {
-                    prev: this.currentItemView
-                });
-            }
-            if (prev = this.collection.activeItem.prev()) {
-                return this.prevItemView = this.createChildView(prev, {
-                    next: this.currentItemView
-                });
-            }
-        };
-
-        Lightbox.prototype.scrollNext = function(item) {
-            if (this.prevItemView) {
-                this.prevItemView.remove();
-            }
-            this.currentItemView.layoutAsPrev();
-            if (this.currentItemView.model.isPrev(item)) {
-                this.prevItemView = this.currentItemView;
-                this.currentItemView = this.nextItemView;
-                this.currentItemView.layoutAsCurrent();
-                this.currentItemView = this.nextItemView;
-                if (this.currentItemView.model.next()) {
-                    return this.nextItemView = this.createChildView(this.currentItemView.model.next(), {
-                        prev: this.currentItemView
-                    });
-                } else {
-                    return this.nextItemView = null;
-                }
-            } else {
-                if (this.nextItemView) {
-                    this.nextItemView.remove();
-                }
-                this.currentItemView = this.createChildView(item, {
-                    fromNext: true
-                });
-                if (item.prev()) {
-                    this.prevItemView = this.createChildView(item.prev(), {
-                        next: this.currentItemView
-                    });
-                }
-                if (item.next()) {
-                    this.nextItemView = this.createChildView(item.next(), {
-                        prev: this.currentItemView
-                    });
-                }
-                return this.currentItemView.layoutAsCurrent();
-            }
-        };
-
-        Lightbox.prototype.scrollPrev = function(item) {
-            if (this.nextItemView) {
-                this.nextItemView.remove();
-            }
-            this.currentItemView.layoutAsNext();
-            if (this.currentItemView.model.isNext(item)) {
-                this.nextItemView = this.currentItemView;
-                this.currentItemView = this.prevItemView;
-                this.currentItemView.layoutAsCurrent();
-                this.currentItemView = this.prevItemView;
-                if (this.currentItemView.model.prev()) {
-                    return this.prevItemView = this.createChildView(this.currentItemView.model.prev(), {
-                        next: this.currentItemView
-                    });
-                } else {
-                    return this.prevItemView = null;
-                }
-            } else {
-                if (this.prevItemView) {
-                    this.prevItemView.remove();
-                }
-                this.currentItemView = this.createChildView(item, {
-                    fromPrev: true
-                });
-                if (item.next()) {
-                    this.nextItemView = this.createChildView(item.next(), {
-                        prev: this.currentItemView
-                    });
-                }
-                if (item.prev()) {
-                    this.prevItemView = this.createChildView(item.prev(), {
-                        next: this.currentItemView
-                    });
-                }
-                return this.currentItemView.layoutAsCurrent();
-            }
-        };
-
-        Lightbox.prototype.layout = function() {
-            return _.debounce(((function(_this) {
-                return function() {
-                    console.info('layout');
-                    if (!_this.$el.is(':visible')) {
-                        return;
-                    }
-                    _this.currentItemView.layoutAsCurrent();
-                    return _.defer(function() {
-                        if (_this.nextItemView) {
-                            _this.nextItemView.layoutAsNext();
-                        }
-                        if (_this.prevItemView) {
-                            return _this.prevItemView.layoutAsPrev();
-                        }
-                    });
-                };
-            })(this)), 3000);
-        };
-
-        return Lightbox;
-
-    })(Uberbox.SlidingWindow);
 
     if (root.Uberbox) {
         Uberbox.Templates = root.Uberbox.Templates;

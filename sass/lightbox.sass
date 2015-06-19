@@ -100,9 +100,10 @@
 	top: 42px
 	right: 6px
 	bottom: 20px
-	
-	&.uberbox-visible
+	transition: opacity 0.3s
+	&.uberbox-loaded
 		opacity: 1
+		transition: opacity 0.3s, left 0.3s, top 0.3s, transform 0.3s
 	&.uberbox-enable-transition
 		transition: opacity 0.3s, left 0.3s, top 0.3s
 	&.uberbox-current

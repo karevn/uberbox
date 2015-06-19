@@ -1,3 +1,93 @@
+class Uberbox.Lightbox extends Uberbox.SlidingWindow
+	className: 'uberbox-lightbox-content'
+	template: -> Uberbox.Templates['lightbox-content']
+	ui:
+		next: '.uberbox-next'
+		prev: '.uberbox-prev'
+	events:
+		'click @ui.next': (-> @currentItemView.model.next().activate() unless @ui.next.is('.uberbox-disabled'))
+		'click @ui.prev': (-> @currentItemView.model.prev().activate() unless @ui.prev.is('.uberbox-disabled'))
+		'click @ui.close': -> @trigger 'close'
+	
+	getChildViewClass: -> Uberbox.LightboxItem
+	onShow: ->
+		super
+		@render()
+		@bindUIElements()
+	render: -> @$el.html(Marionette.Renderer.render(@template))
+
+	onItemActivated: (item)->
+		if !@currentItemView
+			@currentItemView = @createChildView(item)
+			if item.next()
+				@nextItemView = @createChildView(item.next(), prev: @currentItemView)
+			if item.prev()
+				@prevItemView = @createChildView(item.prev(), prev: @currentItemView)
+		else
+			if item.follows(@currentItemView.model)
+				@scrollNext(item)
+			else
+				@scrollPrev(item)
+		if @currentItemView.model.next()
+			@ui.next.removeClass('uberbox-disabled')
+		else
+			@ui.next.addClass('uberbox-disabled')
+		if @currentItemView.model.prev()
+			@ui.prev.removeClass('uberbox-disabled')
+		else
+			@ui.prev.addClass('uberbox-disabled')
+	checkPrevNext: ->
+	scrollNext: (item)->
+		@prevItemView.remove() if @prevItemView
+		if @currentItemView.model.isPrev(item)
+			@prevItemView = @currentItemView
+			@prevItemView.layout()
+			@currentItemView = @nextItemView
+			@currentItemView.layout()
+			@currentItemView = @nextItemView
+			if @currentItemView.model.next()
+				@nextItemView = @createChildView(@currentItemView.model.next(), prev: @currentItemView)
+			else
+				@nextItemView = null
+		else
+			@nextItemView.remove() if @nextItemView
+			@currentItemView.layout()
+			@currentItemView = @createChildView(item)
+			@currentItemView.positionAsNext()
+			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
+			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
+			
+	scrollPrev: (item)->
+		@nextItemView.remove() if @nextItemView
+		if @currentItemView.model.isNext(item)
+			@nextItemView = @currentItemView
+			@nextItemView.layout()
+			@currentItemView = @prevItemView
+			@currentItemView.layout()
+			@currentItemView = @prevItemView
+			if @currentItemView.model.prev()
+				@prevItemView = @createChildView(@currentItemView.model.prev(), next: @currentItemView)
+			else
+				@prevItemView = null
+		else
+			@prevItemView.remove() if @prevItemView
+			@currentItemView.layout()
+			@currentItemView = @createChildView(item, fromPrev: true)
+			@currentItemView.positionAsPrev()
+			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
+			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
+			
+	layout: => _.debounce((=>
+			return unless @$el.is(':visible')
+			@currentItemView.layout()
+			#_.debounce (=> @nextItemView.layoutAsNext()), 200 if @nextItemView
+			#_.debounce (=> @prevItemView.layoutAsPrev()), 200 if @prevItemView
+			_.defer =>
+				@nextItemView.layout() if @nextItemView
+				@prevItemView.layout() if @prevItemView
+		), 200)
+		
+
 class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 	defaults:
 		description:
@@ -11,16 +101,8 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		content: '> .uberbox-lightbox-item-content-wrapper'
 		description: '.uberbox-item-description'
 	padding: 20
-	initialize: ->
-		super
-		@once 'load', => @showContent()
-	showContent: ->
-		_.defer => 
-			@layout()
-			_.defer => 
-				@$el.addClass('uberbox-visible')
 	serializeData: -> {model: @model}
-	layout: =>
+	layoutContent: =>
 		return if @waitForLoad and !@loaded
 		width = @$el.width()
 		height = @$el.height()
@@ -42,9 +124,7 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		return @object.currentView.$el.width() if @model.get('description_style') == 'bottom'
 		return @object.currentView.getWidth() if @model.get('description_style') == 'mini'
 		@ui.content.width()
-	swipeVertically: (amount)-> 
-		console.info "Swipe vert #{amount}"
-		@$el.css(transform: "translate(0, #{amount}px)")
+	swipeVertically: (amount)->  @$el.css(transform: "translate(0, #{amount}px)")
 	swipeHorizontally: (amount)-> @$el.css(transform: "translate(#{amount}px, 0)")
 	swipeBack: -> @$el.css(transform: "translate(0, 0)")
 	layoutWithDescriptionAtBottom: ->
@@ -116,9 +196,28 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		else
 			@trigger 'load'
 			@showContent()
-	layoutAsCurrent: ->
-		@$el.css(transform: '')
-		@layout()
+	layout: ->
+		if @isCurrent()
+			@$el.css transform: ''
+		else if @isNext()
+			@positionAsNext()
+		else if @isPrev()
+			@positionAsPrev()
+		else
+			setTimeout(@remove, 400)
+		@layoutContent()
+
+	isVertical: -> @getOption('orientation') == 'vertical'
+	positionAsNext: ->
+		if @isVertical()
+			@$el.css transform: "translate(0, #{jQuery(window).height()}px)"
+		else
+			@$el.css transform: "translate(#{jQuery(window).width()}px, 0)"
+	positionAsPrev: ->
+		if @isVertical()
+			@$el.css transform: "translate(0, -#{jQuery(window).height()}px)"
+		else
+			@$el.css transform: "translate(-#{jQuery(window).width()}px, 0)"
 	remove: ->
 		if @model.isNext()
 			@$el.addClass('uberbox-flyout-next')
@@ -132,117 +231,4 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 	
 		
 	
-class Uberbox.VerticalLightboxItem extends Uberbox.LightboxItem
-	layoutAsNext: ->
-		@$el.css transform: "translate(0, #{jQuery(window).height()}px)"
-		@layout()
-	layoutAsPrev: ->
-		@$el.css transform: "translate(0, -#{jQuery(window).height()}px)"
-		@layout()
 	
-class Uberbox.HorizontalLightboxItem extends Uberbox.LightboxItem
-	layoutAsNext: ->
-		@$el.css transform: 'translate(120%, 0)'
-		@layout()
-	layoutAsPrev: ->
-		@$el.css transform: 'translate(-120%, 0)'
-		@layout()
-	
-class Uberbox.Lightbox extends Uberbox.SlidingWindow
-	className: 'uberbox-lightbox-content'
-	template: -> Uberbox.Templates['lightbox-content']
-	ui:
-		next: '.uberbox-next'
-		prev: '.uberbox-prev'
-	events:
-		'click @ui.next': (-> @currentItemView.model.next().activate() unless @ui.next.is('.uberbox-disabled'))
-		'click @ui.prev': (-> @currentItemView.model.prev().activate() unless @ui.prev.is('.uberbox-disabled'))
-		'click @ui.close': -> @trigger 'close'
-	
-	getChildViewClass: -> 
-		if @getOption('orientation') == 'horizontal' 
-			return Uberbox.HorizontalLightboxItem 
-		else 
-			return Uberbox.VerticalLightboxItem
-	onShow: ->
-		super
-		@render()
-		@bindUIElements()
-	render: -> @$el.html(Marionette.Renderer.render(@template))
-
-	onItemActivated: (item)->
-		if !@currentItemView
-			@rebuild()
-		else
-			if item.follows(@currentItemView.model)
-				@scrollNext(item)
-			else
-				@scrollPrev(item)
-		if @currentItemView.model.next()
-			@ui.next.removeClass('uberbox-disabled')
-		else
-			@ui.next.addClass('uberbox-disabled')
-		if @currentItemView.model.prev()
-			@ui.prev.removeClass('uberbox-disabled')
-		else
-			@ui.prev.addClass('uberbox-disabled')
-	checkPrevNext: ->
-	rebuild: ->
-		console.info 'rebuild'
-		@currentItemView.remove() if @currentItemView
-		@prevItemView.remove() if @prevItemView
-		@nextItemView.remove() if @nextItemView	
-		@currentItemView = @createChildView(@collection.activeItem)
-		if next = @collection.activeItem.next()
-			@nextItemView = @createChildView(next, prev: @currentItemView)
-		if prev = @collection.activeItem.prev()
-			@prevItemView = @createChildView(prev, next: @currentItemView)
-	scrollNext: (item)->
-		@prevItemView.remove() if @prevItemView
-		@currentItemView.layoutAsPrev()
-		if @currentItemView.model.isPrev(item)
-			@prevItemView = @currentItemView
-			@currentItemView = @nextItemView
-			@currentItemView.layoutAsCurrent()
-			@currentItemView = @nextItemView
-			if @currentItemView.model.next()
-				@nextItemView = @createChildView(@currentItemView.model.next(), prev: @currentItemView)
-			else
-				@nextItemView = null
-		else
-			@nextItemView.remove() if @nextItemView
-			@currentItemView = @createChildView(item, fromNext: true)
-			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
-			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
-			@currentItemView.layoutAsCurrent()
-		
-	scrollPrev: (item)->
-		@nextItemView.remove() if @nextItemView
-		@currentItemView.layoutAsNext()
-		if @currentItemView.model.isNext(item)
-			@nextItemView = @currentItemView
-			@currentItemView = @prevItemView
-			@currentItemView.layoutAsCurrent()
-			@currentItemView = @prevItemView
-			if @currentItemView.model.prev()
-				@prevItemView = @createChildView(@currentItemView.model.prev(), next: @currentItemView)
-			else
-				@prevItemView = null
-		else
-			@prevItemView.remove() if @prevItemView
-			@currentItemView = @createChildView(item, fromPrev: true)
-			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
-			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
-			@currentItemView.layoutAsCurrent()
-			
-	layout: => _.debounce((=>
-			console.info 'layout'
-			return unless @$el.is(':visible')
-			@currentItemView.layoutAsCurrent()
-			#_.debounce (=> @nextItemView.layoutAsNext()), 200 if @nextItemView
-			#_.debounce (=> @prevItemView.layoutAsPrev()), 200 if @prevItemView
-			_.defer =>
-				@nextItemView.layoutAsNext() if @nextItemView
-				@prevItemView.layoutAsPrev() if @prevItemView
-		), 3000)
-		

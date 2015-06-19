@@ -14,23 +14,22 @@ class Uberbox.CarouselItem extends Uberbox.SlidingWindowItem
 	bindUIElements: ->
 		super
 		if @ui.image[0].complete
-			_.defer => @onImageLoaded()
-		@$el.find('img').on 'load', @onImageLoaded
-	onImageLoaded: => 
-		@trigger('load')
+			@triggerLoad()
+		@$el.find('img').on 'load', @triggerLoad
+	triggerLoad: =>
+		_.defer( (=>
+			@trigger('load')
+			_.defer => @$el.addClass('uberbox-enable-transition')
+		))
 	layoutContent: ->
-	hideLoader: ->
-		@ui.loader.remove()
-	layoutAsCurrent: ->
-		@calculateCoordinatesAsCurrent()
-		@layoutContent() if @loaded
-		@applyLayout()
-	layoutAsNext: ->
-		@calculateCoordinatesAsNext()
-		@layoutContent() if @loaded
-		@applyLayout()
-	layoutAsPrev: ->
-		@calculateCoordinatesAsPrev()
+	hideLoader: -> @ui.loader.remove()
+	layout: ->
+		if @model.isActive()
+			@calculateCoordinatesAsCurrent()
+		else if @model.follows(@model.collection.activeItem)
+			@calculateCoordinatesAsNext()
+		else if @model.precedes(@model.collection.activeItem)
+			@calculateCoordinatesAsPrev()
 		@layoutContent() if @loaded
 		@applyLayout()
 	remove: ->
@@ -101,71 +100,44 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 		item.remove() while item = item.getOption('prev')
 		@currentItemView = null
 			
-	buildFromScratch: (item)->
+	build: (item)->
 		@currentItemView = @createChildView(item)
-		@currentItemView.layoutAsCurrent()
 		@currentItemView.runAction =>
-			@currentItemView.layoutAsCurrent()
-			@currentItemView.reveal()
-			@layoutNextItems(@currentItemView)
-			@layoutPrevItems(@currentItemView)
-	slideTo: (item)->
-		@currentItemView.runAction =>
-			@currentItemView = item
-			@layout()
+			@buildNext(@currentItemView)
+			@buildPrev(@currentItemView)
+	buildNext: (item)=>
+		if item.belongs() and item.model.next() and !item.getOption('next')
+			next = @createChildView(item.model.next(), prev: item)
+			next.runAction => @buildNext(next)
+	buildPrev: (item)=>
+		if item.belongs() and item.model.prev()  and !item.getOption('prev')
+			prev = @createChildView(item.model.prev(), next: item)
+			prev.runAction => @buildPrev(prev)
 	layout: =>
 		if !@$el.is(':visible')
 			@hide()
 		else
-			unless @currentItemView
-				@buildFromScratch(@collection.activeItem)
-				return
-			@currentItemView.layoutAsCurrent()
-			@currentItemView.runAction =>
-				@layoutPrevItems(@currentItemView)
-				@layoutNextItems(@currentItemView)
-
-	layoutNextItems: (prev)->
-		if prev != @currentItemView
-			prev.layoutAsNext()
-			unless prev.fits()
-				prev.remove()
-				return null
-		if prev.model.next() and !prev.getOption('next') and prev.fits()
-			view = @createChildView(prev.model.next(), prev: prev)
-			prev.options.next = view
-			view.options.prev = prev
-			view.layoutAsNext()
-			view.reveal()
-			view.runAction => @layoutNextItems(view)
-		else if prev.getOption('next')
-			@layoutNextItems(prev.getOption('next'))
-
-	layoutPrevItems: (next)->
-		if next != @currentItemView
-			next.layoutAsPrev()
-			unless next.fits()
-				next.remove()
-				return null
-		if next.model.prev()  and !next.getOption('prev') and next.fits()
-			view = @createChildView(next.model.prev(), next: next)
-			next.options.prev = view
-			view.options.next = next
-			view.layoutAsPrev()
-			view.reveal()
-			view.runAction => @layoutPrevItems(view)
-		else if next.getOption('prev')
-			@layoutPrevItems(next.getOption('prev'))
+			if !@currentItemView
+				@build(@collection.activeItem)
+			else
+				@currentItemView.layout()
+				prev = next = @currentItemView
+				while next = next.getOption('next')
+					next.layout()
+				while prev = prev.getOption('prev')
+					prev.layout()
 
 	onItemActivated: (item)->
 		return if @currentItemView and item == @currentItemView.model
 		unless @currentItemView
-			@buildFromScratch(item)
+			@build(item)
 			return
 		if next = @currentItemView.getNextToScrollTo(item)
-			@slideTo(next)
+			@currentItemView = next
+			@layout()
 		else if prev = @currentItemView.getPrevToScrollTo(item)
-			@slideTo(prev)
+			@currentItemView = prev
+			@layout()
 		else
 			@currentItemView.remove()
 			next = @currentItemView.getOption('next')
@@ -176,6 +148,5 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 			while prev
 				prev.remove()
 				prev = prev.getOption('prev')
-			#setTimeout((=> @buildFromScratch(item)), 200)
-			@buildFromScratch(item)
+			@build(item)
 	
