@@ -72,7 +72,7 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 		else
 			@prevItemView.remove() if @prevItemView
 			@currentItemView.layout()
-			@currentItemView = @createChildView(item, fromPrev: true)
+			@currentItemView = @createChildView(item)
 			@currentItemView.positionAsPrev()
 			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
 			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()

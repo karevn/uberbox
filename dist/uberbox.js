@@ -664,6 +664,7 @@
 
         function SlidingWindowItem() {
             this.onClicked = __bind(this.onClicked, this);
+            this.enableTransition = __bind(this.enableTransition, this);
             return SlidingWindowItem.__super__.constructor.apply(this, arguments);
         }
 
@@ -694,7 +695,10 @@
                     }
                     _this.$el.addClass('uberbox-loaded');
                     _this.layout();
-                    return _this.hideLoader();
+                    _this.hideLoader();
+                    return _.defer(function() {
+                        return _this.enableTransition();
+                    });
                 };
             })(this));
             this.render();
@@ -706,6 +710,10 @@
 
         SlidingWindowItem.prototype.getTemplate = function() {
             return this.getOption('template')();
+        };
+
+        SlidingWindowItem.prototype.enableTransition = function() {
+            return this.$el.addClass('uberbox-enable-transition');
         };
 
         SlidingWindowItem.prototype.getNextToScrollTo = function(item) {
@@ -873,12 +881,7 @@
 
     })(Marionette.View);
 
-    var __bind = function(fn, me) {
-            return function() {
-                return fn.apply(me, arguments);
-            };
-        },
-        __hasProp = {}.hasOwnProperty,
+    var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) child[key] = parent[key];
@@ -891,13 +894,17 @@
             child.prototype = new ctor();
             child.__super__ = parent.prototype;
             return child;
+        },
+        __bind = function(fn, me) {
+            return function() {
+                return fn.apply(me, arguments);
+            };
         };
 
     Uberbox.CarouselItem = (function(_super) {
         __extends(CarouselItem, _super);
 
         function CarouselItem() {
-            this.triggerLoad = __bind(this.triggerLoad, this);
             return CarouselItem.__super__.constructor.apply(this, arguments);
         }
 
@@ -931,20 +938,17 @@
         CarouselItem.prototype.bindUIElements = function() {
             CarouselItem.__super__.bindUIElements.apply(this, arguments);
             if (this.ui.image[0].complete) {
-                this.triggerLoad();
+                _.defer((function(_this) {
+                    return function() {
+                        return _this.trigger('load');
+                    };
+                })(this));
             }
-            return this.$el.find('img').on('load', this.triggerLoad);
-        };
-
-        CarouselItem.prototype.triggerLoad = function() {
-            return _.defer(((function(_this) {
+            return this.$el.find('img').on('load', (function(_this) {
                 return function() {
-                    _this.trigger('load');
-                    return _.defer(function() {
-                        return _this.$el.addClass('uberbox-enable-transition');
-                    });
+                    return _this.trigger('load');
                 };
-            })(this)));
+            })(this));
         };
 
         CarouselItem.prototype.layoutContent = function() {};
@@ -1873,9 +1877,7 @@
                     this.prevItemView.remove();
                 }
                 this.currentItemView.layout();
-                this.currentItemView = this.createChildView(item, {
-                    fromPrev: true
-                });
+                this.currentItemView = this.createChildView(item);
                 this.currentItemView.positionAsPrev();
                 if (item.next()) {
                     this.nextItemView = this.createChildView(item.next(), {

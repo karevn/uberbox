@@ -15,10 +15,12 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 			@$el.addClass 'uberbox-loaded'
 			@layout()
 			@hideLoader()
+			_.defer => @enableTransition()
 		@render()
 		@bindUIElements()
 		@showRegions() if @showRegions
 	getTemplate: -> @getOption('template')()
+	enableTransition: => @$el.addClass('uberbox-enable-transition')
 	getNextToScrollTo: (item)->
 		return this if @model == item
 		return next.getNextToScrollTo(item) if next = @getOption('next')

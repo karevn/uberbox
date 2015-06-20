@@ -93,7 +93,7 @@
 
 .uberbox-lightbox-item
 	position: fixed
-	transition: opacity 0.3s, left 0.3s, top 0.3s, transform 0.3s
+	transition: opacity 0.3s
 	opacity: 0
 	z-index: 1
 	left: 6px
@@ -103,9 +103,8 @@
 	transition: opacity 0.3s
 	&.uberbox-loaded
 		opacity: 1
-		transition: opacity 0.3s, left 0.3s, top 0.3s, transform 0.3s
 	&.uberbox-enable-transition
-		transition: opacity 0.3s, left 0.3s, top 0.3s
+		transition: opacity 0.3s, transform 0.3s
 	&.uberbox-current
 		z-index: 2
 		

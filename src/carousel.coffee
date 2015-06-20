@@ -14,13 +14,8 @@ class Uberbox.CarouselItem extends Uberbox.SlidingWindowItem
 	bindUIElements: ->
 		super
 		if @ui.image[0].complete
-			@triggerLoad()
-		@$el.find('img').on 'load', @triggerLoad
-	triggerLoad: =>
-		_.defer( (=>
-			@trigger('load')
-			_.defer => @$el.addClass('uberbox-enable-transition')
-		))
+			_.defer => @trigger('load')
+		@$el.find('img').on 'load', => @trigger('load')
 	layoutContent: ->
 	hideLoader: -> @ui.loader.remove()
 	layout: ->
