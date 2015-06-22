@@ -1268,15 +1268,12 @@
             ToolbarView.__super__.initialize.apply(this, arguments);
             this.render();
             this.bindUIElements();
-            return setTimeout(((function(_this) {
+            return this.listenTo(this.getOption('bindTo').currentItemView, 'load', (function(_this) {
                 return function() {
-                    _this.layout();
                     _this.$el.addClass('uberbox-visible');
-                    return setTimeout((function() {
-                        return _this.layout();
-                    }), 200);
+                    return _this.layout();
                 };
-            })(this)), 500);
+            })(this));
         };
 
         ToolbarView.prototype.serializeData = function() {
@@ -1286,17 +1283,21 @@
         };
 
         ToolbarView.prototype.layout = function() {
-            var item, itemView;
-            if (jQuery(window).width() > 639) {
-                item = this.getOption('bindTo');
-                itemView = item.currentItemView;
-                return this.$el.width(itemView.getWidth()).css(itemView.getOffset());
-            } else {
-                return this.$el.css({
-                    left: '',
-                    top: 42
-                });
-            }
+            return _.defer((function(_this) {
+                return function() {
+                    var item, itemView;
+                    if (jQuery(window).width() > 639) {
+                        item = _this.getOption('bindTo');
+                        itemView = item.currentItemView;
+                        return _this.$el.width(itemView.getWidth()).css(itemView.getOffset());
+                    } else {
+                        return _this.$el.css({
+                            left: '',
+                            top: 42
+                        });
+                    }
+                };
+            })(this));
         };
 
         ToolbarView.prototype.onFullscreenClick = function(e) {
