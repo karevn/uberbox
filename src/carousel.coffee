@@ -101,11 +101,11 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 			@buildNext(@currentItemView)
 			@buildPrev(@currentItemView)
 	buildNext: (item)=>
-		if item.belongs() and item.model.next() and !item.getOption('next')
+		if item.fits() and item.model.next() and !item.getOption('next')
 			next = @createChildView(item.model.next(), prev: item)
 			next.runAction => @buildNext(next)
 	buildPrev: (item)=>
-		if item.belongs() and item.model.prev()  and !item.getOption('prev')
+		if item.fits() and item.model.prev()  and !item.getOption('prev')
 			prev = @createChildView(item.model.prev(), next: item)
 			prev.runAction => @buildPrev(prev)
 	layout: =>
@@ -119,8 +119,11 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 				prev = next = @currentItemView
 				while next = next.getOption('next')
 					next.layout()
+					@buildNext(next)
 				while prev = prev.getOption('prev')
 					prev.layout()
+					@buildPrev(prev)
+					
 
 	onItemActivated: (item)->
 		return if @currentItemView and item == @currentItemView.model

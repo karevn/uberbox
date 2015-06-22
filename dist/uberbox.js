@@ -1131,7 +1131,7 @@
 
         Carousel.prototype.buildNext = function(item) {
             var next;
-            if (item.belongs() && item.model.next() && !item.getOption('next')) {
+            if (item.fits() && item.model.next() && !item.getOption('next')) {
                 next = this.createChildView(item.model.next(), {
                     prev: item
                 });
@@ -1145,7 +1145,7 @@
 
         Carousel.prototype.buildPrev = function(item) {
             var prev;
-            if (item.belongs() && item.model.prev() && !item.getOption('prev')) {
+            if (item.fits() && item.model.prev() && !item.getOption('prev')) {
                 prev = this.createChildView(item.model.prev(), {
                     next: item
                 });
@@ -1169,10 +1169,12 @@
                     prev = next = this.currentItemView;
                     while (next = next.getOption('next')) {
                         next.layout();
+                        this.buildNext(next);
                     }
                     _results = [];
                     while (prev = prev.getOption('prev')) {
-                        _results.push(prev.layout());
+                        prev.layout();
+                        _results.push(this.buildPrev(prev));
                     }
                     return _results;
                 }
