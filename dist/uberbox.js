@@ -214,7 +214,7 @@
         Uberbox.getObjectViewType = function(item) {
             var condition, config, type, url, _ref;
             if (type = item.get('type')) {
-                return Uberbox.contentViewTypes[type];
+                return Uberbox.contentViewTypes()[type]['class'];
             }
             _ref = Uberbox.contentViewTypes();
             for (type in _ref) {

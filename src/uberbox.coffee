@@ -106,7 +106,7 @@ class Uberbox extends Marionette.LayoutView
 	
 	@getPixelRatio: -> if window.devicePixelRatio > 0 then window.devicePixelRatio else 1
 	@getObjectViewType: (item)=>
-		return @contentViewTypes[type] if type = item.get('type')
+		return @contentViewTypes()[type]['class'] if type = item.get('type')
 		for type, config of @contentViewTypes()
 			condition = false
 			if config.condition
