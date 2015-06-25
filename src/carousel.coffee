@@ -157,8 +157,8 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 	layout: =>
 		if !@currentItemView
 			@currentItemView = @createChildView(@collection.activeItem)
-		@translateToCurrent()
 		@currentItemView.runAction =>
+			@translateToCurrent()
 			@waitForLast @currentItemView, (last)=>
 				if !@fits(last)
 					while !@fits(last)

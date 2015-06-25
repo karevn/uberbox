@@ -1230,9 +1230,9 @@
             if (!this.currentItemView) {
                 this.currentItemView = this.createChildView(this.collection.activeItem);
             }
-            this.translateToCurrent();
             return this.currentItemView.runAction((function(_this) {
                 return function() {
+                    _this.translateToCurrent();
                     _this.waitForLast(_this.currentItemView, function(last) {
                         var _results;
                         if (!_this.fits(last)) {

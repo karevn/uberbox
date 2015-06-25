@@ -188,7 +188,6 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			@$el.addClass("uberbox-description-#{@model.get('description_style')}")
 		else
 			@$el.addClass('uberbox-no-description')
-
 		@object.show(new type(_.extend(@options, model: @model)))
 		@toolbar.show(new Uberbox.ToolbarView(model: @model, bindTo: @object.currentView))
 		if @object.currentView.waitForLoad
