@@ -141,6 +141,21 @@
 			.uberbox-lightbox-item
 				bottom: 130px
 .uberbox-lightbox-item
+	&.uberbox-no-description
+		.uberbox-lightbox-item-content-wrapper
+			position: absolute
+			left: 0
+			right: 0
+			top: 0
+			bottom: 0
+			transform: none
+		.uberbox-item-object
+			position: absolute
+			bottom: 0
+			top: 0
+			left: 0
+			right: 0
+		
 	&.uberbox-description-mini
 		.uberbox-item-object
 			bottom: 50px
@@ -191,6 +206,7 @@
 			iframe
 				width: 100%
 				height: 100%
+	&.uberbox-description-mini, &.uberbox-no-description
 		&.uberbox-natural-fit
 			.uberbox-item-object
 				position: absolute
@@ -260,6 +276,9 @@
 				top: 0
 			.uberbox-item-description
 				width: 400px
+	&.uberbox-no-description
+		.uberbox-item-object
+			bottom: 0
 	&.uberbox-description-right, &.uberbox-description-bottom
 		font-weight: 200
 		color: #444

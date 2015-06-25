@@ -4,7 +4,6 @@ class Uberbox extends Marionette.LayoutView
 	regions:
 		lightbox: '.uberbox-lightbox-wrapper'
 		carousel: '.uberbox-carousel-wrapper'
-		toolbar: '.uberbox-toolbar-wrapper'
 	ui:{}
 	events:
 		touchstart: 'onTouchStart'
@@ -142,22 +141,13 @@ class Uberbox extends Marionette.LayoutView
 					@carousel.show(new Uberbox.Carousel(lightboxOptions))
 		else
 			@$('.uberbox-carousel-wrapper').remove()
+		@listenTo @getOption('collection'), 'close', => Uberbox.close()
 		current = @getOption('collection').at(@getOption('current'))
-		@listenTo @getOption('collection'), 'activate', @onItemActivated
 		current.activate()
-
 		jQuery('body').on 'keydown', @onKeyDown
 		@overflow = jQuery('html').css('overflow')
 		jQuery('html').css('overflow', 'hidden')
 		
-	onItemActivated: (model)->
-		if @toolbar.currentView
-			jQuery(window).off 'resize.uberbox-main'
-			@toolbar.empty()
-		@toolbar.show new Uberbox.ToolbarView(model: model, bindTo: @lightbox.currentView)
-		@listenTo @toolbar.currentView, 'close', => @remove()
-		jQuery(window).on 'resize.uberbox-main', =>
-			@toolbar.currentView.layout()
 	remove: ->
 		@trigger('close')
 		super

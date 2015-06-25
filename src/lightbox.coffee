@@ -77,15 +77,13 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
 			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
 			
-	layout: => _.debounce((=>
-			return unless @$el.is(':visible')
-			@currentItemView.layout()
-			#_.debounce (=> @nextItemView.layoutAsNext()), 200 if @nextItemView
-			#_.debounce (=> @prevItemView.layoutAsPrev()), 200 if @prevItemView
-			_.defer =>
-				@nextItemView.layout() if @nextItemView
-				@prevItemView.layout() if @prevItemView
-		), 200)
+	layout: => 
+		return unless @$el.is(':visible')
+		@currentItemView.layout()
+		_.defer =>
+			@nextItemView.layout() if @nextItemView
+			@prevItemView.layout() if @prevItemView
+
 		
 
 class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
@@ -97,6 +95,7 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 	regions:
 		object: '.uberbox-item-object'
 		description: '.uberbox-item-description'
+		toolbar: '.uberbox-item-toolbar-wrapper'
 	ui:
 		content: '> .uberbox-lightbox-item-content-wrapper'
 		description: '.uberbox-item-description'
@@ -187,18 +186,24 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		if @model.get('description')
 			@$el.addClass('uberbox-has-description')
 			@$el.addClass("uberbox-description-#{@model.get('description_style')}")
+
 		@object.show(new type(_.extend(@options, model: @model)))
+		@toolbar.show(new Uberbox.ToolbarView(model: @model, bindTo: @object.currentView))
 		if @object.currentView.waitForLoad
 			@showLoader()
 			@listenToOnce @object.currentView, 'load', =>
 				@trigger 'load'
 				@hideLoader()
+				@toolbar.currentView.reveal()
 		else
 			@trigger 'load'
+			@toolbar.currentView.reveal()
 			@showContent()
+		@listenTo @model, 'activate', => @toolbar.currentView.reveal()
 	layout: ->
 		if @isCurrent()
 			@$el.css transform: ''
+			@toolbar.currentView.layout()
 		else if @isNext()
 			@positionAsNext()
 		else if @isPrev()
@@ -206,6 +211,7 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		else
 			setTimeout(@remove, 400)
 		@layoutContent()
+
 
 	isVertical: -> @getOption('orientation') == 'vertical'
 	positionAsNext: ->

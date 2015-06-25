@@ -27,26 +27,33 @@ class Uberbox.CarouselItem extends Uberbox.SlidingWindowItem
 			@calculateCoordinatesAsPrev()
 		@layoutContent() if @loaded
 		@applyLayout()
+		
+	getNext: -> @getOption('next')
+	getPrev: -> @getOption('prev')
 	remove: ->
 		@$el.find('img').off 'load', @onImageLoaded
+		@$el.remove()
+		if next = @getOption('next')
+			next.options.prev = null
+		if prev = @getOption('prev')
+			prev.options.next = null
 	fits: -> 
 		return true if @belongs()
-		offset = @$el.offset()
-		return true if (@top < @getParent().height() and offset.top + @$el.height() > 0 and 
-			offset.left - @$el.offsetParent().offset().left < @getParent().width() and offset.left - @$el.offsetParent().offset().left + @$el.width() > 0)
+		return true if @top < @getParent().height() and @top + @$el.height() > 0 and
+			@left + @$el.width() > 0 and @left < @getParent().width() and @top < @getParent().height()
 		false
 	
 	applyLayout: -> @$el.css(left: @left, top: @top, width: @width, height: @height)
 
 class Uberbox.VerticalCarouselItem extends Uberbox.CarouselItem
 	calculateCoordinatesAsPrev: ->
-		next = @getOption('next')
+		return unless next = @getOption('next')
 		@left = @padding
 		@width = @getParent().width() - @padding * 2
 		@height = @getHeightInVerticalMode()
 		@top = next.top - @padding - @height
 	calculateCoordinatesAsNext: ->
-		prev = @getOption 'prev'
+		return unless prev = @getOption 'prev'
 		@left = @padding
 		@top =  @padding + prev.top  + prev.height
 		@width = @getParent().width() - @padding * 2
@@ -60,13 +67,13 @@ class Uberbox.VerticalCarouselItem extends Uberbox.CarouselItem
 	
 class Uberbox.HorizontalCarouselItem extends Uberbox.CarouselItem
 	calculateCoordinatesAsPrev: ->
-		next = @getOption('next')
+		return unless next = @getOption('next')
 		@height = @getParent().height() - @padding * 2
 		@width = @getWidthInHorizontalMode()
 		@left = next.left - @width - @padding
 		@top = @padding
 	calculateCoordinatesAsNext: ->
-		prev = @getOption 'prev' 
+		return unless prev = @getOption 'prev' 
 		@left = prev.left + prev.width + @padding
 		@top = @padding
 		@height = @getParent().height() - @padding * 2
@@ -96,39 +103,85 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 		@currentItemView = null
 			
 	build: (item)->
-		@currentItemView = @createChildView(item)
-		@currentItemView.runAction =>
-			@buildNext(@currentItemView)
-			@buildPrev(@currentItemView)
-	buildNext: (item)=>
-		if item.fits() and item.model.next() and !item.getOption('next')
-			next = @createChildView(item.model.next(), prev: item)
-			next.runAction => @buildNext(next)
-	buildPrev: (item)=>
-		if item.fits() and item.model.prev()  and !item.getOption('prev')
-			prev = @createChildView(item.model.prev(), next: item)
-			prev.runAction => @buildPrev(prev)
-	layout: =>
-		if !@$el.is(':visible')
-			@hide()
-		else
-			if !@currentItemView
-				@build(@collection.activeItem)
+	
+	buildNext: (last) =>
+		if @belongs(last) and last.model.next() and !last.getNext()
+			next = @createChildView(last.model.next(), prev: last)
+			next.runAction =>
+				next.layout()
+				@buildNext(next)
+	buildPrev: (first)=>
+		if @belongs(first) and first.model.prev() and !first.getPrev()
+			prev = @createChildView(first.model.prev(), next: first)
+			prev.runAction =>
+				prev.layout()
+				@buildPrev(prev)
+	waitForLast: (last, lastCallback)=>
+		last.runAction =>
+			if last.getNext()
+				@waitForLast(last.getNext(), lastCallback)
 			else
-				@currentItemView.layout()
-				prev = next = @currentItemView
-				while next = next.getOption('next')
-					next.layout()
-					@buildNext(next)
-				while prev = prev.getOption('prev')
-					prev.layout()
-					@buildPrev(prev)
-					
+				lastCallback(last)
+	waitForFirst: (first, firstCallback)=>
+		first.runAction =>
+			if first.getPrev()
+				@waitForFirst(first.getPrev(), firstCallback)
+			else
+				firstCallback(first)
+	isHorizontal: -> @getOption('orientation') == 'horizontal'
+	fits: (item)->
+		parent = @$el.parent()
+		if @isHorizontal()
+			width = parent.width()
+			return @translateX + item.left + item.width > 0 and @translateX + item.left < width
+		else
+			height = parent.height()
+			return @translateY + item.top + item.height > 0 and @translateY + item.top < height
+	belongs: (item)->
+		parent = @$el.parent()
+		if @isHorizontal()
+			width = parent.width()
+			return @translateX + item.left + item.width < width and @translateX + item.left > 0
+		else
+			height = parent.height()
+			return @translateY + item.top + item.height < height and @translateY + item.top > 0
+	translateToCurrent: ->
+		if @isHorizontal()
+			offset = @currentItemView.left
+			@translateX = @$el.parent().width() / 2 - offset - @currentItemView.$el.width() / 2
+			@$el.css transform: "translate(#{@translateX}px, 0px)"
+		else
+			offset = @currentItemView.top
+			@translateY = @$el.parent().height() / 2 - offset - @currentItemView.$el.height / 2
+			@$el.css transform: "translate(0px, #{@translateY}px)"
+	layout: =>
+		if !@currentItemView
+			@currentItemView = @createChildView(@collection.activeItem)
+		@translateToCurrent()
+		@currentItemView.runAction =>
+			@waitForLast @currentItemView, (last)=>
+				if !@fits(last)
+					while !@fits(last)
+						last.remove()
+						last = last.getPrev()
+				else
+					@buildNext(last)
+			@waitForFirst @currentItemView, (first)=>
+				if !@fits(first)
+					while !@fits(first)
+						first.remove()
+						first = first.getPrev()
+				else
+					@buildPrev(first)
+				
+			
 
 	onItemActivated: (item)->
 		return if @currentItemView and item == @currentItemView.model
 		unless @currentItemView
-			@build(item)
+			@currentItemView = @createChildView(item)
+			@currentItemView.layout()
+			@layout()
 			return
 		if next = @currentItemView.getNextToScrollTo(item)
 			@currentItemView = next
@@ -146,5 +199,7 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 			while prev
 				prev.remove()
 				prev = prev.getOption('prev')
-			@build(item)
+			@currentItemView.layout()
+			@currentItemView = @createChildView(item)
+			@layout()
 	

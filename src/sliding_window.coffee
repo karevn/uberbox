@@ -5,9 +5,9 @@ class Uberbox.SlidingWindow extends Marionette.View
 	constructor: (options)->
 		super _.extend({}, _.result(this, 'defaults'), options)
 		@listenTo @collection, 'activate', @onItemActivated
-	onShow: -> jQuery(window).on 'resize.uberbox', @layout
+	onShow: -> jQuery(window).on 'resize', @layout
 	remove: ->
-		jQuery(window).off 'resize.uberbox'
+		jQuery(window).off 'resize', @layout
 		super
 	getChildView: (child)-> childView = @getOption('childView')
 	createChildView: (child, options = {})->

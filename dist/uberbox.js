@@ -57,8 +57,7 @@
 
         Uberbox.prototype.regions = {
             lightbox: '.uberbox-lightbox-wrapper',
-            carousel: '.uberbox-carousel-wrapper',
-            toolbar: '.uberbox-toolbar-wrapper'
+            carousel: '.uberbox-carousel-wrapper'
         };
 
         Uberbox.prototype.ui = {};
@@ -279,33 +278,16 @@
             } else {
                 this.$('.uberbox-carousel-wrapper').remove();
             }
+            this.listenTo(this.getOption('collection'), 'close', (function(_this) {
+                return function() {
+                    return Uberbox.close();
+                };
+            })(this));
             current = this.getOption('collection').at(this.getOption('current'));
-            this.listenTo(this.getOption('collection'), 'activate', this.onItemActivated);
             current.activate();
             jQuery('body').on('keydown', this.onKeyDown);
             this.overflow = jQuery('html').css('overflow');
             return jQuery('html').css('overflow', 'hidden');
-        };
-
-        Uberbox.prototype.onItemActivated = function(model) {
-            if (this.toolbar.currentView) {
-                jQuery(window).off('resize.uberbox-main');
-                this.toolbar.empty();
-            }
-            this.toolbar.show(new Uberbox.ToolbarView({
-                model: model,
-                bindTo: this.lightbox.currentView
-            }));
-            this.listenTo(this.toolbar.currentView, 'close', (function(_this) {
-                return function() {
-                    return _this.remove();
-                };
-            })(this));
-            return jQuery(window).on('resize.uberbox-main', (function(_this) {
-                return function() {
-                    return _this.toolbar.currentView.layout();
-                };
-            })(this));
         };
 
         Uberbox.prototype.remove = function() {
@@ -841,11 +823,11 @@
         }
 
         SlidingWindow.prototype.onShow = function() {
-            return jQuery(window).on('resize.uberbox', this.layout);
+            return jQuery(window).on('resize', this.layout);
         };
 
         SlidingWindow.prototype.remove = function() {
-            jQuery(window).off('resize.uberbox');
+            jQuery(window).off('resize', this.layout);
             return SlidingWindow.__super__.remove.apply(this, arguments);
         };
 
@@ -971,17 +953,31 @@
             return this.applyLayout();
         };
 
+        CarouselItem.prototype.getNext = function() {
+            return this.getOption('next');
+        };
+
+        CarouselItem.prototype.getPrev = function() {
+            return this.getOption('prev');
+        };
+
         CarouselItem.prototype.remove = function() {
-            return this.$el.find('img').off('load', this.onImageLoaded);
+            var next, prev;
+            this.$el.find('img').off('load', this.onImageLoaded);
+            this.$el.remove();
+            if (next = this.getOption('next')) {
+                next.options.prev = null;
+            }
+            if (prev = this.getOption('prev')) {
+                return prev.options.next = null;
+            }
         };
 
         CarouselItem.prototype.fits = function() {
-            var offset;
             if (this.belongs()) {
                 return true;
             }
-            offset = this.$el.offset();
-            if (this.top < this.getParent().height() && offset.top + this.$el.height() > 0 && offset.left - this.$el.offsetParent().offset().left < this.getParent().width() && offset.left - this.$el.offsetParent().offset().left + this.$el.width() > 0) {
+            if (this.top < this.getParent().height() && this.top + this.$el.height() > 0 && this.left + this.$el.width() > 0 && this.left < this.getParent().width() && this.top < this.getParent().height()) {
                 return true;
             }
             return false;
@@ -1009,7 +1005,9 @@
 
         VerticalCarouselItem.prototype.calculateCoordinatesAsPrev = function() {
             var next;
-            next = this.getOption('next');
+            if (!(next = this.getOption('next'))) {
+                return;
+            }
             this.left = this.padding;
             this.width = this.getParent().width() - this.padding * 2;
             this.height = this.getHeightInVerticalMode();
@@ -1018,7 +1016,9 @@
 
         VerticalCarouselItem.prototype.calculateCoordinatesAsNext = function() {
             var prev;
-            prev = this.getOption('prev');
+            if (!(prev = this.getOption('prev'))) {
+                return;
+            }
             this.left = this.padding;
             this.top = this.padding + prev.top + prev.height;
             this.width = this.getParent().width() - this.padding * 2;
@@ -1047,7 +1047,9 @@
 
         HorizontalCarouselItem.prototype.calculateCoordinatesAsPrev = function() {
             var next;
-            next = this.getOption('next');
+            if (!(next = this.getOption('next'))) {
+                return;
+            }
             this.height = this.getParent().height() - this.padding * 2;
             this.width = this.getWidthInHorizontalMode();
             this.left = next.left - this.width - this.padding;
@@ -1056,7 +1058,9 @@
 
         HorizontalCarouselItem.prototype.calculateCoordinatesAsNext = function() {
             var prev;
-            prev = this.getOption('prev');
+            if (!(prev = this.getOption('prev'))) {
+                return;
+            }
             this.left = prev.left + prev.width + this.padding;
             this.top = this.padding;
             this.height = this.getParent().height() - this.padding * 2;
@@ -1079,6 +1083,8 @@
 
         function Carousel() {
             this.layout = __bind(this.layout, this);
+            this.waitForFirst = __bind(this.waitForFirst, this);
+            this.waitForLast = __bind(this.waitForLast, this);
             this.buildPrev = __bind(this.buildPrev, this);
             this.buildNext = __bind(this.buildNext, this);
             return Carousel.__super__.constructor.apply(this, arguments);
@@ -1119,66 +1125,142 @@
             return this.currentItemView = null;
         };
 
-        Carousel.prototype.build = function(item) {
-            this.currentItemView = this.createChildView(item);
-            return this.currentItemView.runAction((function(_this) {
-                return function() {
-                    _this.buildNext(_this.currentItemView);
-                    return _this.buildPrev(_this.currentItemView);
-                };
-            })(this));
-        };
+        Carousel.prototype.build = function(item) {};
 
-        Carousel.prototype.buildNext = function(item) {
+        Carousel.prototype.buildNext = function(last) {
             var next;
-            if (item.fits() && item.model.next() && !item.getOption('next')) {
-                next = this.createChildView(item.model.next(), {
-                    prev: item
+            if (this.belongs(last) && last.model.next() && !last.getNext()) {
+                next = this.createChildView(last.model.next(), {
+                    prev: last
                 });
                 return next.runAction((function(_this) {
                     return function() {
+                        next.layout();
                         return _this.buildNext(next);
                     };
                 })(this));
             }
         };
 
-        Carousel.prototype.buildPrev = function(item) {
+        Carousel.prototype.buildPrev = function(first) {
             var prev;
-            if (item.fits() && item.model.prev() && !item.getOption('prev')) {
-                prev = this.createChildView(item.model.prev(), {
-                    next: item
+            if (this.belongs(first) && first.model.prev() && !first.getPrev()) {
+                prev = this.createChildView(first.model.prev(), {
+                    next: first
                 });
                 return prev.runAction((function(_this) {
                     return function() {
+                        prev.layout();
                         return _this.buildPrev(prev);
                     };
                 })(this));
             }
         };
 
-        Carousel.prototype.layout = function() {
-            var next, prev, _results;
-            if (!this.$el.is(':visible')) {
-                return this.hide();
+        Carousel.prototype.waitForLast = function(last, lastCallback) {
+            return last.runAction((function(_this) {
+                return function() {
+                    if (last.getNext()) {
+                        return _this.waitForLast(last.getNext(), lastCallback);
+                    } else {
+                        return lastCallback(last);
+                    }
+                };
+            })(this));
+        };
+
+        Carousel.prototype.waitForFirst = function(first, firstCallback) {
+            return first.runAction((function(_this) {
+                return function() {
+                    if (first.getPrev()) {
+                        return _this.waitForFirst(first.getPrev(), firstCallback);
+                    } else {
+                        return firstCallback(first);
+                    }
+                };
+            })(this));
+        };
+
+        Carousel.prototype.isHorizontal = function() {
+            return this.getOption('orientation') === 'horizontal';
+        };
+
+        Carousel.prototype.fits = function(item) {
+            var height, parent, width;
+            parent = this.$el.parent();
+            if (this.isHorizontal()) {
+                width = parent.width();
+                return this.translateX + item.left + item.width > 0 && this.translateX + item.left < width;
             } else {
-                if (!this.currentItemView) {
-                    return this.build(this.collection.activeItem);
-                } else {
-                    this.currentItemView.layout();
-                    prev = next = this.currentItemView;
-                    while (next = next.getOption('next')) {
-                        next.layout();
-                        this.buildNext(next);
-                    }
-                    _results = [];
-                    while (prev = prev.getOption('prev')) {
-                        prev.layout();
-                        _results.push(this.buildPrev(prev));
-                    }
-                    return _results;
-                }
+                height = parent.height();
+                return this.translateY + item.top + item.height > 0 && this.translateY + item.top < height;
             }
+        };
+
+        Carousel.prototype.belongs = function(item) {
+            var height, parent, width;
+            parent = this.$el.parent();
+            if (this.isHorizontal()) {
+                width = parent.width();
+                return this.translateX + item.left + item.width < width && this.translateX + item.left > 0;
+            } else {
+                height = parent.height();
+                return this.translateY + item.top + item.height < height && this.translateY + item.top > 0;
+            }
+        };
+
+        Carousel.prototype.translateToCurrent = function() {
+            var offset;
+            if (this.isHorizontal()) {
+                offset = this.currentItemView.left;
+                this.translateX = this.$el.parent().width() / 2 - offset - this.currentItemView.$el.width() / 2;
+                return this.$el.css({
+                    transform: "translate(" + this.translateX + "px, 0px)"
+                });
+            } else {
+                offset = this.currentItemView.top;
+                this.translateY = this.$el.parent().height() / 2 - offset - this.currentItemView.$el.height / 2;
+                return this.$el.css({
+                    transform: "translate(0px, " + this.translateY + "px)"
+                });
+            }
+        };
+
+        Carousel.prototype.layout = function() {
+            if (!this.currentItemView) {
+                this.currentItemView = this.createChildView(this.collection.activeItem);
+            }
+            this.translateToCurrent();
+            return this.currentItemView.runAction((function(_this) {
+                return function() {
+                    _this.waitForLast(_this.currentItemView, function(last) {
+                        var _results;
+                        if (!_this.fits(last)) {
+                            _results = [];
+                            while (!_this.fits(last)) {
+                                last.remove();
+                                _results.push(last = last.getPrev());
+                            }
+                            return _results;
+                        } else {
+                            return _this.buildNext(last);
+                        }
+                    });
+                    return _this.waitForFirst(_this.currentItemView, function(first) {
+                        var _results;
+                        if (!_this.fits(first)) {
+                            _results = [];
+                            while (!_this.fits(first)) {
+                                first.remove();
+                                _results.push(first = first.getPrev());
+                            }
+                            return _results;
+                        } else {
+                            return _this.buildPrev(first);
+                        }
+                    });
+                };
+            })(this));
         };
 
         Carousel.prototype.onItemActivated = function(item) {
@@ -1187,7 +1269,9 @@
                 return;
             }
             if (!this.currentItemView) {
-                this.build(item);
+                this.currentItemView = this.createChildView(item);
+                this.currentItemView.layout();
+                this.layout();
                 return;
             }
             if (next = this.currentItemView.getNextToScrollTo(item)) {
@@ -1208,7 +1292,9 @@
                     prev.remove();
                     prev = prev.getOption('prev');
                 }
-                return this.build(item);
+                this.currentItemView.layout();
+                this.currentItemView = this.createChildView(item);
+                return this.layout();
             }
         };
 
@@ -1216,7 +1302,12 @@
 
     })(Uberbox.SlidingWindow);
 
-    var __hasProp = {}.hasOwnProperty,
+    var __bind = function(fn, me) {
+            return function() {
+                return fn.apply(me, arguments);
+            };
+        },
+        __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) child[key] = parent[key];
@@ -1235,6 +1326,7 @@
         __extends(ToolbarView, _super);
 
         function ToolbarView() {
+            this.reveal = __bind(this.reveal, this);
             return ToolbarView.__super__.constructor.apply(this, arguments);
         }
 
@@ -1267,13 +1359,12 @@
         ToolbarView.prototype.initialize = function() {
             ToolbarView.__super__.initialize.apply(this, arguments);
             this.render();
-            this.bindUIElements();
-            return this.listenTo(this.getOption('bindTo').currentItemView, 'load', (function(_this) {
-                return function() {
-                    _this.$el.addClass('uberbox-visible');
-                    return _this.layout();
-                };
-            })(this));
+            return this.bindUIElements();
+        };
+
+        ToolbarView.prototype.reveal = function() {
+            this.$el.addClass('uberbox-visible');
+            return this.layout();
         };
 
         ToolbarView.prototype.serializeData = function() {
@@ -1283,21 +1374,19 @@
         };
 
         ToolbarView.prototype.layout = function() {
-            return _.defer((function(_this) {
-                return function() {
-                    var item, itemView;
-                    if (jQuery(window).width() > 639) {
-                        item = _this.getOption('bindTo');
-                        itemView = item.currentItemView;
-                        return _this.$el.width(itemView.getWidth()).css(itemView.getOffset());
-                    } else {
-                        return _this.$el.css({
-                            left: '',
-                            top: 42
-                        });
-                    }
-                };
-            })(this));
+            var itemView, offset;
+            if (jQuery(window).width() > 639) {
+                itemView = this.getOption('bindTo');
+                offset = itemView.getOffset();
+                offset.left -= this.$el.parent().offset().left;
+                offset.top -= 45;
+                return this.$el.width(itemView.getWidth()).css(offset);
+            } else {
+                return this.$el.css({
+                    left: '',
+                    top: 42
+                });
+            }
         };
 
         ToolbarView.prototype.onFullscreenClick = function(e) {
@@ -1319,7 +1408,7 @@
         ToolbarView.prototype.onCloseClick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            return this.trigger('close');
+            return this.model.trigger('close');
         };
 
         ToolbarView.prototype.onShareClick = function(e) {
@@ -1896,22 +1985,20 @@
         };
 
         Lightbox.prototype.layout = function() {
-            return _.debounce(((function(_this) {
+            if (!this.$el.is(':visible')) {
+                return;
+            }
+            this.currentItemView.layout();
+            return _.defer((function(_this) {
                 return function() {
-                    if (!_this.$el.is(':visible')) {
-                        return;
+                    if (_this.nextItemView) {
+                        _this.nextItemView.layout();
                     }
-                    _this.currentItemView.layout();
-                    return _.defer(function() {
-                        if (_this.nextItemView) {
-                            _this.nextItemView.layout();
-                        }
-                        if (_this.prevItemView) {
-                            return _this.prevItemView.layout();
-                        }
-                    });
+                    if (_this.prevItemView) {
+                        return _this.prevItemView.layout();
+                    }
                 };
-            })(this)), 200);
+            })(this));
         };
 
         return Lightbox;
@@ -1940,7 +2027,8 @@
 
         LightboxItem.prototype.regions = {
             object: '.uberbox-item-object',
-            description: '.uberbox-item-description'
+            description: '.uberbox-item-description',
+            toolbar: '.uberbox-item-toolbar-wrapper'
         };
 
         LightboxItem.prototype.ui = {
@@ -2100,18 +2188,29 @@
             this.object.show(new type(_.extend(this.options, {
                 model: this.model
             })));
+            this.toolbar.show(new Uberbox.ToolbarView({
+                model: this.model,
+                bindTo: this.object.currentView
+            }));
             if (this.object.currentView.waitForLoad) {
                 this.showLoader();
-                return this.listenToOnce(this.object.currentView, 'load', (function(_this) {
+                this.listenToOnce(this.object.currentView, 'load', (function(_this) {
                     return function() {
                         _this.trigger('load');
-                        return _this.hideLoader();
+                        _this.hideLoader();
+                        return _this.toolbar.currentView.reveal();
                     };
                 })(this));
             } else {
                 this.trigger('load');
-                return this.showContent();
+                this.toolbar.currentView.reveal();
+                this.showContent();
             }
+            return this.listenTo(this.model, 'activate', (function(_this) {
+                return function() {
+                    return _this.toolbar.currentView.reveal();
+                };
+            })(this));
         };
 
         LightboxItem.prototype.layout = function() {
@@ -2119,6 +2218,7 @@
                 this.$el.css({
                     transform: ''
                 });
+                this.toolbar.currentView.layout();
             } else if (this.isNext()) {
                 this.positionAsNext();
             } else if (this.isPrev()) {
