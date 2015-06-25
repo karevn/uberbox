@@ -1,3 +1,9 @@
+@keyframes uberbox-spin 
+	0%
+		transform:  matrix(-1, 0, 0, 1, 0, 0) rotate(0deg)
+	100%
+		transform:  matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg)
+
 .uberbox-lightbox-wrapper
 	position: absolute
 	z-index: 100002
@@ -113,6 +119,24 @@
 		top: 45px
 		right: 6px
 		bottom: 6px
+	.uberbox-loader
+		background: black
+		animation: uberbox-spin 2s infinite linear
+		display: block
+		transform:  matrix(-1, 0, 0, 1, 0, 0)
+		position: absolute
+		top: 50%
+		left: 50%
+		color: white
+		font-size: 20px
+		line-height: 20px
+		padding: 5px 0
+		width: 30px
+		border-radius: 15px
+		transform-origin: 50% 50%
+		margin-top: -15px
+		margin-left: -15px
+		
 .uberbox-vertical
 	.uberbox-lightbox-item
 		+respond-to(wide-screens)

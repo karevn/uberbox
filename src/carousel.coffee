@@ -170,7 +170,7 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 				if !@fits(first)
 					while !@fits(first)
 						first.remove()
-						first = first.getPrev()
+						first = first.getNext()
 				else
 					@buildPrev(first)
 				

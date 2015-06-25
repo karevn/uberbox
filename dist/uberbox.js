@@ -1252,7 +1252,7 @@
                             _results = [];
                             while (!_this.fits(first)) {
                                 first.remove();
-                                _results.push(first = first.getPrev());
+                                _results.push(first = first.getNext());
                             }
                             return _results;
                         } else {
@@ -2174,9 +2174,13 @@
             }
         };
 
-        LightboxItem.prototype.hideLoader = function() {};
+        LightboxItem.prototype.hideLoader = function() {
+            return this.$el.find('div.uberbox-loader').remove();
+        };
 
-        LightboxItem.prototype.showLoader = function() {};
+        LightboxItem.prototype.showLoader = function() {
+            return this.$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'));
+        };
 
         LightboxItem.prototype.showRegions = function() {
             var type;

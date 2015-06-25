@@ -180,7 +180,9 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			@$el.addClass('uberbox-fit-width-oversized').removeClass('uberbox-fit-height-oversized')
 		
 	hideLoader: ->
-	showLoader: ->	
+		@$el.find('div.uberbox-loader').remove()
+	showLoader: ->
+		@$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'))
 	showRegions: ->
 		type = Uberbox.getObjectViewType(@model)
 		if @model.get('description')
