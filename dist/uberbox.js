@@ -2184,6 +2184,8 @@
             if (this.model.get('description')) {
                 this.$el.addClass('uberbox-has-description');
                 this.$el.addClass("uberbox-description-" + (this.model.get('description_style')));
+            } else {
+                this.$el.addClass('uberbox-no-description');
             }
             this.object.show(new type(_.extend(this.options, {
                 model: this.model
