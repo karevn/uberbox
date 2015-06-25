@@ -1,7 +1,8 @@
+gulp		= require('gulp')
 pkg			= require('./package.json')
 argv		= require('minimist')(process.argv.slice(2))
 
-gulp		= require('gulp')
+
 util		= require('gulp-util')
 coffee		= require('gulp-coffee')
 header		= require('gulp-header')
@@ -11,9 +12,9 @@ watch		= require('gulp-watch')
 wrap		= require('gulp-wrap')
 sourcemaps	= require('gulp-sourcemaps')
 beautify 	= require('gulp-jsbeautifier')
-sass 		= require 'gulp-sass'
-autoprefixer= require 'gulp-autoprefixer'
-beautifyCSS = require 'gulp-cssbeautify'
+sass 		= require('gulp-sass')
+autoprefixer= require('gulp-autoprefixer')
+beautifyCSS = require('gulp-cssbeautify')
 minifyCSS	= require('gulp-minify-css')
 gutil		= require('gulp-util')
 rename		= require('gulp-rename')
@@ -21,12 +22,13 @@ fs			= require('fs')
 templateCompile = require('gulp-template-compile')
 merge = require('gulp-merge')
 
-banner = ()-> [
+banner = (-> [
 	'// Uberbox.js',
 	'// version: ' + pkg.version,
 	'// author: ' + pkg.author,
 	'// license: ' + pkg.licenses[0].type
 	].join('\n') + '\n'
+)
 
 sources = [
 	'uberbox',
