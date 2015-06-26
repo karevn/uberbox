@@ -11,11 +11,12 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 		super
 		@listenToOnce this, 'load', => 
 			@loaded = true
-			clearTimeout(@loaderTimeout) if @loaderTimeout
-			@$el.addClass 'uberbox-loaded'
+			
 			@layout()
 			@hideLoader()
-			_.defer => @enableTransition()
+			_.defer =>
+				@enableTransition()
+				@$el.addClass 'uberbox-loaded'
 		@render()
 		@bindUIElements()
 		@showRegions() if @showRegions

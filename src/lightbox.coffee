@@ -7,7 +7,6 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 	events:
 		'click @ui.next': (-> @currentItemView.model.next().activate() unless @ui.next.is('.uberbox-disabled'))
 		'click @ui.prev': (-> @currentItemView.model.prev().activate() unless @ui.prev.is('.uberbox-disabled'))
-		'click @ui.close': -> @trigger 'close'
 	
 	getChildViewClass: -> Uberbox.LightboxItem
 	onShow: ->
@@ -180,9 +179,14 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			@$el.addClass('uberbox-fit-width-oversized').removeClass('uberbox-fit-height-oversized')
 		
 	hideLoader: ->
+		if @showLoaderTimeout
+			clearTimeout @showLoaderTimeout
+			@showLoaderTimeout = null
 		@$el.find('div.uberbox-loader').remove()
 	showLoader: ->
-		@$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'))
+		@showLoaderTimeout = setTimeout((=> 
+			@$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'))
+		), 100)
 	showRegions: ->
 		type = Uberbox.getObjectViewType(@model)
 		if @model.get('description')

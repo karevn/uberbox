@@ -672,14 +672,11 @@
             this.listenToOnce(this, 'load', (function(_this) {
                 return function() {
                     _this.loaded = true;
-                    if (_this.loaderTimeout) {
-                        clearTimeout(_this.loaderTimeout);
-                    }
-                    _this.$el.addClass('uberbox-loaded');
                     _this.layout();
                     _this.hideLoader();
                     return _.defer(function() {
-                        return _this.enableTransition();
+                        _this.enableTransition();
+                        return _this.$el.addClass('uberbox-loaded');
                     });
                 };
             })(this));
@@ -1235,9 +1232,9 @@
                     _this.translateToCurrent();
                     _this.waitForLast(_this.currentItemView, function(last) {
                         var _results;
-                        if (!_this.fits(last)) {
+                        if (last && !_this.fits(last)) {
                             _results = [];
-                            while (!_this.fits(last)) {
+                            while (last && !_this.fits(last)) {
                                 last.remove();
                                 _results.push(last = last.getPrev());
                             }
@@ -1248,9 +1245,9 @@
                     });
                     return _this.waitForFirst(_this.currentItemView, function(first) {
                         var _results;
-                        if (!_this.fits(first)) {
+                        if (first && !_this.fits(first)) {
                             _results = [];
-                            while (!_this.fits(first)) {
+                            while (first && !_this.fits(first)) {
                                 first.remove();
                                 _results.push(first = first.getNext());
                             }
@@ -1469,6 +1466,7 @@
 
         function ObjectView() {
             this.onObjectLoaded = __bind(this.onObjectLoaded, this);
+            this.onObjectError = __bind(this.onObjectError, this);
             this.fadeIn = __bind(this.fadeIn, this);
             return ObjectView.__super__.constructor.apply(this, arguments);
         }
@@ -1856,10 +1854,7 @@
                 if (!this.ui.prev.is('.uberbox-disabled')) {
                     return this.currentItemView.model.prev().activate();
                 }
-            }),
-            'click @ui.close': function() {
-                return this.trigger('close');
-            }
+            })
         };
 
         Lightbox.prototype.getChildViewClass = function() {
@@ -2175,11 +2170,19 @@
         };
 
         LightboxItem.prototype.hideLoader = function() {
+            if (this.showLoaderTimeout) {
+                clearTimeout(this.showLoaderTimeout);
+                this.showLoaderTimeout = null;
+            }
             return this.$el.find('div.uberbox-loader').remove();
         };
 
         LightboxItem.prototype.showLoader = function() {
-            return this.$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'));
+            return this.showLoaderTimeout = setTimeout(((function(_this) {
+                return function() {
+                    return _this.$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'));
+                };
+            })(this)), 100);
         };
 
         LightboxItem.prototype.showRegions = function() {

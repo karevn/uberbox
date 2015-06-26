@@ -160,15 +160,15 @@ class Uberbox.Carousel extends Uberbox.SlidingWindow
 		@currentItemView.runAction =>
 			@translateToCurrent()
 			@waitForLast @currentItemView, (last)=>
-				if !@fits(last)
-					while !@fits(last)
+				if last and !@fits(last)
+					while last and !@fits(last)
 						last.remove()
 						last = last.getPrev()
 				else
 					@buildNext(last)
 			@waitForFirst @currentItemView, (first)=>
-				if !@fits(first)
-					while !@fits(first)
+				if first and !@fits(first)
+					while first and !@fits(first)
 						first.remove()
 						first = first.getNext()
 				else

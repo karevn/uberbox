@@ -100,17 +100,14 @@
 .uberbox-lightbox-item
 	position: fixed
 	transition: opacity 0.3s
-	opacity: 0
 	z-index: 1
 	left: 6px
 	top: 42px
 	right: 6px
 	bottom: 20px
-	transition: opacity 0.3s
-	&.uberbox-loaded
-		opacity: 1
 	&.uberbox-enable-transition
-		transition: opacity 0.3s, transform 0.3s
+		transition: transform 0.5s
+		opacity: 1
 	&.uberbox-current
 		z-index: 2
 		
@@ -120,22 +117,32 @@
 		right: 6px
 		bottom: 6px
 	.uberbox-loader
-		background: black
-		animation: uberbox-spin 2s infinite linear
 		display: block
-		transform:  matrix(-1, 0, 0, 1, 0, 0)
 		position: absolute
 		top: 50%
 		left: 50%
 		color: white
-		font-size: 20px
-		line-height: 20px
-		padding: 5px 0
-		width: 30px
-		border-radius: 15px
-		transform-origin: 50% 50%
-		margin-top: -15px
-		margin-left: -15px
+		height: 72px
+		width: 72x
+		margin-top: -36px
+		margin-left: -36px
+		clip-path: circle(36px at 36px 36px)
+		transition: transform 0.5s
+		&:before
+			animation: uberbox-spin 2s infinite linear
+			font-size: 48px
+			transform:  matrix(-1, 0, 0, 1, 0, 0)
+			position: absolute
+			top: 6px
+			left: 6px
+			margin: 0
+		
+		
+	.uberbox-lightbox-item-content-wrapper
+		opacity: 0
+		transition: opacity 0.3s
+	&.uberbox-loaded .uberbox-lightbox-item-content-wrapper
+		opacity: 1
 		
 .uberbox-vertical
 	.uberbox-lightbox-item
