@@ -1,4 +1,29 @@
-.uberbox-spin 
+@keyframes uberbox-spin 
+	0%
+		transform:  matrix(-1, 0, 0, 1, 0, 0) rotate(0deg)
+	100%
+		transform:  matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg)
+
+.uberbox-loader
+		display: block
+		position: fixed
+		top: 50%
+		left: 50%
+		color: white
+		height: 72px
+		width: 72x
+		margin-top: -36px
+		margin-left: -36px
+		clip-path: circle(36px at 36px 36px)
+		transition: transform 0.5s
+		&:before
+			animation: uberbox-spin 2s infinite linear
+			font-size: 48px
+			transform:  matrix(-1, 0, 0, 1, 0, 0)
+			position: absolute
+			top: 6px
+			left: 6px
+			margin: 0
 		
 .uberbox
 	position: fixed

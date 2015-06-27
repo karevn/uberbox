@@ -51,6 +51,8 @@ class Uberbox.Item extends Backbone.Model
 			share = Uberbox.ShareService.services if _.isBoolean(share)
 			@set 'share', _.map share, (config, name)->
 				new Uberbox.ShareService(_.extend({}, {slug: name}, config))
+		if !@get('title') and !@get('description')
+			@set('description_style', 'none')
 	activate: -> @trigger('activate', this) unless @collection.activeItem == this
 	deactivate: -> @trigger('deactivate')
 	next: -> @collection.next(this)
@@ -58,6 +60,9 @@ class Uberbox.Item extends Backbone.Model
 	isActive: -> @collection.activeItem == this
 	isNext: -> @collection.activeItem == @prev()
 	isPrev: -> @collection.activeItem == @next()
+	showDescription: ->
+		return false if @get('description_style') == 'none'
+		return !!@get('description')
 	follows: (item)->
 		next = item.next()
 		return true if next == this

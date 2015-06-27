@@ -57,7 +57,8 @@
 
         Uberbox.prototype.regions = {
             lightbox: '.uberbox-lightbox-wrapper',
-            carousel: '.uberbox-carousel-wrapper'
+            carousel: '.uberbox-carousel-wrapper',
+            toolbar: '.uberbox-toolbar-wrapper'
         };
 
         Uberbox.prototype.ui = {};
@@ -89,7 +90,7 @@
                 return e.preventDefault();
             } else {
                 this.lightbox.currentView.currentItemView.swipeBack();
-                if (this.collection.activeItem.get('description_style') === 'mini') {
+                if (this.collection.activeItem.get('description_style') === 'mini' || this.collection.activeItem.get('description_style') === 'none') {
                     return e.preventDefault();
                 } else {
                     return e.stopPropagation();
@@ -238,6 +239,7 @@
 
         function Uberbox(options) {
             this.onKeyDown = __bind(this.onKeyDown, this);
+            this.onItemActivated = __bind(this.onItemActivated, this);
             this.onTouchEnd = __bind(this.onTouchEnd, this);
             this.onTouchMove = __bind(this.onTouchMove, this);
             this.onTouchStart = __bind(this.onTouchStart, this);
@@ -264,13 +266,17 @@
                 };
             })(this));
             if (this.getOption('carousel')) {
-                this.$el.addClass('uberbox-has-carousel');
-                this.carousel.show(new Uberbox.Carousel(lightboxOptions));
+                if (jQuery(window).width > 1024) {
+                    this.$el.addClass('uberbox-has-carousel');
+                    this.carousel.show(new Uberbox.Carousel(lightboxOptions));
+                }
                 jQuery(window).on('resize.uberbox-main', (function(_this) {
                     return function() {
                         if (jQuery(window).width() < 1024) {
-                            return _this.carousel.empty();
+                            _this.carousel.empty();
+                            return _this.$el.removeClass('uberbox-has-carousel');
                         } else if (!_this.carousel.currentView) {
+                            _this.$el.addClass('uberbox-has-carousel');
                             return _this.carousel.show(new Uberbox.Carousel(lightboxOptions));
                         }
                     };
@@ -283,11 +289,54 @@
                     return Uberbox.close();
                 };
             })(this));
+            this.listenTo(this.getOption('collection'), 'activate', this.onItemActivated);
             current = this.getOption('collection').at(this.getOption('current'));
             current.activate();
             jQuery('body').on('keydown', this.onKeyDown);
             this.overflow = jQuery('html').css('overflow');
             return jQuery('html').css('overflow', 'hidden');
+        };
+
+        Uberbox.prototype.onItemActivated = function(item) {
+            if (this.toolbar.currentView) {
+                this.stopListening(this.toolbar.currentView, 'close');
+            }
+            this.toolbar.show(new Uberbox.ToolbarView({
+                model: item
+            }));
+            this.listenTo(this.toolbar.currentView, 'close', (function(_this) {
+                return function() {
+                    return _this.close();
+                };
+            })(this));
+            if (!item.get('loaded')) {
+                this.showLoader();
+            }
+            if (this.oldActiveItem) {
+                this.stopListening(this.oldActiveItem, 'load');
+            }
+            this.oldActiveItem = item;
+            return this.listenTo(item, 'load', (function(_this) {
+                return function() {
+                    return _this.hideLoader();
+                };
+            })(this));
+        };
+
+        Uberbox.prototype.hideLoader = function() {
+            if (this.showLoaderTimeout) {
+                clearTimeout(this.showLoaderTimeout);
+                this.showLoaderTimeout = null;
+            }
+            return this.$el.find('div.uberbox-loader').remove();
+        };
+
+        Uberbox.prototype.showLoader = function() {
+            return this.showLoaderTimeout = setTimeout(((function(_this) {
+                return function() {
+                    return _this.$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'));
+                };
+            })(this)), 100);
         };
 
         Uberbox.prototype.remove = function() {
@@ -498,11 +547,14 @@
                 if (_.isBoolean(share)) {
                     share = Uberbox.ShareService.services;
                 }
-                return this.set('share', _.map(share, function(config, name) {
+                this.set('share', _.map(share, function(config, name) {
                     return new Uberbox.ShareService(_.extend({}, {
                         slug: name
                     }, config));
                 }));
+            }
+            if (!this.get('title') && !this.get('description')) {
+                return this.set('description_style', 'none');
             }
         };
 
@@ -534,6 +586,13 @@
 
         Item.prototype.isPrev = function() {
             return this.collection.activeItem === this.next();
+        };
+
+        Item.prototype.showDescription = function() {
+            if (this.get('description_style') === 'none') {
+                return false;
+            }
+            return !!this.get('description');
         };
 
         Item.prototype.follows = function(item) {
@@ -672,8 +731,8 @@
             this.listenToOnce(this, 'load', (function(_this) {
                 return function() {
                     _this.loaded = true;
+                    _this.model.trigger('load');
                     _this.layout();
-                    _this.hideLoader();
                     return _.defer(function() {
                         _this.enableTransition();
                         return _this.$el.addClass('uberbox-loaded');
@@ -721,7 +780,6 @@
             if (this.loaded) {
                 return callback();
             } else {
-                this.loaderTimeout = setTimeout(this.showLoader, 200);
                 return this.listenToOnce(this, 'load', (function(_this) {
                     return function() {
                         return callback();
@@ -896,8 +954,7 @@
         CarouselItem.prototype.padding = 15;
 
         CarouselItem.prototype.ui = {
-            image: 'img',
-            loader: '.uberbox-loader'
+            image: 'img'
         };
 
         CarouselItem.prototype.getImageAspectRatio = function() {
@@ -1299,12 +1356,7 @@
 
     })(Uberbox.SlidingWindow);
 
-    var __bind = function(fn, me) {
-            return function() {
-                return fn.apply(me, arguments);
-            };
-        },
-        __hasProp = {}.hasOwnProperty,
+    var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) child[key] = parent[key];
@@ -1323,7 +1375,6 @@
         __extends(ToolbarView, _super);
 
         function ToolbarView() {
-            this.reveal = __bind(this.reveal, this);
             return ToolbarView.__super__.constructor.apply(this, arguments);
         }
 
@@ -1353,37 +1404,18 @@
             'click .uberbox-share-overlay': 'onShareClick'
         };
 
-        ToolbarView.prototype.initialize = function() {
-            ToolbarView.__super__.initialize.apply(this, arguments);
-            this.render();
-            return this.bindUIElements();
-        };
-
-        ToolbarView.prototype.reveal = function() {
-            this.$el.addClass('uberbox-visible');
-            return this.layout();
-        };
-
         ToolbarView.prototype.serializeData = function() {
             return {
                 model: this.model
             };
         };
 
-        ToolbarView.prototype.layout = function() {
-            var itemView, offset;
-            if (jQuery(window).width() > 639) {
-                itemView = this.getOption('bindTo');
-                offset = itemView.getOffset();
-                offset.left -= this.$el.parent().offset().left;
-                offset.top -= 45;
-                return this.$el.width(itemView.getWidth()).css(offset);
-            } else {
-                return this.$el.css({
-                    left: '',
-                    top: 42
-                });
-            }
+        ToolbarView.prototype.onShow = function() {
+            return _.defer((function(_this) {
+                return function() {
+                    return _this.$el.addClass('uberbox-visible');
+                };
+            })(this));
         };
 
         ToolbarView.prototype.onFullscreenClick = function(e) {
@@ -1428,12 +1460,6 @@
                     };
                 })(this)), 300);
             }
-        };
-
-        ToolbarView.prototype.remove = function() {
-            this.stopListening();
-            this.$el.html('');
-            return this;
         };
 
         return ToolbarView;
@@ -1605,6 +1631,8 @@
         IframeObjectView.prototype.waitForLoad = true;
 
         IframeObjectView.prototype.supportsOversizing = false;
+
+        IframeObjectView.prototype.className = 'uberbox-iframe-content';
 
         IframeObjectView.prototype.ui = {
             iframe: 'iframe'
@@ -2022,8 +2050,7 @@
 
         LightboxItem.prototype.regions = {
             object: '.uberbox-item-object',
-            description: '.uberbox-item-description',
-            toolbar: '.uberbox-item-toolbar-wrapper'
+            description: '.uberbox-item-description'
         };
 
         LightboxItem.prototype.ui = {
@@ -2032,6 +2059,15 @@
         };
 
         LightboxItem.prototype.padding = 20;
+
+        LightboxItem.prototype.initialize = function() {
+            LightboxItem.__super__.initialize.apply(this, arguments);
+            return this.once('load', (function(_this) {
+                return function() {
+                    return _this.model.set('loaded', true);
+                };
+            })(this));
+        };
 
         LightboxItem.prototype.serializeData = function() {
             return {
@@ -2169,26 +2205,10 @@
             }
         };
 
-        LightboxItem.prototype.hideLoader = function() {
-            if (this.showLoaderTimeout) {
-                clearTimeout(this.showLoaderTimeout);
-                this.showLoaderTimeout = null;
-            }
-            return this.$el.find('div.uberbox-loader').remove();
-        };
-
-        LightboxItem.prototype.showLoader = function() {
-            return this.showLoaderTimeout = setTimeout(((function(_this) {
-                return function() {
-                    return _this.$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'));
-                };
-            })(this)), 100);
-        };
-
         LightboxItem.prototype.showRegions = function() {
             var type;
             type = Uberbox.getObjectViewType(this.model);
-            if (this.model.get('description')) {
+            if (this.model.get('description') && this.model.get('description_style') !== 'none') {
                 this.$el.addClass('uberbox-has-description');
                 this.$el.addClass("uberbox-description-" + (this.model.get('description_style')));
             } else {
@@ -2197,29 +2217,16 @@
             this.object.show(new type(_.extend(this.options, {
                 model: this.model
             })));
-            this.toolbar.show(new Uberbox.ToolbarView({
-                model: this.model,
-                bindTo: this.object.currentView
-            }));
             if (this.object.currentView.waitForLoad) {
-                this.showLoader();
-                this.listenToOnce(this.object.currentView, 'load', (function(_this) {
+                return this.listenToOnce(this.object.currentView, 'load', (function(_this) {
                     return function() {
-                        _this.trigger('load');
-                        _this.hideLoader();
-                        return _this.toolbar.currentView.reveal();
+                        return _this.trigger('load');
                     };
                 })(this));
             } else {
                 this.trigger('load');
-                this.toolbar.currentView.reveal();
-                this.showContent();
+                return this.showContent();
             }
-            return this.listenTo(this.model, 'activate', (function(_this) {
-                return function() {
-                    return _this.toolbar.currentView.reveal();
-                };
-            })(this));
         };
 
         LightboxItem.prototype.layout = function() {
@@ -2227,7 +2234,6 @@
                 this.$el.css({
                     transform: ''
                 });
-                this.toolbar.currentView.layout();
             } else if (this.isNext()) {
                 this.positionAsNext();
             } else if (this.isPrev()) {

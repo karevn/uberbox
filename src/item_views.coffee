@@ -53,6 +53,7 @@ class Uberbox.ImageObjectView extends ObjectView
 class Uberbox.IframeObjectView extends ObjectView
 	waitForLoad: true
 	supportsOversizing: false
+	className: 'uberbox-iframe-content'
 	ui:
 		iframe: 'iframe'
 	template: -> Uberbox.Templates['content-iframe']

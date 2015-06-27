@@ -11,9 +11,8 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 		super
 		@listenToOnce this, 'load', => 
 			@loaded = true
-			
+			@model.trigger 'load'
 			@layout()
-			@hideLoader()
 			_.defer =>
 				@enableTransition()
 				@$el.addClass 'uberbox-loaded'
@@ -34,7 +33,6 @@ class Uberbox.SlidingWindowItem extends Marionette.LayoutView
 		if @loaded
 			callback()
 		else
-			@loaderTimeout = setTimeout @showLoader, 200
 			@listenToOnce this, 'load', => callback()
 	getParent: ->
 		@parent = @$el.parent() unless @parent

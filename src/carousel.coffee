@@ -4,7 +4,6 @@ class Uberbox.CarouselItem extends Uberbox.SlidingWindowItem
 	padding: 15
 	ui:
 		image: 'img'
-		loader: '.uberbox-loader'
 	getImageAspectRatio: ->
 		image = @ui.image[0]
 		aspect = image.naturalWidth / image.naturalHeight

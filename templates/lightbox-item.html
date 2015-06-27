@@ -1,8 +1,9 @@
-<div class="uberbox-item-toolbar-wrapper"></div>
 <div class="uberbox-lightbox-item-content-wrapper">
 		<div class="uberbox-item-object"></div>
-		<div class="uberbox-item-description">
-			<% if (obj.model.get('title')) { %><h2><%= obj.model.get('title') %></h2><% } %>
-			<%= obj.model.get('description') %>
-		</div>
+		<% if (obj.model.showDescription()) { %>
+			<div class="uberbox-item-description">
+				<% if (obj.model.get('title')) { %><h2><%= obj.model.get('title') %></h2><% } %>
+				<%= obj.model.get('description') %>
+			</div>
+		<% } %>
 </div>

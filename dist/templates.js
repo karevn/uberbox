@@ -8,7 +8,7 @@ var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<img src="' +
 ((__t = ( thumbnail )) == null ? '' : __t) +
-'">\n<div class="uberbox-loader"></div>';
+'">';
 
 }
 return __p
@@ -79,15 +79,19 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="uberbox-item-toolbar-wrapper"></div>\n<div class="uberbox-lightbox-item-content-wrapper">\n\t\t<div class="uberbox-item-object"></div>\n\t\t<div class="uberbox-item-description">\n\t\t\t';
+__p += '<div class="uberbox-lightbox-item-content-wrapper">\n\t\t<div class="uberbox-item-object"></div>\n\t\t';
+ if (obj.model.showDescription()) { ;
+__p += '\n\t\t\t<div class="uberbox-item-description">\n\t\t\t\t';
  if (obj.model.get('title')) { ;
 __p += '<h2>' +
 ((__t = ( obj.model.get('title') )) == null ? '' : __t) +
 '</h2>';
  } ;
-__p += '\n\t\t\t' +
+__p += '\n\t\t\t\t' +
 ((__t = ( obj.model.get('description') )) == null ? '' : __t) +
-'\n\t\t</div>\n</div>';
+'\n\t\t\t</div>\n\t\t';
+ } ;
+__p += '\n</div>';
 
 }
 return __p
@@ -160,7 +164,7 @@ window["Uberbox"]["Templates"]["uberbox"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class="uberbox-lightbox-wrapper"></div>\n<div class="uberbox-carousel-wrapper"></div>';
+__p += '<div class="uberbox-toolbar-wrapper"></div>\n<div class="uberbox-lightbox-wrapper"></div>\n<div class="uberbox-carousel-wrapper"></div>';
 
 }
 return __p

@@ -1,0 +1,3 @@
+[submodule "vendor/uberbox"]
+	path = vendor/uberbox
+	url = https://github.com/karevn/uberbox

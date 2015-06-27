@@ -14,24 +14,9 @@ class Uberbox.ToolbarView extends Marionette.ItemView
 		'click @ui.close': 'onCloseClick'
 		'click @ui.share': 'onShareClick'
 		'click .uberbox-share-overlay': 'onShareClick'
-	
-	initialize: ->
-		super
-		@render()
-		@bindUIElements()
-	reveal: =>
-		@$el.addClass('uberbox-visible')
-		@layout()
 	serializeData: -> {model: @model}
-	layout: ->
-		if jQuery(window).width() > 639
-			itemView = @getOption('bindTo')
-			offset = itemView.getOffset()
-			offset.left -= @$el.parent().offset().left
-			offset.top -= 45
-			@$el.width(itemView.getWidth()).css offset
-		else
-			@$el.css(left: '', top: 42)
+	onShow: ->
+		_.defer => @$el.addClass('uberbox-visible')
 	onFullscreenClick: (e)-> 
 		e.preventDefault()
 		e.stopPropagation()
@@ -63,7 +48,4 @@ class Uberbox.ToolbarView extends Marionette.ItemView
 				@ui.share.removeClass('uberbox-active')
 			), 300)
 
-	remove: ->
-		@stopListening()
-		@$el.html('')
-		this
+	

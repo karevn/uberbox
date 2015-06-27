@@ -609,6 +609,59 @@
     opacity: 1;
 }
 
+@-webkit-keyframes uberbox-spin {
+    0% {
+        -webkit-transform: matrix(-1, 0, 0, 1, 0, 0) rotate(0deg);
+        transform: matrix(-1, 0, 0, 1, 0, 0) rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg);
+        transform: matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg);
+    }
+}
+
+@keyframes uberbox-spin {
+    0% {
+        -webkit-transform: matrix(-1, 0, 0, 1, 0, 0) rotate(0deg);
+        transform: matrix(-1, 0, 0, 1, 0, 0) rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg);
+        transform: matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg);
+    }
+}
+
+.uberbox-loader {
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    color: white;
+    height: 72px;
+    width: 72x;
+    margin-top: -36px;
+    margin-left: -36px;
+    -webkit-clip-path: circle(36px at 36px 36px);
+    clip-path: circle(36px at 36px 36px);
+    -webkit-transition: -webkit-transform 0.5s;
+    transition: transform 0.5s;
+}
+
+.uberbox-loader:before {
+    -webkit-animation: uberbox-spin 2s infinite linear;
+    animation: uberbox-spin 2s infinite linear;
+    font-size: 48px;
+    -webkit-transform: matrix(-1, 0, 0, 1, 0, 0);
+    -ms-transform: matrix(-1, 0, 0, 1, 0, 0);
+    transform: matrix(-1, 0, 0, 1, 0, 0);
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    margin: 0;
+}
+
 .uberbox {
     position: fixed;
     left: 0;
@@ -620,9 +673,10 @@
 }
 
 .uberbox-toolbar-wrapper {
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
+    right: 0;
     z-index: 100005;
 }
 
@@ -631,12 +685,11 @@
     padding: 0;
     z-index: 100005;
     height: 42px;
-    margin-top: -42px;
     opacity: 0;
     -webkit-transition: opacity 0.3s;
     transition: opacity 0.3s;
     top: 3px;
-    right: 9px;
+    right: 15px;
     font-size: 13px;
     text-transform: none;
 }
@@ -664,6 +717,7 @@
     transition: color 0.3s;
     cursor: pointer;
     text-transform: none;
+    outline: none;
 }
 
 .uberbox-toolbar a[data-action]:disabled, .uberbox-toolbar button[data-action]:disabled {
@@ -682,6 +736,7 @@
 
 .uberbox-toolbar a[data-action]:hover, .uberbox-toolbar button[data-action]:hover {
     color: white;
+    outline: none;
 }
 
 .uberbox-toolbar a[data-action]:hover .uberbox-tooltip, .uberbox-toolbar button[data-action]:hover .uberbox-tooltip {
@@ -788,30 +843,6 @@
     left: 50%;
     margin-left: -3px;
     top: -3px;
-}
-
-@-webkit-keyframes uberbox-spin {
-    0% {
-        -webkit-transform: matrix(-1, 0, 0, 1, 0, 0) rotate(0deg);
-        transform: matrix(-1, 0, 0, 1, 0, 0) rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg);
-        transform: matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg);
-    }
-}
-
-@keyframes uberbox-spin {
-    0% {
-        -webkit-transform: matrix(-1, 0, 0, 1, 0, 0) rotate(0deg);
-        transform: matrix(-1, 0, 0, 1, 0, 0) rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg);
-        transform: matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg);
-    }
 }
 
 .uberbox-lightbox-wrapper {
@@ -981,7 +1012,7 @@
     text-align: center;
     display: inline-block;
     width: 100%;
-    margin: -70px 0 0 0;
+    margin: -38px 0 0 0;
     top: 50%;
 }
 
@@ -1012,6 +1043,14 @@
 
 .uberbox-horizontal .uberbox-next i:before, .uberbox-horizontal .uberbox-prev i:before {
     margin: 0;
+}
+
+.uberbox-horizontal.uberbox-has-carousel .uberbox-next, .uberbox-horizontal.uberbox-has-carousel .uberbox-prev {
+    bottom: 130px;
+}
+
+.uberbox-horizontal.uberbox-has-carousel .uberbox-next i, .uberbox-horizontal.uberbox-has-carousel .uberbox-prev i {
+    margin-top: -28px;
 }
 
 .uberbox-horizontal .uberbox-prev {
@@ -1068,35 +1107,6 @@
         right: 6px;
         bottom: 6px;
     }
-}
-
-.uberbox-lightbox-item .uberbox-loader {
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    color: white;
-    height: 72px;
-    width: 72x;
-    margin-top: -36px;
-    margin-left: -36px;
-    -webkit-clip-path: circle(36px at 36px 36px);
-    clip-path: circle(36px at 36px 36px);
-    -webkit-transition: -webkit-transform 0.5s;
-    transition: transform 0.5s;
-}
-
-.uberbox-lightbox-item .uberbox-loader:before {
-    -webkit-animation: uberbox-spin 2s infinite linear;
-    animation: uberbox-spin 2s infinite linear;
-    font-size: 48px;
-    -webkit-transform: matrix(-1, 0, 0, 1, 0, 0);
-    -ms-transform: matrix(-1, 0, 0, 1, 0, 0);
-    transform: matrix(-1, 0, 0, 1, 0, 0);
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    margin: 0;
 }
 
 .uberbox-lightbox-item .uberbox-lightbox-item-content-wrapper {
@@ -1172,6 +1182,32 @@
     top: 0;
     left: 0;
     right: 0;
+}
+
+.uberbox-lightbox-item.uberbox-no-description .uberbox-iframe-content {
+    width: 100%;
+    height: 100%;
+}
+
+.uberbox-lightbox-item.uberbox-no-description .uberbox-iframe-content iframe {
+    width: 100%;
+    height: 100%;
+}
+
+.uberbox-lightbox-item.uberbox-no-description .uberbox-image-content {
+    width: 100%;
+    height: 100%;
+}
+
+.uberbox-lightbox-item.uberbox-no-description .uberbox-image-content img {
+    position: absolute;
+    max-width: 100%;
+    max-height: 100%;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 .uberbox-lightbox-item.uberbox-description-mini .uberbox-item-object {

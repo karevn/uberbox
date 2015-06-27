@@ -94,11 +94,13 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 	regions:
 		object: '.uberbox-item-object'
 		description: '.uberbox-item-description'
-		toolbar: '.uberbox-item-toolbar-wrapper'
 	ui:
 		content: '> .uberbox-lightbox-item-content-wrapper'
 		description: '.uberbox-item-description'
 	padding: 20
+	initialize: ->
+		super
+		@once 'load', => @model.set('loaded', true)
 	serializeData: -> {model: @model}
 	layoutContent: =>
 		return if @waitForLoad and !@loaded
@@ -117,7 +119,6 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		offset = @ui.content.offset()
 		offset.top -= jQuery(window).scrollTop()
 		offset
-		
 	getWidth: ->
 		return @object.currentView.$el.width() if @model.get('description_style') == 'bottom'
 		return @object.currentView.getWidth() if @model.get('description_style') == 'mini'
@@ -178,39 +179,23 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		else
 			@$el.addClass('uberbox-fit-width-oversized').removeClass('uberbox-fit-height-oversized')
 		
-	hideLoader: ->
-		if @showLoaderTimeout
-			clearTimeout @showLoaderTimeout
-			@showLoaderTimeout = null
-		@$el.find('div.uberbox-loader').remove()
-	showLoader: ->
-		@showLoaderTimeout = setTimeout((=> 
-			@$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'))
-		), 100)
+	
 	showRegions: ->
 		type = Uberbox.getObjectViewType(@model)
-		if @model.get('description')
+		if @model.get('description') and @model.get('description_style') != 'none'
 			@$el.addClass('uberbox-has-description')
 			@$el.addClass("uberbox-description-#{@model.get('description_style')}")
 		else
 			@$el.addClass('uberbox-no-description')
 		@object.show(new type(_.extend(@options, model: @model)))
-		@toolbar.show(new Uberbox.ToolbarView(model: @model, bindTo: @object.currentView))
 		if @object.currentView.waitForLoad
-			@showLoader()
-			@listenToOnce @object.currentView, 'load', =>
-				@trigger 'load'
-				@hideLoader()
-				@toolbar.currentView.reveal()
+			@listenToOnce @object.currentView, 'load', => @trigger 'load'
 		else
 			@trigger 'load'
-			@toolbar.currentView.reveal()
 			@showContent()
-		@listenTo @model, 'activate', => @toolbar.currentView.reveal()
 	layout: ->
 		if @isCurrent()
 			@$el.css transform: ''
-			@toolbar.currentView.layout()
 		else if @isNext()
 			@positionAsNext()
 		else if @isPrev()
