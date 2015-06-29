@@ -168,6 +168,12 @@
                     },
                     "class": Uberbox.HTMLObjectView
                 },
+                ajax: {
+                    condition: function(item) {
+                        return item.get('ajax');
+                    },
+                    "class": Uberbox.AJAXOBjectView
+                },
                 unknown: {
                     "class": Uberbox.UnknownItemView
                 }
@@ -1821,7 +1827,7 @@
         HTMLObjectView.prototype.waitForLoad = false;
 
         HTMLObjectView.prototype.template = function() {
-            return Uberbox.Templates['html-content'];
+            return Uberbox.Templates['content-html'];
         };
 
         HTMLObjectView.prototype.getObjectNaturalWidth = function() {
@@ -1833,6 +1839,46 @@
         };
 
         return HTMLObjectView;
+
+    })(ObjectView);
+
+    Uberbox.AJAXOBjectView = (function(_super) {
+        __extends(AJAXOBjectView, _super);
+
+        function AJAXOBjectView() {
+            this.layout = __bind(this.layout, this);
+            return AJAXOBjectView.__super__.constructor.apply(this, arguments);
+        }
+
+        AJAXOBjectView.prototype.className = 'uberbox-ajax-content';
+
+        AJAXOBjectView.prototype.waitForLoad = true;
+
+        AJAXOBjectView.prototype.template = function() {
+            return Uberbox.Templates['content-html'];
+        };
+
+        AJAXOBjectView.prototype.bindUIElements = function() {
+            AJAXOBjectView.__super__.bindUIElements.apply(this, arguments);
+            jQuery.get(this.model.get('url'), (function(_this) {
+                return function(response) {
+                    _this.$el.html(response);
+                    _this.trigger('load');
+                    return _this.layout();
+                };
+            })(this));
+            return jQuery(window).on('resize', this.layout);
+        };
+
+        AJAXOBjectView.prototype.layout = function() {
+            if (this.$el.height() < this.$el.parent().height()) {
+                return this.$el.addClass('uberbox-center-vertical');
+            } else {
+                return this.$el.addClass('uberbox-scroll').removeClass('uberbox-center-vertical');
+            }
+        };
+
+        return AJAXOBjectView;
 
     })(ObjectView);
 

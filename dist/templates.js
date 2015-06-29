@@ -17,6 +17,20 @@ return __p
 window["Uberbox"] = window["Uberbox"] || {};
 window["Uberbox"]["Templates"] = window["Uberbox"]["Templates"] || {};
 
+window["Uberbox"]["Templates"]["content-html"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape;
+with (obj) {
+__p +=
+((__t = ( obj.model.get('html') )) == null ? '' : __t);
+
+}
+return __p
+}})();
+(function() {
+window["Uberbox"] = window["Uberbox"] || {};
+window["Uberbox"]["Templates"] = window["Uberbox"]["Templates"] || {};
+
 window["Uberbox"]["Templates"]["content-iframe"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
@@ -39,20 +53,6 @@ with (obj) {
 __p += '<img src="' +
 ((__t = ( obj.model.get('url') )) == null ? '' : __t) +
 '"/>';
-
-}
-return __p
-}})();
-(function() {
-window["Uberbox"] = window["Uberbox"] || {};
-window["Uberbox"]["Templates"] = window["Uberbox"]["Templates"] || {};
-
-window["Uberbox"]["Templates"]["html-content"] = function(obj) {
-obj || (obj = {});
-var __t, __p = '', __e = _.escape;
-with (obj) {
-__p +=
-((__t = ( obj.model.get('html') )) == null ? '' : __t);
 
 }
 return __p

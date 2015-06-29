@@ -1710,6 +1710,37 @@
     max-width: 700px;
 }
 
+.uberbox-ajax-content.uberbox-center-vertical {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    -webkit-transform: translate(0, -50%);
+    -ms-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+}
+
+.uberbox-ajax-content.uberbox-scroll {
+    position: fixed;
+    overflow: scroll;
+    top: 0;
+}
+
+.uberbox-ajax-content.uberbox-scroll {
+    bottom: 20px;
+    left: 40px;
+    right: 40px;
+    top: 45px;
+}
+
+.uberbox-horizontal.uberbox-has-carousel .uberbox-ajax-content.uberbox-scroll {
+    bottom: 130px;
+}
+
+.uberbox-vertical.uberbox-has-carousel .uberbox-ajax-content.uberbox-scroll {
+    right: 180px;
+}
+
 .uberbox-carousel-wrapper {
     position: fixed;
     z-index: 100003;

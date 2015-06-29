@@ -83,6 +83,9 @@ class Uberbox extends Marionette.LayoutView
 		html:
 			condition: (item)-> !!item.get('html')
 			class: Uberbox.HTMLObjectView
+		ajax:
+			condition: (item) -> item.get('ajax')
+			class: Uberbox.AJAXOBjectView
 		unknown:
 			class: Uberbox.UnknownItemView
 				
