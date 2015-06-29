@@ -50,11 +50,13 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 				@nextItemView = null
 		else
 			@nextItemView.remove() if @nextItemView
-			@currentItemView.layout()
-			@currentItemView = @createChildView(item)
-			@currentItemView.positionAsNext()
+			previousCurrent = @currentItemView
+			previousCurrent.layout()
+			setTimeout((=> previousCurrent.remove()), 500)
+			current = @currentItemView = @createChildView(item)
 			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
 			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
+			
 			
 	scrollPrev: (item)->
 		@nextItemView.remove() if @nextItemView
@@ -70,11 +72,13 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 				@prevItemView = null
 		else
 			@prevItemView.remove() if @prevItemView
-			@currentItemView.layout()
-			@currentItemView = @createChildView(item)
-			@currentItemView.positionAsPrev()
+			previousCurrent = @currentItemView
+			previousCurrent.layout()
+			setTimeout((=> previousCurrent.remove()), 500)
+			current = @currentItemView = @createChildView(item)
 			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
 			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
+			
 			
 	layout: => 
 		return unless @$el.is(':visible')
@@ -82,9 +86,7 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 		_.defer =>
 			@nextItemView.layout() if @nextItemView
 			@prevItemView.layout() if @prevItemView
-
 		
-
 class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 	defaults:
 		description:
@@ -161,10 +163,16 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			return
 		width = @$el.width()
 		height = @$el.height()
-		objectAspectRatio = @object.currentView.getObjectNaturalAspectRatio()
-		availableAreaWidth = width - @ui.description.width()
-		availableAreaAspectRatio = availableAreaWidth / height
-		@fitOversized()
+		if jQuery(window).width() < 1024
+			containerHeight = @$('.uberbox-item-object > *').height()
+			contentHeight = (content = @$('.uberbox-item-object > * > *')).height()
+			if  containerHeight < contentHeight
+				content.css('margin-top', - (contentHeight - containerHeight) / 2)
+		else
+			objectAspectRatio = @object.currentView.getObjectNaturalAspectRatio()
+			availableAreaWidth = width - @ui.description.width()
+			availableAreaAspectRatio = availableAreaWidth / height
+			@fitOversized()
 	fitHeight: ->
 		@$el.addClass('uberbox-fit-height').removeClass('uberbox-fit-width uberbox-natural-fit uberbox-fit-oversized uberbox-fit-height-oversized uberbox-fit-width-oversized')
 	fitWidth: ->
@@ -178,8 +186,6 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			@$el.addClass('uberbox-fit-height-oversized').removeClass('uberbox-fit-width-oversized')
 		else
 			@$el.addClass('uberbox-fit-width-oversized').removeClass('uberbox-fit-height-oversized')
-		
-	
 	showRegions: ->
 		type = Uberbox.getObjectViewType(@model)
 		if @model.get('description') and @model.get('description_style') != 'none'
@@ -195,17 +201,18 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			@showContent()
 	layout: ->
 		if @isCurrent()
-			@$el.css transform: ''
+			@positionAsCurrent()
 		else if @isNext()
 			@positionAsNext()
 		else if @isPrev()
 			@positionAsPrev()
 		else
 			setTimeout(@remove, 400)
+			return
 		@layoutContent()
-
-
 	isVertical: -> @getOption('orientation') == 'vertical'
+	positionAsCurrent: -> @$el.css transform: ''
+
 	positionAsNext: ->
 		if @isVertical()
 			@$el.css transform: "translate(0, #{jQuery(window).height()}px)"
@@ -216,7 +223,7 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 			@$el.css transform: "translate(0, -#{jQuery(window).height()}px)"
 		else
 			@$el.css transform: "translate(-#{jQuery(window).width()}px, 0)"
-	remove: ->
+	remove: =>
 		if @model.isNext()
 			@$el.addClass('uberbox-flyout-next')
 		if @model.isPrev()
@@ -226,7 +233,4 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		if @getOption('prev')
 			@getOption('prev').options.next = null
 		setTimeout((=>super()), 600)
-	
-		
-	
 	

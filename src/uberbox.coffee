@@ -133,7 +133,7 @@ class Uberbox extends Marionette.LayoutView
 		@lightbox.show(new Uberbox.Lightbox(lightboxOptions))
 		@listenTo(@lightbox.currentView, 'close', => @remove())
 		if @getOption('carousel')
-			if jQuery(window).width > 1024
+			if jQuery(window).width() > 1024
 				@$el.addClass('uberbox-has-carousel')
 				@carousel.show(new Uberbox.Carousel(lightboxOptions))
 			jQuery(window).on 'resize.uberbox-main', =>
@@ -168,6 +168,7 @@ class Uberbox extends Marionette.LayoutView
 			@showLoaderTimeout = null
 		@$el.find('div.uberbox-loader').remove()
 	showLoader: ->
+		return if @showLoaderTimeout
 		@showLoaderTimeout = setTimeout((=> 
 			@$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'))
 		), 100)

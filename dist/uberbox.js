@@ -266,7 +266,7 @@
                 };
             })(this));
             if (this.getOption('carousel')) {
-                if (jQuery(window).width > 1024) {
+                if (jQuery(window).width() > 1024) {
                     this.$el.addClass('uberbox-has-carousel');
                     this.carousel.show(new Uberbox.Carousel(lightboxOptions));
                 }
@@ -332,6 +332,9 @@
         };
 
         Uberbox.prototype.showLoader = function() {
+            if (this.showLoaderTimeout) {
+                return;
+            }
             return this.showLoaderTimeout = setTimeout(((function(_this) {
                 return function() {
                     return _this.$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'));
@@ -1934,6 +1937,7 @@
         Lightbox.prototype.checkPrevNext = function() {};
 
         Lightbox.prototype.scrollNext = function(item) {
+            var current, previousCurrent;
             if (this.prevItemView) {
                 this.prevItemView.remove();
             }
@@ -1954,9 +1958,14 @@
                 if (this.nextItemView) {
                     this.nextItemView.remove();
                 }
-                this.currentItemView.layout();
-                this.currentItemView = this.createChildView(item);
-                this.currentItemView.positionAsNext();
+                previousCurrent = this.currentItemView;
+                previousCurrent.layout();
+                setTimeout(((function(_this) {
+                    return function() {
+                        return previousCurrent.remove();
+                    };
+                })(this)), 500);
+                current = this.currentItemView = this.createChildView(item);
                 if (item.prev()) {
                     this.prevItemView = this.createChildView(item.prev(), {
                         next: this.currentItemView
@@ -1971,6 +1980,7 @@
         };
 
         Lightbox.prototype.scrollPrev = function(item) {
+            var current, previousCurrent;
             if (this.nextItemView) {
                 this.nextItemView.remove();
             }
@@ -1991,9 +2001,14 @@
                 if (this.prevItemView) {
                     this.prevItemView.remove();
                 }
-                this.currentItemView.layout();
-                this.currentItemView = this.createChildView(item);
-                this.currentItemView.positionAsPrev();
+                previousCurrent = this.currentItemView;
+                previousCurrent.layout();
+                setTimeout(((function(_this) {
+                    return function() {
+                        return previousCurrent.remove();
+                    };
+                })(this)), 500);
+                current = this.currentItemView = this.createChildView(item);
                 if (item.next()) {
                     this.nextItemView = this.createChildView(item.next(), {
                         prev: this.currentItemView
@@ -2032,6 +2047,7 @@
         __extends(LightboxItem, _super);
 
         function LightboxItem() {
+            this.remove = __bind(this.remove, this);
             this.layoutContent = __bind(this.layoutContent, this);
             return LightboxItem.__super__.constructor.apply(this, arguments);
         }
@@ -2171,17 +2187,25 @@
         };
 
         LightboxItem.prototype.layoutWithDescriptionAtRight = function() {
-            var availableAreaAspectRatio, availableAreaWidth, height, objectAspectRatio, width;
+            var availableAreaAspectRatio, availableAreaWidth, containerHeight, content, contentHeight, height, objectAspectRatio, width;
             if (!this.object.currentView.supportsOversizing) {
                 this.$el.addClass('uberbox-skin-dark');
                 return;
             }
             width = this.$el.width();
             height = this.$el.height();
-            objectAspectRatio = this.object.currentView.getObjectNaturalAspectRatio();
-            availableAreaWidth = width - this.ui.description.width();
-            availableAreaAspectRatio = availableAreaWidth / height;
-            return this.fitOversized();
+            if (jQuery(window).width() < 1024) {
+                containerHeight = this.$('.uberbox-item-object > *').height();
+                contentHeight = (content = this.$('.uberbox-item-object > * > *')).height();
+                if (containerHeight < contentHeight) {
+                    return content.css('margin-top', -(contentHeight - containerHeight) / 2);
+                }
+            } else {
+                objectAspectRatio = this.object.currentView.getObjectNaturalAspectRatio();
+                availableAreaWidth = width - this.ui.description.width();
+                availableAreaAspectRatio = availableAreaWidth / height;
+                return this.fitOversized();
+            }
         };
 
         LightboxItem.prototype.fitHeight = function() {
@@ -2231,21 +2255,26 @@
 
         LightboxItem.prototype.layout = function() {
             if (this.isCurrent()) {
-                this.$el.css({
-                    transform: ''
-                });
+                this.positionAsCurrent();
             } else if (this.isNext()) {
                 this.positionAsNext();
             } else if (this.isPrev()) {
                 this.positionAsPrev();
             } else {
                 setTimeout(this.remove, 400);
+                return;
             }
             return this.layoutContent();
         };
 
         LightboxItem.prototype.isVertical = function() {
             return this.getOption('orientation') === 'vertical';
+        };
+
+        LightboxItem.prototype.positionAsCurrent = function() {
+            return this.$el.css({
+                transform: ''
+            });
         };
 
         LightboxItem.prototype.positionAsNext = function() {

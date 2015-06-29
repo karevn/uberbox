@@ -12,7 +12,7 @@ class ObjectView extends Marionette.ItemView
 	getWidth: -> @$el.width()
 	getObjectNaturalAspectRatio: -> @getObjectNaturalWidth() / @getObjectNaturalHeight()
 	onObjectError: => @trigger 'error'
-	onObjectLoaded: => @trigger 'load'
+	onObjectLoaded: => @trigger('load')
 	serializeData: -> model: @model
 	getOffset: -> 
 		offset = @$el.offset()
