@@ -1,9 +1,3 @@
-@keyframes uberbox-spin 
-	0%
-		transform:  matrix(-1, 0, 0, 1, 0, 0) rotate(0deg)
-	100%
-		transform:  matrix(-1, 0, 0, 1, 0, 0) rotate(-359deg)
-
 .uberbox-lightbox-wrapper
 	position: absolute
 	z-index: 100002
@@ -24,17 +18,20 @@
 	cursor: pointer
 	z-index: 5
 	+hover-active
+	background: transparent
+	user-select: none
 	&.uberbox-disabled
 		opacity: 0.15
 		cursor: default
 		&:hover
 			opacity: 0.15
+	&:active, &:focus
+		outline: none
+		background: transparent
 	i
 		position: absolute
 		display: block
-	+respond-to(handhelds)
-		display: none
-		
+			
 .uberbox-vertical
 	.uberbox-next, .uberbox-prev
 		left: 50%
@@ -49,6 +46,7 @@
 			top: 9px
 			margin-left: -26px
 			left: 50%
+			border-radus: 0 0 4px 4px
 			&:before
 				content: '\e800'
 				transform: rotate(-90deg)
@@ -60,6 +58,7 @@
 			bottom: 9px
 			left: 50%
 			margin-left: -26px
+			border-radius: 4px 4px 0 0
 			&:before
 				content: '\e800'
 				transform: rotate(90deg)
@@ -78,14 +77,21 @@
 			display: inline-block
 			width: 100%
 			+uberbox-icon
-			margin: -70px 0 0 0
+			margin: -38px 0 0 0
+			padding: 15px 0
 			top: 50%
 			&:before
 				margin: 0
+	&.uberbox-has-carousel
+		.uberbox-next, .uberbox-prev
+			bottom: 130px
+			i
+				margin-top: -28px
 	.uberbox-prev 
 		left: 0
 		width: 54px
 		i
+			border-radius: 0 4px 4px 0
 			&:before
 				content: '\e800'
 				transform: rotate(180deg)
@@ -93,56 +99,51 @@
 	.uberbox-next
 		right: 0
 		i
+			border-radius: 4px 0 0 4px
 			&:before
 				content: '\e800'
 				transform-origin: 50% 50%
-
+@media screen and (orientation: portrait)
+	.uberbox
+		.uberbox-next, .uberbox-prev
+			font-size: 20px
+			height: 42px
+			width: 30px
+			bottom: auto
+			line-height: 42px
+			i
+				margin: none
+				position: static
+				padding: 0
+				display: inline
+		.uberbox-prev
+			left: 12px
+			top: 3px
+		.uberbox-next
+			left: 36px
+			top: 3px
 .uberbox-lightbox-item
 	position: fixed
-	transition: opacity 0.3s
 	z-index: 1
 	left: 6px
 	top: 42px
 	right: 6px
 	bottom: 20px
+	transition: opacity 0.3s
+	opacity: 0
 	&.uberbox-enable-transition
-		transition: transform 0.5s
+		transition: all 0.3s
 		opacity: 1
 	&.uberbox-current
 		z-index: 2
+	&.uberblox-loaded
+		opacity: 1
 		
 	+respond-to(handhelds)
 		left: 6px
 		top: 45px
 		right: 6px
 		bottom: 6px
-	.uberbox-loader
-		display: block
-		position: absolute
-		top: 50%
-		left: 50%
-		color: white
-		height: 72px
-		width: 72x
-		margin-top: -36px
-		margin-left: -36px
-		clip-path: circle(36px at 36px 36px)
-		transition: transform 0.5s
-		&:before
-			animation: uberbox-spin 2s infinite linear
-			font-size: 48px
-			transform:  matrix(-1, 0, 0, 1, 0, 0)
-			position: absolute
-			top: 6px
-			left: 6px
-			margin: 0
-		
-		
-	.uberbox-lightbox-item-content-wrapper
-		opacity: 0
-		transition: opacity 0.3s
-	&.uberbox-loaded .uberbox-lightbox-item-content-wrapper
-		opacity: 1
 		
 .uberbox-vertical
 	.uberbox-lightbox-item
@@ -151,10 +152,6 @@
 			right: 30px
 			top: 90px
 			bottom: 90px
-		&.uberbox-flyout-next
-			transform: translate(0, 200%)
-		&.uberbox-flyout-prev
-			transform: translate(0, -200%)
 	&.uberbox-has-carousel .uberbox-lightbox-item
 		right: 30px
 		+respond-to(wide-screens)
@@ -186,7 +183,24 @@
 			top: 0
 			left: 0
 			right: 0
+		.uberbox-iframe-content
+			width: 100%
+			height: 100%
+			iframe
+				width: 100%
+				height: 100%
+		.uberbox-image-content
+			width: 100%
+			height: 100%
+			img
+				position: absolute
+				max-width: 100%
+				max-height: 100%
+				left: 50%
+				top: 50%
+				transform: translate(-50%, -50%)
 		
+
 	&.uberbox-description-mini
 		.uberbox-item-object
 			bottom: 50px
@@ -405,6 +419,19 @@
 				box-sizing: border-box
 				overflow: auto
 				padding: 30px 36px 20px 42px
+		@media screen and (max-width: 1024px)
+			overflow: scroll
+			.uberbox-lightbox-item-content-wrapper
+				max-height: 100%
+			.uberbox-image-content 
+				max-height: 600px
+				overflow: hidden
+				img
+					width: 100%
+			.uberbox-item-description
+				padding: 24px
+
+
 		&.uberbox-skin-dark
 			.uberbox-lightbox-item-content-wrapper
 				top: 0
@@ -437,7 +464,7 @@
 		+respond-to(handhelds-portrait)
 			width: 100%
 			bottom: 0
-			.uberbox-item-description, .uberbox-item-object
+			.uberbox-item-description, .uberbox-item-object, .uberbox-lightbox-item-content-wrapper
 				width: 100%
 		.uberbox-item-object
 			overflow: hidden
@@ -479,6 +506,7 @@
 			left: 6px
 			right: 6px
 			bottom: 6px
+			width: auto
 			overflow: scroll
 			.uberbox-item-object
 				.uberbox-image-content img
@@ -495,3 +523,25 @@
 		transform: translate(-50%, -50%)
 .uberbox-bandcamp-content iframe
 	max-width: 700px
+.uberbox-ajax-content
+		&.uberbox-center-vertical
+			position: absolute
+			left: 0
+			right: 0
+			top: 50%
+			transform: translate(0, -50%)
+		&.uberbox-scroll
+			position: fixed
+			overflow: scroll
+			top: 0
+.uberbox-ajax-content.uberbox-scroll
+	bottom: 20px
+	left: 40px
+	right: 40px
+	top: 45px
+.uberbox-horizontal.uberbox-has-carousel .uberbox-ajax-content.uberbox-scroll
+	bottom: 130px
+.uberbox-vertical.uberbox-has-carousel .uberbox-ajax-content.uberbox-scroll
+	right: 180px
+	
+

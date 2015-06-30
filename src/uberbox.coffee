@@ -4,6 +4,7 @@ class Uberbox extends Marionette.LayoutView
 	regions:
 		lightbox: '.uberbox-lightbox-wrapper'
 		carousel: '.uberbox-carousel-wrapper'
+		toolbar:  '.uberbox-toolbar-wrapper'
 	ui:{}
 	events:
 		touchstart: 'onTouchStart'
@@ -26,7 +27,7 @@ class Uberbox extends Marionette.LayoutView
 			e.preventDefault()
 		else
 			@lightbox.currentView.currentItemView.swipeBack()
-			if @collection.activeItem.get('description_style') == 'mini'
+			if @collection.activeItem.get('description_style') == 'mini' or @collection.activeItem.get('description_style') == 'none'
 				e.preventDefault()
 			else
 				e.stopPropagation()
@@ -82,6 +83,9 @@ class Uberbox extends Marionette.LayoutView
 		html:
 			condition: (item)-> !!item.get('html')
 			class: Uberbox.HTMLObjectView
+		ajax:
+			condition: (item) -> item.get('ajax')
+			class: Uberbox.AJAXOBjectView
 		unknown:
 			class: Uberbox.UnknownItemView
 				
@@ -132,22 +136,45 @@ class Uberbox extends Marionette.LayoutView
 		@lightbox.show(new Uberbox.Lightbox(lightboxOptions))
 		@listenTo(@lightbox.currentView, 'close', => @remove())
 		if @getOption('carousel')
-			@$el.addClass('uberbox-has-carousel')
-			@carousel.show(new Uberbox.Carousel(lightboxOptions))
+			if jQuery(window).width() > 1024
+				@$el.addClass('uberbox-has-carousel')
+				@carousel.show(new Uberbox.Carousel(lightboxOptions))
 			jQuery(window).on 'resize.uberbox-main', =>
 				if jQuery(window).width() < 1024
 					@carousel.empty()
+					@$el.removeClass('uberbox-has-carousel')
 				else if !@carousel.currentView
+					@$el.addClass('uberbox-has-carousel')
 					@carousel.show(new Uberbox.Carousel(lightboxOptions))
 		else
 			@$('.uberbox-carousel-wrapper').remove()
 		@listenTo @getOption('collection'), 'close', => Uberbox.close()
+		@listenTo @getOption('collection'),  'activate', @onItemActivated
 		current = @getOption('collection').at(@getOption('current'))
 		current.activate()
 		jQuery('body').on 'keydown', @onKeyDown
 		@overflow = jQuery('html').css('overflow')
 		jQuery('html').css('overflow', 'hidden')
-		
+	onItemActivated: (item)=>	 
+		if @toolbar.currentView
+			@stopListening @toolbar.currentView, 'close'
+		@toolbar.show(new Uberbox.ToolbarView(model: item))
+		@listenTo @toolbar.currentView, 'close', => @close()
+		@showLoader() unless item.get('loaded')
+		if @oldActiveItem
+			@stopListening @oldActiveItem, 'load'
+		@oldActiveItem = item
+		@listenTo item, 'load', => @hideLoader()
+	hideLoader: ->
+		if @showLoaderTimeout
+			clearTimeout @showLoaderTimeout
+			@showLoaderTimeout = null
+		@$el.find('div.uberbox-loader').remove()
+	showLoader: ->
+		return if @showLoaderTimeout
+		@showLoaderTimeout = setTimeout((=> 
+			@$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'))
+		), 100)
 	remove: ->
 		@trigger('close')
 		super

@@ -12,7 +12,7 @@ class ObjectView extends Marionette.ItemView
 	getWidth: -> @$el.width()
 	getObjectNaturalAspectRatio: -> @getObjectNaturalWidth() / @getObjectNaturalHeight()
 	onObjectError: => @trigger 'error'
-	onObjectLoaded: => @trigger 'load'
+	onObjectLoaded: => @trigger('load')
 	serializeData: -> model: @model
 	getOffset: -> 
 		offset = @$el.offset()
@@ -53,6 +53,7 @@ class Uberbox.ImageObjectView extends ObjectView
 class Uberbox.IframeObjectView extends ObjectView
 	waitForLoad: true
 	supportsOversizing: false
+	className: 'uberbox-iframe-content'
 	ui:
 		iframe: 'iframe'
 	template: -> Uberbox.Templates['content-iframe']
@@ -107,7 +108,24 @@ class Uberbox.BandcampObjectView extends Uberbox.IframeObjectView
 class Uberbox.HTMLObjectView extends ObjectView
 	className: 'uberbox-html-content'
 	waitForLoad: false
-	template: -> Uberbox.Templates['html-content']
+	template: -> Uberbox.Templates['content-html']
 	getObjectNaturalWidth: -> 650
 	getObjectNaturalHeight: -> 400
-	
+class Uberbox.AJAXOBjectView extends ObjectView
+	className: 'uberbox-ajax-content'
+	waitForLoad: true
+	template: -> Uberbox.Templates['content-html']
+	bindUIElements: ->
+		super
+		jQuery.get(@model.get('url'), (response)=>
+			@$el.html(response)
+			@trigger('load')
+			@layout()
+		)
+		jQuery(window).on 'resize', @layout
+
+	layout: =>
+		if @$el.height() < @$el.parent().height()
+			@$el.addClass('uberbox-center-vertical')
+		else
+			@$el.addClass('uberbox-scroll').removeClass('uberbox-center-vertical')
