@@ -241,6 +241,7 @@
                     return config["class"];
                 }
             }
+            return Uberbox.contentViewTypes().unknown;
         };
 
         function Uberbox(options) {
@@ -1882,6 +1883,35 @@
 
     })(ObjectView);
 
+    Uberbox.UnknownItemView = (function(_super) {
+        __extends(UnknownItemView, _super);
+
+        function UnknownItemView() {
+            return UnknownItemView.__super__.constructor.apply(this, arguments);
+        }
+
+        UnknownItemView.prototype.className = 'uberbox-unknown-content';
+
+        UnknownItemView.prototype.template = function() {
+            return Uberbox.Templates['content-unknown'];
+        };
+
+        UnknownItemView.prototype.waitForLoad = false;
+
+        UnknownItemView.prototype.showContent = function() {};
+
+        UnknownItemView.prototype.getObjectNaturalWidth = function() {
+            return this.$el.parent().width();
+        };
+
+        UnknownItemView.prototype.getObjectNaturalHeight = function() {
+            return this.$el.parent().height();
+        };
+
+        return UnknownItemView;
+
+    })(ObjectView);
+
     var __bind = function(fn, me) {
             return function() {
                 return fn.apply(me, arguments);
@@ -2294,8 +2324,11 @@
                     };
                 })(this));
             } else {
-                this.trigger('load');
-                return this.showContent();
+                return _.defer((function(_this) {
+                    return function() {
+                        return _this.trigger('load');
+                    };
+                })(this));
             }
         };
 
