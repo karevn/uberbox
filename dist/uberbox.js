@@ -1431,16 +1431,16 @@
         ToolbarView.prototype.onFullscreenClick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            this.ui.fullscreen.prop('disabled', true);
-            this.ui.exitFullscreen.prop('disabled', false);
+            this.ui.fullscreen.addClass('uberbox-disabled');
+            this.ui.exitFullscreen.removeClass('uberbox-disabled');
             return Uberbox.Utils.enterFullscreen(document.documentElement);
         };
 
         ToolbarView.prototype.onExitFullscreenClick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            this.ui.exitFullscreen.prop('disabled', true);
-            this.ui.fullscreen.prop('disabled', false);
+            this.ui.exitFullscreen.addClass('uberbox-disabled');
+            this.ui.fullscreen.removeClass('uberbox-disabled');
             return Uberbox.Utils.exitFullscreen();
         };
 

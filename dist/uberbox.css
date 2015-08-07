@@ -698,7 +698,7 @@
     opacity: 1;
 }
 
-.uberbox-toolbar a[data-action], .uberbox-toolbar button[data-action] {
+.uberbox-toolbar *[data-action] {
     position: relative;
     float: right;
     font-size: 15px;
@@ -720,26 +720,26 @@
     outline: none;
 }
 
-.uberbox-toolbar a[data-action]:disabled, .uberbox-toolbar button[data-action]:disabled {
+.uberbox-toolbar *[data-action].uberbox-disabled {
     display: none;
 }
 
-.uberbox-toolbar a[data-action]:active, .uberbox-toolbar button[data-action]:active {
+.uberbox-toolbar *[data-action]:active {
     box-shadow: none;
     outline: none;
 }
 
-.uberbox-toolbar a[data-action][data-action="close"], .uberbox-toolbar button[data-action][data-action="close"] {
+.uberbox-toolbar *[data-action][data-action="close"] {
     opacity: 1;
     color: white;
 }
 
-.uberbox-toolbar a[data-action]:hover, .uberbox-toolbar button[data-action]:hover {
+.uberbox-toolbar *[data-action]:hover {
     color: white;
     outline: none;
 }
 
-.uberbox-toolbar a[data-action]:hover .uberbox-tooltip, .uberbox-toolbar button[data-action]:hover .uberbox-tooltip {
+.uberbox-toolbar *[data-action]:hover .uberbox-tooltip {
     opacity: 1;
 }
 
@@ -787,12 +787,12 @@
     background: #eee;
 }
 
-.uberbox-toolbar button[data-action=share] .uberbox-share-menu {
+.uberbox-toolbar *[data-action=share] .uberbox-share-menu {
     display: none;
     opacity: 0;
 }
 
-.uberbox-toolbar button[data-action=share].uberbox-active .uberbox-share-overlay {
+.uberbox-toolbar *[data-action=share].uberbox-active .uberbox-share-overlay {
     position: fixed;
     left: 0;
     right: 0;
@@ -804,11 +804,11 @@
     z-index: 5;
 }
 
-.uberbox-toolbar button[data-action=share].uberbox-active .uberbox-share-menu {
+.uberbox-toolbar *[data-action=share].uberbox-active .uberbox-share-menu {
     display: block;
 }
 
-.uberbox-toolbar button[data-action=share].uberbox-active .uberbox-share-menu.uberbox-active {
+.uberbox-toolbar *[data-action=share].uberbox-active .uberbox-share-menu.uberbox-active {
     opacity: 1;
 }
 

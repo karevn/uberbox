@@ -20,14 +20,14 @@ class Uberbox.ToolbarView extends Marionette.ItemView
 	onFullscreenClick: (e)-> 
 		e.preventDefault()
 		e.stopPropagation()
-		@ui.fullscreen.prop('disabled', true)
-		@ui.exitFullscreen.prop('disabled', false)
+		@ui.fullscreen.addClass 'uberbox-disabled'
+		@ui.exitFullscreen.removeClass 'uberbox-disabled'
 		Uberbox.Utils.enterFullscreen(document.documentElement)
 	onExitFullscreenClick: (e)->
 		e.preventDefault()
 		e.stopPropagation()
-		@ui.exitFullscreen.prop('disabled', true)
-		@ui.fullscreen.prop('disabled', false)
+		@ui.exitFullscreen.addClass 'uberbox-disabled'
+		@ui.fullscreen.removeClass 'uberbox-disabled'
 		Uberbox.Utils.exitFullscreen()
 	onCloseClick: (e)-> 
 		e.preventDefault()
