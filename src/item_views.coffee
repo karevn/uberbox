@@ -129,3 +129,11 @@ class Uberbox.AJAXOBjectView extends ObjectView
 			@$el.addClass('uberbox-center-vertical')
 		else
 			@$el.addClass('uberbox-scroll').removeClass('uberbox-center-vertical')
+class Uberbox.UnknownItemView extends ObjectView
+	className: 'uberbox-unknown-content'
+	template: -> Uberbox.Templates['content-unknown']
+	waitForLoad: false
+	showContent: ->
+	getObjectNaturalWidth: -> @$el.parent().width()
+	getObjectNaturalHeight: -> @$el.parent().height()
+

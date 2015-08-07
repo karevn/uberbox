@@ -197,8 +197,8 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		if @object.currentView.waitForLoad
 			@listenToOnce @object.currentView, 'load', => @trigger 'load'
 		else
-			@trigger 'load'
-			@showContent()
+			_.defer => @trigger 'load'
+
 	layout: ->
 		if @isCurrent()
 			@positionAsCurrent()

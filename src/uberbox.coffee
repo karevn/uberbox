@@ -121,6 +121,7 @@ class Uberbox extends Marionette.LayoutView
 			else
 				condition = true
 			return config.class if condition
+		return @contentViewTypes().unknown
 
 	constructor: (options)->
 		super _.extend {el: jQuery('<div class="uberbox" />').appendTo(jQuery('body'))}, options

@@ -2,8 +2,8 @@
 
 @font-face {
     font-family: 'uberbox';
-  src: url('font/uberbox.eot?24950036');
-  src: url('font/uberbox.eot?24950036#iefix') format("embedded-opentype"), url('../font/uberbox.woff?24950036') format("woff"), url('../font/uberbox.ttf?24950036') format("truetype"), url('../font/uberbox.svg?24950036#uberbox') format("svg");
+  src: url("font/uberbox.eot?24950036");
+  src: url("font/uberbox.eot?24950036#iefix") format("embedded-opentype"), url("../font/uberbox.woff?24950036") format("woff"), url("../font/uberbox.ttf?24950036") format("truetype"), url("../font/uberbox.svg?24950036#uberbox") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -1741,6 +1741,15 @@
     right: 180px;
 }
 
+.uberbox-unknown-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: url(../img/no-photo.png) center center no-repeat;
+}
+
 .uberbox-carousel-wrapper {
     position: fixed;
     z-index: 100003;
@@ -1838,6 +1847,5 @@
 .uberbox-horizontal .uberbox-carousel-wrapper .uberbox-carousel-item img {
     height: 100%;
 }
-
 
 /*# sourceMappingURL=uberbox.css.map */
