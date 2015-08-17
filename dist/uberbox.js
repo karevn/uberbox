@@ -522,7 +522,7 @@
                 description: this.get('description')
             };
             for (tag in tags) {
-                template = template.replace("%" + tag, encodeURIComponent(tags[tag]));
+                template = template.replace("%" + tag + "%", encodeURIComponent(tags[tag]));
             }
             return template;
         };

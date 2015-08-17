@@ -33,7 +33,7 @@ class Uberbox.ShareService extends Backbone.Model
 			title: @get('title')
 			description: @get('description')
 		}
-		template = template.replace("%#{tag}", encodeURIComponent(tags[tag])) for tag of tags
+		template = template.replace("%#{tag}%", encodeURIComponent(tags[tag])) for tag of tags
 		template
 	getShareLinkUrl: -> @processPseudotags(@get('url'))
 	
