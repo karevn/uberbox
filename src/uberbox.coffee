@@ -90,7 +90,6 @@ class Uberbox extends Marionette.LayoutView
 			class: Uberbox.UnknownItemView
 				
 	@show: (items, options = {})->
-		jQuery('html').css('')
 		options = _.extend({
 			current: 0
 			orientation: 'vertical'
@@ -154,8 +153,9 @@ class Uberbox extends Marionette.LayoutView
 		current = @getOption('collection').at(@getOption('current'))
 		current.activate()
 		jQuery('body').on 'keydown', @onKeyDown
-		@overflow = jQuery('html').css('overflow')
-		jQuery('html').css('overflow', 'hidden')
+		$html = jQuery('html')
+		@overflow = $html.css('overflow')
+		$html.css('overflow', 'hidden')
 	onItemActivated: (item)=>	 
 		if @toolbar.currentView
 			@stopListening @toolbar.currentView, 'close'

@@ -185,7 +185,6 @@
             if (options == null) {
                 options = {};
             }
-            jQuery('html').css('');
             options = _.extend({
                 current: 0,
                 orientation: 'vertical',
@@ -256,7 +255,7 @@
         }
 
         Uberbox.prototype.initialize = function() {
-            var current, lightboxOptions;
+            var $html, current, lightboxOptions;
             Uberbox.__super__.initialize.apply(this, arguments);
             this.render();
             this.bindUIElements();
@@ -300,8 +299,9 @@
             current = this.getOption('collection').at(this.getOption('current'));
             current.activate();
             jQuery('body').on('keydown', this.onKeyDown);
-            this.overflow = jQuery('html').css('overflow');
-            return jQuery('html').css('overflow', 'hidden');
+            $html = jQuery('html');
+            this.overflow = $html.css('overflow');
+            return $html.css('overflow', 'hidden');
         };
 
         Uberbox.prototype.onItemActivated = function(item) {
