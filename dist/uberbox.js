@@ -505,7 +505,7 @@
                 name: 'Delicious'
             },
             pinterest: {
-                url: "//www.pinterest.com/pin/create/button/?url=%url%&description=%title%",
+                url: "//www.pinterest.com/pin/create/button/?url=%url%&description=%title%&image_url=%image_url%",
                 name: 'Pinterest'
             },
             vk: {
