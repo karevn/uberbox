@@ -22,7 +22,7 @@ class Uberbox.ShareService extends Backbone.Model
 			url: "//delicious.com/post?url="
 			name: 'Delicious'
 		pinterest:
-			url: "//www.pinterest.com/pin/create/button/?url=%url%&description=%title%"
+			url: "//www.pinterest.com/pin/create/button/?url=%url%&description=%title%&image_url=%image_url%"
 			name: 'Pinterest'
 		vk:
 			url: "http://vk.com/share.php?url=%url%"
