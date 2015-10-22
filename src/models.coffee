@@ -1,6 +1,6 @@
 class Uberbox.ShareService extends Backbone.Model
 	@services:
-		facebook: 
+		facebook:
 			url: "//www.facebook.com/share.php?v=4&src=bm&u=%url%"
 			name: 'Facebook'
 		twitter:
@@ -15,7 +15,7 @@ class Uberbox.ShareService extends Backbone.Model
 		digg:
 			url: "//digg.com/submit?phase=2&url=%url%"
 			name: 'Digg'
-		stumbleupon: 
+		stumbleupon:
 			url: "http://www.stumbleupon.com/submit?url=%url%&title=%title%"
 			name: "Stumbleupon"
 		delicious:
@@ -30,13 +30,13 @@ class Uberbox.ShareService extends Backbone.Model
 	processPseudotags: (template)->
 		tags = {
 			url: window.location.href
-			title: @get('title')
-			description: @get('description')
+			title: @get('title') || ''
+			description: @get('description') || ''
 		}
 		template = template.replace("%#{tag}%", encodeURIComponent(tags[tag])) for tag of tags
 		template
 	getShareLinkUrl: -> @processPseudotags(@get('url'))
-	
+
 class Uberbox.Item extends Backbone.Model
 	defaults:
 		description_style: 'mini'
@@ -44,7 +44,7 @@ class Uberbox.Item extends Backbone.Model
 		share_tooltip: 'Share'
 		fullscreen_tooltip: 'Fullscreen'
 		exit_fullscreen_tooltip: 'Exit fullscreen'
-	
+
 	initialize: ->
 		super
 		if share = @get('share')
