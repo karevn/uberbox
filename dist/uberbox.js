@@ -501,11 +501,11 @@
                 name: "Stumbleupon"
             },
             delicious: {
-                url: "//delicious.com/post?url=",
+                url: "//delicious.com/post?url=%url%",
                 name: 'Delicious'
             },
             pinterest: {
-                url: "//www.pinterest.com/pin/create/button/?url=%url%&description=%title%&image_url=%image_url%",
+                url: "https://www.pinterest.com/pin/create/button/?url=%url%&media=%image_url%&description=%description%&title=%title%",
                 name: 'Pinterest'
             },
             vk: {
@@ -514,13 +514,13 @@
             }
         };
 
-        ShareService.prototype.processPseudotags = function(template) {
+        ShareService.prototype.processPseudotags = function(template, model) {
             var tag, tags;
             tags = {
                 url: window.location.href,
-                image_url: this.get('url'),
-                title: this.get('title') || '',
-                description: this.get('description') || ''
+                image_url: model.get('url'),
+                title: model.get('title') || '',
+                description: model.get('description') || ''
             };
             for (tag in tags) {
                 template = template.replace("%" + tag + "%", encodeURIComponent(tags[tag]));
@@ -528,8 +528,8 @@
             return template;
         };
 
-        ShareService.prototype.getShareLinkUrl = function() {
-            return this.processPseudotags(this.get('url'));
+        ShareService.prototype.getShareLinkUrl = function(model) {
+            return this.processPseudotags(this.get('url'), model);
         };
 
         return ShareService;

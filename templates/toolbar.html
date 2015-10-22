@@ -23,13 +23,13 @@
 			<div class="uberbox-share-menu">
 				<% for (service in services) { %>
 					<% service = services[service] %>
-					<a target="_blank" class="uberbox-share-link" href="<%= service.getShareLinkUrl() %>" > 
+					<a target="_blank" class="uberbox-share-link" href="<%= service.getShareLinkUrl(obj.model) %>" >
 							<% if (service.get('image')) { %>
 								<img src="<%= service.get('image') %>" alt="">
 							<% } else { %>
 								<i class="uberbox-icon-<%= service.get('slug') %>"></i>
 							<% } %>
-							
+
 							<% if (service.get('name')) { %>
 								<%= service.get('name') %>
 							<% } %>

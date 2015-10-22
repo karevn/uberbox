@@ -143,8 +143,8 @@ __p += '\n\t\t<div href="#" data-action="share">\n\t\t\t<i class="uberbox-icon-s
 __p += '\n\t\t\t\t\t';
  service = services[service] ;
 __p += '\n\t\t\t\t\t<a target="_blank" class="uberbox-share-link" href="' +
-((__t = ( service.getShareLinkUrl() )) == null ? '' : __t) +
-'" > \n\t\t\t\t\t\t\t';
+((__t = ( service.getShareLinkUrl(obj.model) )) == null ? '' : __t) +
+'" >\n\t\t\t\t\t\t\t';
  if (service.get('image')) { ;
 __p += '\n\t\t\t\t\t\t\t\t<img src="' +
 ((__t = ( service.get('image') )) == null ? '' : __t) +
@@ -154,7 +154,7 @@ __p += '\n\t\t\t\t\t\t\t\t<i class="uberbox-icon-' +
 ((__t = ( service.get('slug') )) == null ? '' : __t) +
 '"></i>\n\t\t\t\t\t\t\t';
  } ;
-__p += '\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t';
+__p += '\n\n\t\t\t\t\t\t\t';
  if (service.get('name')) { ;
 __p += '\n\t\t\t\t\t\t\t\t' +
 ((__t = ( service.get('name') )) == null ? '' : __t) +

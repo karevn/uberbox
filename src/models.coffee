@@ -19,24 +19,26 @@ class Uberbox.ShareService extends Backbone.Model
 			url: "http://www.stumbleupon.com/submit?url=%url%&title=%title%"
 			name: "Stumbleupon"
 		delicious:
-			url: "//delicious.com/post?url="
+			url: "//delicious.com/post?url=%url%"
 			name: 'Delicious'
 		pinterest:
-			url: "//www.pinterest.com/pin/create/button/?url=%url%&description=%title%&image_url=%image_url%"
+			url: "https://www.pinterest.com/pin/create/button/?url=%url%&media=%image_url%&description=%description%&title=%title%"
 			name: 'Pinterest'
 		vk:
 			url: "http://vk.com/share.php?url=%url%"
 			name: 'VK'
-	processPseudotags: (template)->
+	processPseudotags: (template, model)->
 		tags = {
 			url: window.location.href
-			image_url: @get('url')
-			title: @get('title') || ''
-			description: @get('description') || ''
+			image_url: model.get('url')
+			title: model.get('title') || ''
+			description: model.get('description') || ''
 		}
-		template = template.replace("%#{tag}%", encodeURIComponent(tags[tag])) for tag of tags
+		for tag of tags
+			template = template.replace("%#{tag}%", encodeURIComponent(tags[tag]))
+
 		template
-	getShareLinkUrl: -> @processPseudotags(@get('url'))
+	getShareLinkUrl: (model)-> @processPseudotags(@get('url'), model)
 
 class Uberbox.Item extends Backbone.Model
 	defaults:
