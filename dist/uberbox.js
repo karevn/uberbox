@@ -518,6 +518,7 @@
             var tag, tags;
             tags = {
                 url: window.location.href,
+                image_url: this.get('url'),
                 title: this.get('title') || '',
                 description: this.get('description') || ''
             };

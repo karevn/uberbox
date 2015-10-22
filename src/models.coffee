@@ -30,6 +30,7 @@ class Uberbox.ShareService extends Backbone.Model
 	processPseudotags: (template)->
 		tags = {
 			url: window.location.href
+			image_url: @get('url')
 			title: @get('title') || ''
 			description: @get('description') || ''
 		}
