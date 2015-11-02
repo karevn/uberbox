@@ -9,7 +9,7 @@ class Uberbox.Utils
 		for method in ['fullscreenEnabled', 'webkitFullscreenEnabled', 'mozFullscreenEnabled', 'msFullscreenEnabled']
 			if !_.isUndefined(document[method])
 				return document[method]
-		
+
 	@enterFullscreen: (el)->
 		el = document.documentElement unless el
 		method = el.requestFullScreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullScreen
@@ -17,6 +17,13 @@ class Uberbox.Utils
 	@exitFullscreen: ->
 		el = document.documentElement
 		method = el.exitFullscreen || el.mozCancelFullScreen || el.msExitFullscreen
-		method.apply(el) if method 
+		method.apply(el) if method
 		if document.webkitExitFullscreen
 			document.webkitExitFullscreen()
+	@notification: (options)->
+		notification = jQuery('<div class="uberbox-notification" />').html(options.message).appendTo(jQuery('body'))
+		_.defer => notification.addClass('uberbox-active')
+		setTimeout (=>
+			notification.removeClass('uberbox-active')
+			setTimeout (=> notification.remove()), 600
+		), 4000

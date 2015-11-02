@@ -128,7 +128,7 @@ __p += '\n\t\t<a href="#" data-action="fullscreen">\n\t\t\t<i class="uberbox-ico
  } ;
 __p += '\n\t';
  if (obj.model.get('download_url')) { ;
-__p += '\n\t\t<a data-action="download" href="' +
+__p += '\n\t\t<a data-action="download" download href="' +
 ((__t = ( obj.model.get('download_url') )) == null ? '' : __t) +
 '" target="_blank">\n\t\t\t<i class="uberbox-icon-download"></i>\n\t\t\t<span class="uberbox-tooltip">' +
 ((__t = ( obj.model.get('download_tooltip') )) == null ? '' : __t) +

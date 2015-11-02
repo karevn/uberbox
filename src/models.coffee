@@ -44,6 +44,7 @@ class Uberbox.Item extends Backbone.Model
 	defaults:
 		description_style: 'mini'
 		download_tooltip: 'Download'
+		download_started_tooltip: 'Download started'
 		share_tooltip: 'Share'
 		fullscreen_tooltip: 'Fullscreen'
 		exit_fullscreen_tooltip: 'Exit fullscreen'

@@ -449,6 +449,24 @@
             }
         };
 
+        Utils.notification = function(options) {
+            var notification;
+            notification = jQuery('<div class="uberbox-notification" />').html(options.message).appendTo(jQuery('body'));
+            _.defer((function(_this) {
+                return function() {
+                    return notification.addClass('uberbox-active');
+                };
+            })(this));
+            return setTimeout(((function(_this) {
+                return function() {
+                    notification.removeClass('uberbox-active');
+                    return setTimeout((function() {
+                        return notification.remove();
+                    }), 600);
+                };
+            })(this)), 4000);
+        };
+
         return Utils;
 
     })();
@@ -546,6 +564,7 @@
         Item.prototype.defaults = {
             description_style: 'mini',
             download_tooltip: 'Download',
+            download_started_tooltip: 'Download started',
             share_tooltip: 'Share',
             fullscreen_tooltip: 'Fullscreen',
             exit_fullscreen_tooltip: 'Exit fullscreen'
@@ -1400,6 +1419,7 @@
         ToolbarView.prototype.className = 'uberbox-toolbar';
 
         ToolbarView.prototype.ui = {
+            download: '*[data-action=download]',
             fullscreen: '*[data-action=fullscreen]',
             exitFullscreen: '*[data-action=exit-fullscreen]',
             close: '*[data-action=close]',
@@ -1412,6 +1432,7 @@
             'click @ui.exitFullscreen': 'onExitFullscreenClick',
             'click @ui.close': 'onCloseClick',
             'click @ui.share': 'onShareClick',
+            'click @ui.download': 'onDownloadClick',
             'click .uberbox-share-overlay': 'onShareClick'
         };
 
@@ -1435,6 +1456,12 @@
             this.ui.fullscreen.addClass('uberbox-disabled');
             this.ui.exitFullscreen.removeClass('uberbox-disabled');
             return Uberbox.Utils.enterFullscreen(document.documentElement);
+        };
+
+        ToolbarView.prototype.onDownloadClick = function(e) {
+            return Uberbox.Utils.notification({
+                message: this.model.get('download_started_tooltip')
+            });
         };
 
         ToolbarView.prototype.onExitFullscreenClick = function(e) {

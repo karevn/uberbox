@@ -11,7 +11,7 @@
 		</a>
 	<% } %>
 	<% if (obj.model.get('download_url')) { %>
-		<a data-action="download" href="<%= obj.model.get('download_url') %>" target="_blank">
+		<a data-action="download" download href="<%= obj.model.get('download_url') %>" target="_blank">
 			<i class="uberbox-icon-download"></i>
 			<span class="uberbox-tooltip"><%= obj.model.get('download_tooltip') %></span>
 		</a>
