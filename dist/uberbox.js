@@ -26,15 +26,14 @@
 
 }(this, function(root, _, jQuery, Backbone, Marionette) {
     var Uberbox,
-        __bind = function(fn, me) {
+        bind = function(fn, me) {
             return function() {
                 return fn.apply(me, arguments);
             };
         },
-        __hasProp = {}.hasOwnProperty,
-        __extends = function(child, parent) {
+        extend = function(child, parent) {
             for (var key in parent) {
-                if (__hasProp.call(parent, key)) child[key] = parent[key];
+                if (hasProp.call(parent, key)) child[key] = parent[key];
             }
 
             function ctor() {
@@ -44,10 +43,11 @@
             child.prototype = new ctor();
             child.__super__ = parent.prototype;
             return child;
-        };
+        },
+        hasProp = {}.hasOwnProperty;
 
-    Uberbox = (function(_super) {
-        __extends(Uberbox, _super);
+    Uberbox = (function(superClass) {
+        extend(Uberbox, superClass);
 
         Uberbox.instances = [];
 
@@ -218,13 +218,13 @@
         };
 
         Uberbox.getObjectViewType = function(item) {
-            var condition, config, type, url, _ref;
+            var condition, config, ref, type, url;
             if (type = item.get('type')) {
                 return Uberbox.contentViewTypes()[type]['class'];
             }
-            _ref = Uberbox.contentViewTypes();
-            for (type in _ref) {
-                config = _ref[type];
+            ref = Uberbox.contentViewTypes();
+            for (type in ref) {
+                config = ref[type];
                 condition = false;
                 if (config.condition) {
                     if (_.isRegExp(config.condition) && (url = item.get('url'))) {
@@ -244,11 +244,11 @@
         };
 
         function Uberbox(options) {
-            this.onKeyDown = __bind(this.onKeyDown, this);
-            this.onItemActivated = __bind(this.onItemActivated, this);
-            this.onTouchEnd = __bind(this.onTouchEnd, this);
-            this.onTouchMove = __bind(this.onTouchMove, this);
-            this.onTouchStart = __bind(this.onTouchStart, this);
+            this.onKeyDown = bind(this.onKeyDown, this);
+            this.onItemActivated = bind(this.onItemActivated, this);
+            this.onTouchEnd = bind(this.onTouchEnd, this);
+            this.onTouchMove = bind(this.onTouchMove, this);
+            this.onTouchStart = bind(this.onTouchStart, this);
             Uberbox.__super__.constructor.call(this, _.extend({
                 el: jQuery('<div class="uberbox" />').appendTo(jQuery('body'))
             }, options));
@@ -402,15 +402,15 @@
         function Utils() {}
 
         Utils.supportsFullScreen = function() {
-            var el, prefix, _i, _len, _ref;
+            var el, i, len, prefix, ref;
             el = document.documentElement;
             if (el.requestFullscreen) {
                 return true;
             }
-            _ref = ['moz', 'webkit', 'ms'];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                prefix = _ref[_i];
-                if (el["" + prefix + "RequestFullScreen"]) {
+            ref = ['moz', 'webkit', 'ms'];
+            for (i = 0, len = ref.length; i < len; i++) {
+                prefix = ref[i];
+                if (el[prefix + "RequestFullScreen"]) {
                     return true;
                 }
             }
@@ -418,10 +418,10 @@
         };
 
         Utils.isFullscreen = function() {
-            var method, _i, _len, _ref;
-            _ref = ['fullscreenEnabled', 'webkitFullscreenEnabled', 'mozFullscreenEnabled', 'msFullscreenEnabled'];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                method = _ref[_i];
+            var i, len, method, ref;
+            ref = ['fullscreenEnabled', 'webkitFullscreenEnabled', 'mozFullscreenEnabled', 'msFullscreenEnabled'];
+            for (i = 0, len = ref.length; i < len; i++) {
+                method = ref[i];
                 if (!_.isUndefined(document[method])) {
                     return document[method];
                 }
@@ -471,10 +471,9 @@
 
     })();
 
-    var __hasProp = {}.hasOwnProperty,
-        __extends = function(child, parent) {
+    var extend = function(child, parent) {
             for (var key in parent) {
-                if (__hasProp.call(parent, key)) child[key] = parent[key];
+                if (hasProp.call(parent, key)) child[key] = parent[key];
             }
 
             function ctor() {
@@ -484,10 +483,11 @@
             child.prototype = new ctor();
             child.__super__ = parent.prototype;
             return child;
-        };
+        },
+        hasProp = {}.hasOwnProperty;
 
-    Uberbox.ShareService = (function(_super) {
-        __extends(ShareService, _super);
+    Uberbox.ShareService = (function(superClass) {
+        extend(ShareService, superClass);
 
         function ShareService() {
             return ShareService.__super__.constructor.apply(this, arguments);
@@ -554,8 +554,8 @@
 
     })(Backbone.Model);
 
-    Uberbox.Item = (function(_super) {
-        __extends(Item, _super);
+    Uberbox.Item = (function(superClass) {
+        extend(Item, superClass);
 
         function Item() {
             return Item.__super__.constructor.apply(this, arguments);
@@ -653,8 +653,8 @@
 
     })(Backbone.Model);
 
-    Uberbox.ItemCollection = (function(_super) {
-        __extends(ItemCollection, _super);
+    Uberbox.ItemCollection = (function(superClass) {
+        extend(ItemCollection, superClass);
 
         function ItemCollection() {
             return ItemCollection.__super__.constructor.apply(this, arguments);
@@ -710,15 +710,14 @@
 
     })(Backbone.Collection);
 
-    var __bind = function(fn, me) {
+    var bind = function(fn, me) {
             return function() {
                 return fn.apply(me, arguments);
             };
         },
-        __hasProp = {}.hasOwnProperty,
-        __extends = function(child, parent) {
+        extend = function(child, parent) {
             for (var key in parent) {
-                if (__hasProp.call(parent, key)) child[key] = parent[key];
+                if (hasProp.call(parent, key)) child[key] = parent[key];
             }
 
             function ctor() {
@@ -728,14 +727,15 @@
             child.prototype = new ctor();
             child.__super__ = parent.prototype;
             return child;
-        };
+        },
+        hasProp = {}.hasOwnProperty;
 
-    Uberbox.SlidingWindowItem = (function(_super) {
-        __extends(SlidingWindowItem, _super);
+    Uberbox.SlidingWindowItem = (function(superClass) {
+        extend(SlidingWindowItem, superClass);
 
         function SlidingWindowItem() {
-            this.onClicked = __bind(this.onClicked, this);
-            this.enableTransition = __bind(this.enableTransition, this);
+            this.onClicked = bind(this.onClicked, this);
+            this.enableTransition = bind(this.enableTransition, this);
             return SlidingWindowItem.__super__.constructor.apply(this, arguments);
         }
 
@@ -877,10 +877,9 @@
 
     })(Marionette.LayoutView);
 
-    var __hasProp = {}.hasOwnProperty,
-        __extends = function(child, parent) {
+    var extend = function(child, parent) {
             for (var key in parent) {
-                if (__hasProp.call(parent, key)) child[key] = parent[key];
+                if (hasProp.call(parent, key)) child[key] = parent[key];
             }
 
             function ctor() {
@@ -890,10 +889,11 @@
             child.prototype = new ctor();
             child.__super__ = parent.prototype;
             return child;
-        };
+        },
+        hasProp = {}.hasOwnProperty;
 
-    Uberbox.SlidingWindow = (function(_super) {
-        __extends(SlidingWindow, _super);
+    Uberbox.SlidingWindow = (function(superClass) {
+        extend(SlidingWindow, superClass);
 
         SlidingWindow.prototype.defaults = function() {
             return {
@@ -948,10 +948,9 @@
 
     })(Marionette.View);
 
-    var __hasProp = {}.hasOwnProperty,
-        __extends = function(child, parent) {
+    var extend = function(child, parent) {
             for (var key in parent) {
-                if (__hasProp.call(parent, key)) child[key] = parent[key];
+                if (hasProp.call(parent, key)) child[key] = parent[key];
             }
 
             function ctor() {
@@ -962,14 +961,15 @@
             child.__super__ = parent.prototype;
             return child;
         },
-        __bind = function(fn, me) {
+        hasProp = {}.hasOwnProperty,
+        bind = function(fn, me) {
             return function() {
                 return fn.apply(me, arguments);
             };
         };
 
-    Uberbox.CarouselItem = (function(_super) {
-        __extends(CarouselItem, _super);
+    Uberbox.CarouselItem = (function(superClass) {
+        extend(CarouselItem, superClass);
 
         function CarouselItem() {
             return CarouselItem.__super__.constructor.apply(this, arguments);
@@ -1080,8 +1080,8 @@
 
     })(Uberbox.SlidingWindowItem);
 
-    Uberbox.VerticalCarouselItem = (function(_super) {
-        __extends(VerticalCarouselItem, _super);
+    Uberbox.VerticalCarouselItem = (function(superClass) {
+        extend(VerticalCarouselItem, superClass);
 
         function VerticalCarouselItem() {
             return VerticalCarouselItem.__super__.constructor.apply(this, arguments);
@@ -1122,8 +1122,8 @@
 
     })(Uberbox.CarouselItem);
 
-    Uberbox.HorizontalCarouselItem = (function(_super) {
-        __extends(HorizontalCarouselItem, _super);
+    Uberbox.HorizontalCarouselItem = (function(superClass) {
+        extend(HorizontalCarouselItem, superClass);
 
         function HorizontalCarouselItem() {
             return HorizontalCarouselItem.__super__.constructor.apply(this, arguments);
@@ -1162,15 +1162,15 @@
 
     })(Uberbox.CarouselItem);
 
-    Uberbox.Carousel = (function(_super) {
-        __extends(Carousel, _super);
+    Uberbox.Carousel = (function(superClass) {
+        extend(Carousel, superClass);
 
         function Carousel() {
-            this.layout = __bind(this.layout, this);
-            this.waitForFirst = __bind(this.waitForFirst, this);
-            this.waitForLast = __bind(this.waitForLast, this);
-            this.buildPrev = __bind(this.buildPrev, this);
-            this.buildNext = __bind(this.buildNext, this);
+            this.layout = bind(this.layout, this);
+            this.waitForFirst = bind(this.waitForFirst, this);
+            this.waitForLast = bind(this.waitForLast, this);
+            this.buildPrev = bind(this.buildPrev, this);
+            this.buildNext = bind(this.buildNext, this);
             return Carousel.__super__.constructor.apply(this, arguments);
         }
 
@@ -1318,27 +1318,27 @@
                 return function() {
                     _this.translateToCurrent();
                     _this.waitForLast(_this.currentItemView, function(last) {
-                        var _results;
+                        var results;
                         if (last && !_this.fits(last)) {
-                            _results = [];
+                            results = [];
                             while (last && !_this.fits(last)) {
                                 last.remove();
-                                _results.push(last = last.getPrev());
+                                results.push(last = last.getPrev());
                             }
-                            return _results;
+                            return results;
                         } else {
                             return _this.buildNext(last);
                         }
                     });
                     return _this.waitForFirst(_this.currentItemView, function(first) {
-                        var _results;
+                        var results;
                         if (first && !_this.fits(first)) {
-                            _results = [];
+                            results = [];
                             while (first && !_this.fits(first)) {
                                 first.remove();
-                                _results.push(first = first.getNext());
+                                results.push(first = first.getNext());
                             }
-                            return _results;
+                            return results;
                         } else {
                             return _this.buildPrev(first);
                         }
@@ -1386,10 +1386,9 @@
 
     })(Uberbox.SlidingWindow);
 
-    var __hasProp = {}.hasOwnProperty,
-        __extends = function(child, parent) {
+    var extend = function(child, parent) {
             for (var key in parent) {
-                if (__hasProp.call(parent, key)) child[key] = parent[key];
+                if (hasProp.call(parent, key)) child[key] = parent[key];
             }
 
             function ctor() {
@@ -1399,10 +1398,11 @@
             child.prototype = new ctor();
             child.__super__ = parent.prototype;
             return child;
-        };
+        },
+        hasProp = {}.hasOwnProperty;
 
-    Uberbox.ToolbarView = (function(_super) {
-        __extends(ToolbarView, _super);
+    Uberbox.ToolbarView = (function(superClass) {
+        extend(ToolbarView, superClass);
 
         function ToolbarView() {
             return ToolbarView.__super__.constructor.apply(this, arguments);
@@ -1505,15 +1505,14 @@
     })(Marionette.ItemView);
 
     var ObjectView,
-        __bind = function(fn, me) {
+        bind = function(fn, me) {
             return function() {
                 return fn.apply(me, arguments);
             };
         },
-        __hasProp = {}.hasOwnProperty,
-        __extends = function(child, parent) {
+        extend = function(child, parent) {
             for (var key in parent) {
-                if (__hasProp.call(parent, key)) child[key] = parent[key];
+                if (hasProp.call(parent, key)) child[key] = parent[key];
             }
 
             function ctor() {
@@ -1523,15 +1522,16 @@
             child.prototype = new ctor();
             child.__super__ = parent.prototype;
             return child;
-        };
+        },
+        hasProp = {}.hasOwnProperty;
 
-    ObjectView = (function(_super) {
-        __extends(ObjectView, _super);
+    ObjectView = (function(superClass) {
+        extend(ObjectView, superClass);
 
         function ObjectView() {
-            this.onObjectLoaded = __bind(this.onObjectLoaded, this);
-            this.onObjectError = __bind(this.onObjectError, this);
-            this.fadeIn = __bind(this.fadeIn, this);
+            this.onObjectLoaded = bind(this.onObjectLoaded, this);
+            this.onObjectError = bind(this.onObjectError, this);
+            this.fadeIn = bind(this.fadeIn, this);
             return ObjectView.__super__.constructor.apply(this, arguments);
         }
 
@@ -1589,8 +1589,8 @@
 
     })(Marionette.ItemView);
 
-    Uberbox.ImageObjectView = (function(_super) {
-        __extends(ImageObjectView, _super);
+    Uberbox.ImageObjectView = (function(superClass) {
+        extend(ImageObjectView, superClass);
 
         function ImageObjectView() {
             return ImageObjectView.__super__.constructor.apply(this, arguments);
@@ -1658,11 +1658,11 @@
 
     })(ObjectView);
 
-    Uberbox.IframeObjectView = (function(_super) {
-        __extends(IframeObjectView, _super);
+    Uberbox.IframeObjectView = (function(superClass) {
+        extend(IframeObjectView, superClass);
 
         function IframeObjectView() {
-            this.onWindowResized = __bind(this.onWindowResized, this);
+            this.onWindowResized = bind(this.onWindowResized, this);
             return IframeObjectView.__super__.constructor.apply(this, arguments);
         }
 
@@ -1733,8 +1733,8 @@
 
     })(ObjectView);
 
-    Uberbox.YoutubeObjectView = (function(_super) {
-        __extends(YoutubeObjectView, _super);
+    Uberbox.YoutubeObjectView = (function(superClass) {
+        extend(YoutubeObjectView, superClass);
 
         function YoutubeObjectView() {
             return YoutubeObjectView.__super__.constructor.apply(this, arguments);
@@ -1764,8 +1764,8 @@
 
     })(Uberbox.IframeObjectView);
 
-    Uberbox.VimeoObjectView = (function(_super) {
-        __extends(VimeoObjectView, _super);
+    Uberbox.VimeoObjectView = (function(superClass) {
+        extend(VimeoObjectView, superClass);
 
         function VimeoObjectView() {
             return VimeoObjectView.__super__.constructor.apply(this, arguments);
@@ -1789,8 +1789,8 @@
 
     })(Uberbox.IframeObjectView);
 
-    Uberbox.GoogleMapsObjectView = (function(_super) {
-        __extends(GoogleMapsObjectView, _super);
+    Uberbox.GoogleMapsObjectView = (function(superClass) {
+        extend(GoogleMapsObjectView, superClass);
 
         function GoogleMapsObjectView() {
             return GoogleMapsObjectView.__super__.constructor.apply(this, arguments);
@@ -1810,8 +1810,8 @@
 
     })(Uberbox.IframeObjectView);
 
-    Uberbox.SoundcloudObjectView = (function(_super) {
-        __extends(SoundcloudObjectView, _super);
+    Uberbox.SoundcloudObjectView = (function(superClass) {
+        extend(SoundcloudObjectView, superClass);
 
         function SoundcloudObjectView() {
             return SoundcloudObjectView.__super__.constructor.apply(this, arguments);
@@ -1827,8 +1827,8 @@
 
     })(Uberbox.IframeObjectView);
 
-    Uberbox.BandcampObjectView = (function(_super) {
-        __extends(BandcampObjectView, _super);
+    Uberbox.BandcampObjectView = (function(superClass) {
+        extend(BandcampObjectView, superClass);
 
         function BandcampObjectView() {
             return BandcampObjectView.__super__.constructor.apply(this, arguments);
@@ -1844,8 +1844,8 @@
 
     })(Uberbox.IframeObjectView);
 
-    Uberbox.HTMLObjectView = (function(_super) {
-        __extends(HTMLObjectView, _super);
+    Uberbox.HTMLObjectView = (function(superClass) {
+        extend(HTMLObjectView, superClass);
 
         function HTMLObjectView() {
             return HTMLObjectView.__super__.constructor.apply(this, arguments);
@@ -1871,11 +1871,11 @@
 
     })(ObjectView);
 
-    Uberbox.AJAXOBjectView = (function(_super) {
-        __extends(AJAXOBjectView, _super);
+    Uberbox.AJAXOBjectView = (function(superClass) {
+        extend(AJAXOBjectView, superClass);
 
         function AJAXOBjectView() {
-            this.layout = __bind(this.layout, this);
+            this.layout = bind(this.layout, this);
             return AJAXOBjectView.__super__.constructor.apply(this, arguments);
         }
 
@@ -1911,8 +1911,8 @@
 
     })(ObjectView);
 
-    Uberbox.UnknownItemView = (function(_super) {
-        __extends(UnknownItemView, _super);
+    Uberbox.UnknownItemView = (function(superClass) {
+        extend(UnknownItemView, superClass);
 
         function UnknownItemView() {
             return UnknownItemView.__super__.constructor.apply(this, arguments);
@@ -1940,15 +1940,14 @@
 
     })(ObjectView);
 
-    var __bind = function(fn, me) {
+    var bind = function(fn, me) {
             return function() {
                 return fn.apply(me, arguments);
             };
         },
-        __hasProp = {}.hasOwnProperty,
-        __extends = function(child, parent) {
+        extend = function(child, parent) {
             for (var key in parent) {
-                if (__hasProp.call(parent, key)) child[key] = parent[key];
+                if (hasProp.call(parent, key)) child[key] = parent[key];
             }
 
             function ctor() {
@@ -1958,13 +1957,14 @@
             child.prototype = new ctor();
             child.__super__ = parent.prototype;
             return child;
-        };
+        },
+        hasProp = {}.hasOwnProperty;
 
-    Uberbox.Lightbox = (function(_super) {
-        __extends(Lightbox, _super);
+    Uberbox.Lightbox = (function(superClass) {
+        extend(Lightbox, superClass);
 
         function Lightbox() {
-            this.layout = __bind(this.layout, this);
+            this.layout = bind(this.layout, this);
             return Lightbox.__super__.constructor.apply(this, arguments);
         }
 
@@ -2147,12 +2147,12 @@
 
     })(Uberbox.SlidingWindow);
 
-    Uberbox.LightboxItem = (function(_super) {
-        __extends(LightboxItem, _super);
+    Uberbox.LightboxItem = (function(superClass) {
+        extend(LightboxItem, superClass);
 
         function LightboxItem() {
-            this.remove = __bind(this.remove, this);
-            this.layoutContent = __bind(this.layoutContent, this);
+            this.remove = bind(this.remove, this);
+            this.layoutContent = bind(this.layoutContent, this);
             return LightboxItem.__super__.constructor.apply(this, arguments);
         }
 

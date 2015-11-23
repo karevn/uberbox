@@ -21,7 +21,10 @@
 			<i class="uberbox-icon-share"></i>
 			<span class="uberbox-tooltip"><%= obj.model.get('share_tooltip') %></span>
 			<div class="uberbox-share-menu">
-				<% for (service of services) { %>
+				<% var index %>
+				<% for (index = 0; index < services.length; index ++) {
+					service = services[index];
+					%>
 					<a target="_blank" class="uberbox-share-link" href="<%= service.getShareLinkUrl(obj.model) %>" >
 							<% if (service.get('image')) { %>
 								<img src="<%= service.get('image') %>" alt="">

@@ -139,7 +139,11 @@ __p += '\n\t';
 __p += '\n\t\t<div href="#" data-action="share">\n\t\t\t<i class="uberbox-icon-share"></i>\n\t\t\t<span class="uberbox-tooltip">' +
 ((__t = ( obj.model.get('share_tooltip') )) == null ? '' : __t) +
 '</span>\n\t\t\t<div class="uberbox-share-menu">\n\t\t\t\t';
- for (service of services) { ;
+ var index ;
+__p += '\n\t\t\t\t';
+ for (index = 0; index < services.length; index ++) {
+					service = services[index];
+					;
 __p += '\n\t\t\t\t\t<a target="_blank" class="uberbox-share-link" href="' +
 ((__t = ( service.getShareLinkUrl(obj.model) )) == null ? '' : __t) +
 '" >\n\t\t\t\t\t\t\t';
