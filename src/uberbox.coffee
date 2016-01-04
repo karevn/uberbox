@@ -10,11 +10,22 @@ class Uberbox extends Marionette.LayoutView
 		touchstart: 'onTouchStart'
 		touchmove: 'onTouchMove'
 		touchend: 'onTouchEnd'
+		mousedown: 'onMouseDown'
+		mouseup: 'onMouseUp'
+		mousemove: 'onMouseMove'
+	onMouseDown: (e)=>
+		@onTouchStart(e) if @isAndroid()
+	onMouseMove: (e)=>
+		@onTouchMove(e) if @isAndroid()
+	onMouseUp: (e)=>
+		@onMouseMove(e) if @isAndroid()
+	isAndroid: -> navigator.userAgent.toLowerCase().indexOf('android') != -1
 	onTouchStart: (e)=>
-		@touchStartedAt = 
+		@touchStartedAt =
 			left: e.originalEvent.pageX
 			top: e.originalEvent.pageY
 	onTouchMove: (e)=>
+		return unless @touchStartedAt
 		threshold = 10
 		original = e.originalEvent
 		diffX = original.pageX - @touchStartedAt.left
@@ -31,7 +42,7 @@ class Uberbox extends Marionette.LayoutView
 				e.preventDefault()
 			else
 				e.stopPropagation()
-			
+
 	shouldBotherWithTouch: (e)->
 		@getOption('orientation') == 'horizontal' and Math.abs() > threshold or
 			@getOption('orientation') == 'vertical' and Math.abs(e.pageY - @touchStartedAt.top) > threshold
@@ -40,11 +51,13 @@ class Uberbox extends Marionette.LayoutView
 		threshold = 40
 		diffX = original.pageX - @touchStartedAt.left
 		diffY = original.pageY - @touchStartedAt.top
+		console.info(diffX)
 		if @getOption('orientation') == 'horizontal'
 			if diffX > threshold and @lightbox.currentView.currentItemView.model.prev()
 				@lightbox.currentView.currentItemView.swipeBack()
 				@lightbox.currentView.currentItemView.model.prev().activate()
 			if diffX <  -threshold and @lightbox.currentView.currentItemView.model.next()
+				console.info("Swipe back")
 				@lightbox.currentView.currentItemView.swipeBack()
 				@lightbox.currentView.currentItemView.model.next().activate()
 		if @getOption('orientation') == 'vertical'
@@ -55,8 +68,6 @@ class Uberbox extends Marionette.LayoutView
 				@lightbox.currentView.currentItemView.swipeBack()
 				@lightbox.currentView.currentItemView.model.next().activate()
 		@lightbox.currentView.currentItemView.swipeBack()
-				
-			
 		@touchStartedAt = null
 	@contentViewTypes: ->
 		image:
@@ -88,7 +99,7 @@ class Uberbox extends Marionette.LayoutView
 			class: Uberbox.AJAXOBjectView
 		unknown:
 			class: Uberbox.UnknownItemView
-				
+
 	@show: (items, options = {})->
 		options = _.extend({
 			current: 0
@@ -104,9 +115,9 @@ class Uberbox extends Marionette.LayoutView
 			instance = @instances.pop()
 			Uberbox.Utils.exitFullscreen() if Uberbox.Utils.isFullscreen()
 			instance.remove()
-			
-	
-	
+
+
+
 	@getPixelRatio: -> if window.devicePixelRatio > 0 then window.devicePixelRatio else 1
 	@getObjectViewType: (item)=>
 		return @contentViewTypes()[type]['class'] if type = item.get('type')
@@ -156,7 +167,7 @@ class Uberbox extends Marionette.LayoutView
 		$html = jQuery('html')
 		@overflow = $html.css('overflow')
 		$html.css('overflow', 'hidden')
-	onItemActivated: (item)=>	 
+	onItemActivated: (item)=>
 		if @toolbar.currentView
 			@stopListening @toolbar.currentView, 'close'
 		@toolbar.show(new Uberbox.ToolbarView(model: item))
@@ -173,7 +184,7 @@ class Uberbox extends Marionette.LayoutView
 		@$el.find('div.uberbox-loader').remove()
 	showLoader: ->
 		return if @showLoaderTimeout
-		@showLoaderTimeout = setTimeout((=> 
+		@showLoaderTimeout = setTimeout((=>
 			@$el.append(jQuery('<div class="uberbox-loader uberbox-icon-arrows-ccw">'))
 		), 100)
 	remove: ->
