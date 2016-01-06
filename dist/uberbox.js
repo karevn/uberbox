@@ -63,31 +63,8 @@
 
         Uberbox.prototype.ui = {};
 
-        Uberbox.prototype.events = {
-            touchstart: 'onTouchStart',
-            touchmove: 'onTouchMove',
-            touchend: 'onTouchEnd',
-            mousedown: 'onMouseDown',
-            mouseup: 'onMouseUp',
-            mousemove: 'onMouseMove'
-        };
-
-        Uberbox.prototype.onMouseDown = function(e) {
-            if (this.isAndroid()) {
-                return this.onTouchStart(e);
-            }
-        };
-
-        Uberbox.prototype.onMouseMove = function(e) {
-            if (this.isAndroid()) {
-                return this.onTouchMove(e);
-            }
-        };
-
-        Uberbox.prototype.onMouseUp = function(e) {
-            if (this.isAndroid()) {
-                return this.onMouseMove(e);
-            }
+        Uberbox.prototype.onTouchCancel = function(e) {
+            return e.preventDefault();
         };
 
         Uberbox.prototype.isAndroid = function() {
@@ -95,9 +72,10 @@
         };
 
         Uberbox.prototype.onTouchStart = function(e) {
+            e.preventDefault();
             return this.touchStartedAt = {
-                left: e.originalEvent.pageX,
-                top: e.originalEvent.pageY
+                pageX: e.touches[0].pageX,
+                pageY: e.touches[0].pageY
             };
         };
 
@@ -106,14 +84,15 @@
             if (!this.touchStartedAt) {
                 return;
             }
-            threshold = 10;
-            original = e.originalEvent;
-            diffX = original.pageX - this.touchStartedAt.left;
-            diffY = original.pageY - this.touchStartedAt.top;
-            if (this.getOption('orientation') === 'horizontal' && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+            e.preventDefault();
+            threshold = 5;
+            original = e.touches[0];
+            diffX = original.pageX - this.touchStartedAt.pageX;
+            diffY = original.pageY - this.touchStartedAt.pageX;
+            if (this.getOption('orientation') === 'horizontal' && Math.abs(diffX) > threshold) {
                 this.lightbox.currentView.currentItemView.swipeHorizontally(diffX > 0 ? diffX - threshold : diffX + threshold);
                 return e.preventDefault();
-            } else if (this.getOption('orientation') === 'vertical' && Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > threshold) {
+            } else if (this.getOption('orientation') === 'vertical' && Math.abs(diffY) > threshold) {
                 this.lightbox.currentView.currentItemView.swipeVertically(diffY > 0 ? diffY - threshold : diffY + threshold);
                 return e.preventDefault();
             } else {
@@ -132,18 +111,17 @@
 
         Uberbox.prototype.onTouchEnd = function(e) {
             var diffX, diffY, original, threshold;
-            original = e.originalEvent;
-            threshold = 40;
-            diffX = original.pageX - this.touchStartedAt.left;
-            diffY = original.pageY - this.touchStartedAt.top;
-            console.info(diffX);
+            original = e;
+            threshold = 15;
+            original = e.changedTouches[0];
+            diffX = original.pageX - this.touchStartedAt.pageX;
+            diffY = original.pageY - this.touchStartedAt.pageY;
             if (this.getOption('orientation') === 'horizontal') {
                 if (diffX > threshold && this.lightbox.currentView.currentItemView.model.prev()) {
                     this.lightbox.currentView.currentItemView.swipeBack();
                     this.lightbox.currentView.currentItemView.model.prev().activate();
                 }
                 if (diffX < -threshold && this.lightbox.currentView.currentItemView.model.next()) {
-                    console.info("Swipe back");
                     this.lightbox.currentView.currentItemView.swipeBack();
                     this.lightbox.currentView.currentItemView.model.next().activate();
                 }
@@ -279,9 +257,6 @@
             this.onTouchEnd = __bind(this.onTouchEnd, this);
             this.onTouchMove = __bind(this.onTouchMove, this);
             this.onTouchStart = __bind(this.onTouchStart, this);
-            this.onMouseUp = __bind(this.onMouseUp, this);
-            this.onMouseMove = __bind(this.onMouseMove, this);
-            this.onMouseDown = __bind(this.onMouseDown, this);
             Uberbox.__super__.constructor.call(this, _.extend({
                 el: jQuery('<div class="uberbox" />').appendTo(jQuery('body'))
             }, options));
@@ -334,7 +309,10 @@
             jQuery('body').on('keydown', this.onKeyDown);
             $html = jQuery('html');
             this.overflow = $html.css('overflow');
-            return $html.css('overflow', 'hidden');
+            $html.css('overflow', 'hidden');
+            this.el.addEventListener('touchstart', this.onTouchStart, true);
+            this.el.addEventListener('touchend', this.onTouchEnd, true);
+            return this.el.addEventListener('touchmove', this.onTouchMove, true);
         };
 
         Uberbox.prototype.onItemActivated = function(item) {
@@ -391,6 +369,9 @@
             this.ui.overlay.removeClass('visible');
             jQuery('body').off('keydown.uberbox', this.onKeyDown);
             jQuery('html').css('overflow', this.overflow);
+            this.el.removeEventListener('touchstart', this.onTouchStart, true);
+            this.el.removeEventListener('touchend', this.onTouchEnd, true);
+            this.el.removeEventListener('touchmove', this.onTouchMove, true);
             return setTimeout(((function(_this) {
                 return function() {
                     return _this.ui.overlay.remove();
@@ -2269,13 +2250,17 @@
 
         LightboxItem.prototype.swipeVertically = function(amount) {
             return this.$el.css({
-                transform: "translate(0, " + amount + "px)"
+                transform: "translate(0, " + amount + "px)",
+                '-webkit-transform': "translate(0, " + amount + "px)",
+                '-moz-transform': "translate(0, " + amount + "px)"
             });
         };
 
         LightboxItem.prototype.swipeHorizontally = function(amount) {
             return this.$el.css({
-                transform: "translate(" + amount + "px, 0)"
+                transform: "translate(" + amount + "px, 0)",
+                '-webkit-transform': "translate(" + amount + "px, 0)",
+                '-moz-transform': "translate(" + amount + "px, 0)"
             });
         };
 

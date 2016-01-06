@@ -7,7 +7,7 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 	events:
 		'click @ui.next': (-> @currentItemView.model.next().activate() unless @ui.next.is('.uberbox-disabled'))
 		'click @ui.prev': (-> @currentItemView.model.prev().activate() unless @ui.prev.is('.uberbox-disabled'))
-	
+
 	getChildViewClass: -> Uberbox.LightboxItem
 	onShow: ->
 		super
@@ -56,8 +56,8 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 			current = @currentItemView = @createChildView(item)
 			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
 			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
-			
-			
+
+
 	scrollPrev: (item)->
 		@nextItemView.remove() if @nextItemView
 		if @currentItemView.model.isNext(item)
@@ -78,15 +78,15 @@ class Uberbox.Lightbox extends Uberbox.SlidingWindow
 			current = @currentItemView = @createChildView(item)
 			@nextItemView = @createChildView(item.next(), prev: @currentItemView) if item.next()
 			@prevItemView = @createChildView(item.prev(), next: @currentItemView) if item.prev()
-			
-			
-	layout: => 
+
+
+	layout: =>
 		return unless @$el.is(':visible')
 		@currentItemView.layout()
 		_.defer =>
 			@nextItemView.layout() if @nextItemView
 			@prevItemView.layout() if @prevItemView
-		
+
 class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 	defaults:
 		description:
@@ -109,7 +109,7 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		width = @$el.width()
 		height = @$el.height()
 		return if width == 0 or height == 0
-		if @model.get('description_style')== 'right' 
+		if @model.get('description_style')== 'right'
 			@layoutWithDescriptionAtRight()
 		else if @model.get('description_style') == 'mini'
 			@layoutWithMiniDescription()
@@ -125,8 +125,16 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		return @object.currentView.$el.width() if @model.get('description_style') == 'bottom'
 		return @object.currentView.getWidth() if @model.get('description_style') == 'mini'
 		@ui.content.width()
-	swipeVertically: (amount)->  @$el.css(transform: "translate(0, #{amount}px)")
-	swipeHorizontally: (amount)-> @$el.css(transform: "translate(#{amount}px, 0)")
+	swipeVertically: (amount)->  @$el.css(
+		transform: "translate(0, #{amount}px)"
+		'-webkit-transform': "translate(0, #{amount}px)"
+		'-moz-transform': "translate(0, #{amount}px)"
+		)
+	swipeHorizontally: (amount)-> @$el.css(
+		transform: "translate(#{amount}px, 0)"
+		'-webkit-transform': "translate(#{amount}px, 0)"
+		'-moz-transform': "translate(#{amount}px, 0)"
+		)
 	swipeBack: -> @$el.css(transform: "translate(0, 0)")
 	layoutWithDescriptionAtBottom: ->
 		unless @object.currentView.supportsOversizing
@@ -178,7 +186,7 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 	fitWidth: ->
 		@$el.addClass('uberbox-fit-width').removeClass('uberbox-fit-height uberbox-natural-fit uberbox-fit-oversized uberbox-fit-height-oversized uberbox-fit-width-oversized')
 
-	fitNaturally: -> 
+	fitNaturally: ->
 		@$el.removeClass('uberbox-fit-width uberbox-fit-height uberbox-natural-fit uberbox-fit-height-oversized uberbox-fit-width-oversized uberbox-fit-oversized').addClass('uberbox-natural-fit')
 	fitOversized: ->
 		@$el.addClass('uberbox-fit-oversized').removeClass('uberbox-fit-width uberbox-fit-height')
@@ -233,4 +241,4 @@ class Uberbox.LightboxItem extends Uberbox.SlidingWindowItem
 		if @getOption('prev')
 			@getOption('prev').options.next = null
 		setTimeout((=>super()), 600)
-	
+
