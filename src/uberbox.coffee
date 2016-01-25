@@ -10,6 +10,9 @@ class Uberbox extends Marionette.LayoutView
   onTouchCancel: (e)-> e.preventDefault()
   isAndroid: -> navigator.userAgent.toLowerCase().indexOf('android') != -1
   onTouchStart: (e)=>
+    if jQuery(e.target).closest('.uberbox-toolbar-wrapper, .uberbox-prev,
+      .uberbox-next').length > 0
+      return
     e.preventDefault()
     @touchStartedAt = {
       pageX: e.touches[0].pageX
@@ -160,9 +163,9 @@ class Uberbox extends Marionette.LayoutView
     $html = jQuery('html')
     @overflow = $html.css('overflow')
     $html.css('overflow', 'hidden')
-    @el.addEventListener('touchstart', @onTouchStart, true)
-    @el.addEventListener('touchend', @onTouchEnd, true)
-    @el.addEventListener('touchmove', @onTouchMove, true)
+    @el.addEventListener('touchstart', @onTouchStart)
+    @el.addEventListener('touchend', @onTouchEnd)
+    @el.addEventListener('touchmove', @onTouchMove)
   onItemActivated: (item)=>
     if @toolbar.currentView
       @stopListening @toolbar.currentView, 'close'
@@ -191,9 +194,9 @@ class Uberbox extends Marionette.LayoutView
     @ui.overlay.removeClass('visible')
     jQuery('body').off 'keydown.uberbox', @onKeyDown
     jQuery('html').css('overflow', @overflow)
-    @el.removeEventListener('touchstart', @onTouchStart, true)
-    @el.removeEventListener('touchend', @onTouchEnd, true)
-    @el.removeEventListener('touchmove', @onTouchMove, true)
+    @el.removeEventListener('touchstart', @onTouchStart)
+    @el.removeEventListener('touchend', @onTouchEnd)
+    @el.removeEventListener('touchmove', @onTouchMove)
     setTimeout((=> @ui.overlay.remove()), 600)
   onKeyDown: (e)=>
     if e.which == 27
